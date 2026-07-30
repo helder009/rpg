@@ -3,453 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG: Sítio SS — Painel de Fichas</title>
+<title>RPG: Sítio SS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&family=Vollkorn:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&family=Vollkorn:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-  :root{--papel:#e6d9b8;--papel-esc:#d8c69c;--tinta:#211a12;--tinta-suave:#4a3d2c;--brasa:#9e2b16;--brasa-esc:#6e1d0f;--mata:#42542f;--ocre:#b5842f;--linha:rgba(33,26,18,.28)}
+  :root{--papel:#e6d9b8;--papel-esc:#d8c69c;--tinta:#211a12;--tinta-suave:#4a3d2c;--brasa:#9e2b16;--brasa-esc:#6e1d0f;--mata:#42542f;--linha:rgba(33,26,18,.28)}
   *{box-sizing:border-box}
-  body{margin:0;color:var(--tinta);font-family:"Vollkorn",Georgia,serif;font-size:16px;line-height:1.5;
-    background:var(--papel);background-image:repeating-linear-gradient(0deg,rgba(120,90,50,.03) 0 2px,transparent 2px 4px)}
-  .wrap{max-width:960px;margin:0 auto;padding:18px}
-  h1{font-family:"Rye",serif;font-weight:400;font-size:clamp(1.6rem,6vw,2.6rem);margin:0;line-height:1}
-  .eyebrow{font-family:"Special Elite",monospace;text-transform:uppercase;letter-spacing:.24em;font-size:.68rem;color:var(--brasa-esc)}
-  header.top{border:3px solid var(--tinta);background:var(--papel-esc);padding:16px 18px;box-shadow:6px 6px 0 var(--tinta);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-  .modo{font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;padding:4px 10px;border:2px solid var(--tinta)}
-  .modo.jogador{background:var(--papel);color:var(--tinta-suave)}
-  .modo.mestre{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
-  .barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
-  button{font-family:"Special Elite",monospace;font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:2px solid var(--tinta);background:var(--papel-esc);color:var(--tinta);padding:7px 12px;box-shadow:2px 2px 0 var(--tinta)}
-  button:hover{background:var(--papel)}button:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--tinta)}
-  button.brasa{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
-  button.mini{padding:3px 8px;font-size:.72rem;box-shadow:1px 1px 0 var(--tinta)}
-  button.menu-btn{padding:9px 16px;font-size:.82rem}
-  .sync{font-family:"Special Elite",monospace;font-size:.7rem;color:var(--tinta-suave);margin-left:auto}
-  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#b5842f;margin-right:5px;vertical-align:middle}
-  .dot.on{background:#4a7a2e}.dot.off{background:#9e2b16}
-  .aviso{border:2px dashed var(--brasa);background:rgba(158,43,22,.07);padding:12px 15px;font-size:.9rem;margin-bottom:14px}
-  .aviso b{color:var(--brasa-esc)}
-  details.setup{margin-top:8px}
-  details.setup summary{cursor:pointer;font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--brasa-esc)}
-  details.setup ol{margin:8px 0 0;padding-left:1.3em}details.setup li{margin:.3em 0}
-  code{background:rgba(33,26,18,.1);padding:1px 5px;font-family:"Special Elite",monospace;font-size:.85em}
-  .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
-  .card{border:2.5px solid var(--tinta);background:var(--papel-esc);box-shadow:5px 5px 0 var(--tinta);border-left-width:8px;display:flex;flex-direction:column}
-  .card .cab{display:flex;justify-content:space-between;align-items:baseline;padding:10px 14px 6px;border-bottom:2px solid var(--tinta)}
-  .card .nome{font-family:"Rye",serif;font-size:1.3rem;line-height:.9}
-  .card .cl{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--brasa)}
-  .card .corpo{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-  .hp{display:flex;align-items:center;gap:8px;justify-content:center}
-  .hp .valor{font-family:"Rye",serif;font-size:2rem;line-height:1;color:var(--brasa)}
-  .hp .valor small{font-size:1rem;color:var(--tinta-suave)}
-  .barra-hp{height:10px;border:2px solid var(--tinta);background:var(--papel);overflow:hidden}
-  .barra-hp i{display:block;height:100%;transition:width .2s,background .2s}
-  .hpbtns{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
-  .duo{display:flex;gap:8px}.campo{flex:1}
-  .campo label{display:block;font-family:"Special Elite",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tinta-suave);margin-bottom:2px}
-  .campo .ro{font-weight:700}
-  input,textarea{width:100%;font-family:inherit;font-size:.92rem;border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);padding:5px 7px}
-  input[type=number]{text-align:center}
-  textarea{resize:vertical;min-height:38px}
-  input:disabled,textarea:disabled{background:transparent;border-color:var(--linha);color:var(--tinta);cursor:default;opacity:1}
-  .num-inline{width:52px}
-  .togglefull{width:100%;text-align:center;margin-top:2px}
-  .fichafull{border-top:2px dashed var(--linha);margin-top:2px;padding-top:10px;display:none;flex-direction:column;gap:8px}
-  .fichafull.open{display:flex}
-  .attrs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
-  .attr{text-align:center;border:1px solid var(--linha);padding:4px 0;background:rgba(255,255,255,.14)}
-  .attr b{display:block;font-family:"Special Elite",monospace;font-size:.55rem;color:var(--brasa-esc)}
-  .attr .n{font-weight:700;font-size:.9rem}.attr .m{font-size:.66rem;color:var(--tinta-suave)}
-  .info-line{font-size:.86rem}
-  .info-line .rot{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--brasa-esc);display:block}
-  .assin{border-top:1px dashed var(--linha);padding-top:6px}
-  .assin .tag{display:inline-block;background:var(--brasa);color:var(--papel);font-family:"Special Elite",monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;padding:2px 7px;margin-bottom:3px}
-  .assin b{font-family:"Rye",serif;font-weight:400;font-size:1rem}
-  /* painéis extras */
-  .painel-extra{border:2.5px solid var(--tinta);background:var(--papel-esc);box-shadow:5px 5px 0 var(--tinta);margin-top:16px;padding:12px 14px}
-  .painel-extra h3{font-family:"Rye",serif;font-weight:400;font-size:1.15rem;margin:0 0 8px;display:flex;align-items:center;gap:8px}
-  .tagm{font-family:"Special Elite",monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.1em;background:var(--brasa);color:var(--papel);padding:2px 7px}
-  #notasMestre{width:100%;min-height:92px;font-family:inherit;font-size:.98rem;line-height:1.5;border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);padding:8px 10px;resize:vertical}
-  #notasMestre:disabled{background:transparent;opacity:1;cursor:default}
-  .canvas-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
-  .canvas-ctrl label{font-family:"Special Elite",monospace;font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta-suave)}
-  .swatch{width:26px;height:26px;border:2px solid var(--tinta);padding:0;cursor:pointer;box-shadow:none}
-  .canvas-wrap{border:2px solid var(--tinta);background:#f3ead0;line-height:0}
-  #tela{width:100%;height:auto;display:block;touch-action:none}
-  #canvasNota{font-size:.8rem;color:var(--tinta-suave);margin-top:5px}
-  .flash{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--tinta);color:var(--papel);font-family:"Special Elite",monospace;font-size:.74rem;padding:8px 16px;box-shadow:3px 3px 0 var(--brasa);opacity:0;transition:opacity .25s;pointer-events:none;z-index:20}
-  .flash.on{opacity:1}
+  body{margin:0;min-height:100vh;color:var(--tinta);font-family:"Vollkorn",Georgia,serif;font-size:17px;line-height:1.55;
+    display:flex;align-items:center;justify-content:center;padding:22px;
+    background:var(--papel);
+    background-image:repeating-linear-gradient(0deg,rgba(120,90,50,.03) 0 2px,transparent 2px 4px),radial-gradient(circle at 18% 8%,rgba(0,0,0,.05),transparent 42%),radial-gradient(circle at 85% 88%,rgba(0,0,0,.07),transparent 45%)}
+  .capa{max-width:760px;width:100%;border:3px solid var(--tinta);background:var(--papel-esc);box-shadow:10px 10px 0 var(--tinta);position:relative;padding:38px 30px 30px;text-align:center}
+  .capa::before{content:"";position:absolute;inset:9px;border:1px solid var(--linha);pointer-events:none}
+  .selo{width:120px;height:120px;display:block;margin:0 auto 8px}
+  .eyebrow{font-family:"Special Elite",monospace;text-transform:uppercase;letter-spacing:.26em;font-size:.72rem;color:var(--brasa-esc)}
+  h1{font-family:"Rye",serif;font-weight:400;font-size:clamp(2.2rem,8vw,4rem);line-height:.95;margin:.12em 0 .05em}
+  .fio{width:58%;height:1px;background:var(--tinta);margin:14px auto;position:relative}
+  .fio::before,.fio::after{content:"◆";position:absolute;top:-.7em;color:var(--brasa)}
+  .fio::before{left:-14px}.fio::after{right:-14px}
+  .lume{max-width:560px;margin:0 auto 6px;font-style:italic;color:var(--tinta-suave)}
+  .portas{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:26px 0 8px}
+  @media (max-width:560px){.portas{grid-template-columns:1fr}}
+  .porta{display:block;text-decoration:none;color:var(--tinta);border:2.5px solid var(--tinta);background:var(--papel);
+    box-shadow:5px 5px 0 var(--tinta);padding:20px 16px;transition:transform .06s,box-shadow .06s,background .1s;text-align:left}
+  .porta:hover{background:#efe6cb}
+  .porta:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--tinta)}
+  .porta.mestre{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc);box-shadow:5px 5px 0 var(--brasa-esc)}
+  .porta.mestre:hover{background:#b23319}
+  .porta .ic{font-size:2rem;line-height:1}
+  .porta .tit{font-family:"Rye",serif;font-size:1.4rem;margin:6px 0 4px}
+  .porta .desc{font-size:.9rem;line-height:1.4}
+  .porta.mestre .desc{color:#f3e6cf}
+  .porta .seta{font-family:"Special Elite",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;margin-top:8px;display:inline-block}
+  .rodape{margin-top:14px;font-family:"Special Elite",monospace;font-size:.72rem;letter-spacing:.06em;color:var(--tinta-suave)}
+  .rodape a{color:var(--brasa-esc);text-decoration:none;border-bottom:1px dotted var(--brasa-esc)}
+  .mini-porta{font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;border:2px solid var(--tinta);background:var(--papel-esc);color:var(--tinta-suave);padding:7px 16px;box-shadow:2px 2px 0 var(--tinta);margin:8px 0 2px}
+  .mini-porta:hover{background:var(--papel)}
+  .mini-porta:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--tinta)}
 </style>
 </head>
 <body>
-<div class="wrap">
+  <main class="capa">
+    <svg class="selo" viewBox="0 0 100 100" fill="none" stroke="#211a12" stroke-width="3">
+      <rect x="18" y="30" width="64" height="52" fill="#d8c69c" stroke="#211a12"/>
+      <path d="M18 30 L50 12 L82 30" fill="#9e2b16" stroke="#211a12"/>
+      <rect x="42" y="54" width="16" height="28" fill="#211a12"/>
+      <rect x="26" y="42" width="12" height="12" fill="#211a12"/><rect x="62" y="42" width="12" height="12" fill="#211a12"/>
+      <text x="50" y="26" font-family="monospace" font-size="12" fill="#211a12" text-anchor="middle" font-weight="bold">SS</text>
+    </svg>
+    <div class="eyebrow">Aventura na Velha Mata</div>
+    <h1>RPG: Sítio SS</h1>
+    <div class="fio"></div>
+    <p class="lume">Uma carroça na beira da estrada, um portão de ferro com duas letras e um sítio velho que não quer visita. Escolha por onde entrar.</p>
 
-  <header class="top">
-    <div>
-      <div class="eyebrow">Painel de fichas · Firebase · tempo real</div>
-      <h1>RPG: Sítio SS</h1>
+    <div class="portas">
+      <a class="porta mestre" href="painel-fichas-firebase.html">
+        <div class="ic">✏️</div>
+        <div class="tit">Painel do Mestre</div>
+        <div class="desc">Fichas ao vivo, rolador de dados, anotações e o quadro de desenho compartilhado.</div>
+        <span class="seta">Entrar ▸</span>
+      </a>
+      <a class="porta" href="guia-do-jogador.html">
+        <div class="ic">📖</div>
+        <div class="tit">Guia do Jogador</div>
+        <div class="desc">A história até aqui, as regras rápidas e as fichas do grupo, atualizadas em tempo real.</div>
+        <span class="seta">Abrir ▸</span>
+      </a>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <button id="btnMestre" class="brasa">🔑 Entrar como Mestre</button>
-      <span id="modoBadge" class="modo jogador">Modo Jogador</span>
+
+    <button class="mini-porta" onclick="abrirMestre()">🔒 Guia do Mestre</button>
+
+    <div class="rodape">
+      que a noite seja longa e a estrada, mais ainda &nbsp;·&nbsp; <a href="https://www.google.com/search?q=roll+a+d20" target="_blank" rel="noopener">🎲 D20 online</a>
     </div>
-  </header>
-
-  <div id="avisoBox"></div>
-
-  <div class="barra">
-    <button class="menu-btn" onclick="window.open('guia-do-jogador.html','_blank')">📖 Guia do Jogador ↗</button>
-    <button class="menu-btn" onclick="window.open('https://www.google.com/search?q=roll+a+d20','_blank')">🎲 D20 online ↗</button>
-    <button id="btnPin" style="display:none" class="mini">Trocar PIN</button>
-    <button id="btnReset" style="display:none" class="mini">Zerar painel</button>
-    <span id="sync" class="sync"><span class="dot"></span>iniciando…</span>
-  </div>
-
-  <div id="grade" class="grade"></div>
-
-  <section class="painel-extra">
-    <h3>Anotações do Mestre <span class="tagm">ao vivo</span></h3>
-    <textarea id="notasMestre" placeholder="—" disabled></textarea>
-  </section>
-
-  <section class="painel-extra">
-    <h3>Quadro do Mestre <span class="tagm">ao vivo</span></h3>
-    <div id="canvasCtrl" class="canvas-ctrl" style="display:none">
-      <label>Cor</label>
-      <button class="swatch" style="background:#211a12" onclick="setCor('#211a12')"></button>
-      <button class="swatch" style="background:#9e2b16" onclick="setCor('#9e2b16')"></button>
-      <button class="swatch" style="background:#2f6b3a" onclick="setCor('#2f6b3a')"></button>
-      <button class="swatch" style="background:#2b5a8c" onclick="setCor('#2b5a8c')"></button>
-      <button class="swatch" style="background:#b5842f" onclick="setCor('#b5842f')"></button>
-      <input type="color" id="corPicker" value="#211a12" onchange="setCor(this.value)" style="width:34px;height:28px;padding:0;border:2px solid var(--tinta);box-shadow:none;cursor:pointer">
-      <label>Traço</label>
-      <input type="range" id="brush" min="1" max="22" value="3" style="width:90px">
-      <button class="mini" id="btnBorracha" onclick="toggleBorracha()">Borracha</button>
-      <button class="mini brasa" onclick="limparTela()">Limpar</button>
-    </div>
-    <div class="canvas-wrap"><canvas id="tela" width="900" height="520"></canvas></div>
-    <div id="canvasNota">Somente o Mestre desenha; vocês veem em tempo real.</div>
-  </section>
-
-</div>
-
-<div id="flash" class="flash"></div>
-
-<script>
-/* ============================================================
-   Configuração do Firebase (projeto rpg-deberg)
-   ============================================================ */
-const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyAt-PlL34BpKlKynoOd2qU4Ll6dOFQpLkE",
-  authDomain:        "rpg-deberg.firebaseapp.com",
-  databaseURL:       "https://rpg-deberg-default-rtdb.firebaseio.com",
-  projectId:         "rpg-deberg",
-  storageBucket:     "rpg-deberg.firebasestorage.app",
-  messagingSenderId: "493974534263",
-  appId:             "1:493974534263:web:e9bd28ee5d3955b601ee72",
-  measurementId:     "G-G9ZHDMPV4P"
-};
-let ROOM = "sitio-ss";
-/* ============================================================ */
-
-const PADRAO = {
-  pin: "DEBERG",
-  updated: 0,
-  updatedBy: "",
-  notasMestre: "",
-  chars: [
-    {
-      id:"duda", nome:"Duda", cl:"Druida · Elfa", cor:"#42542f",
-      pvMax:12, pvAtual:12, ca:14, cond:"", notas:"",
-      attrs:{FOR:8,DES:15,CON:13,INT:12,SAB:16,CAR:10},
-      info:[
-        {rot:"Sem armas", txt:"Luta com a magia da natureza — brasa, cipós e cura."},
-        {rot:"Magia (SAB · CD 13)", txt:"Truques: Produzir Chama, Orientação. Nível 1 (2/dia): Curar Ferimentos, Emaranhar."},
-        {rot:"Traços de elfa", txt:"Visão no escuro · vantagem contra encantos · não dorme (transe)."}
-      ],
-      assin:{nome:"Toque da Mata", txt:"cura 1d8+3 PV num aliado."}
-    },
-    {
-      id:"vlad", nome:"Vlad", cl:"Guerreiro · Humano", cor:"#4a3d2c",
-      pvMax:14, pvAtual:14, ca:16, cond:"", notas:"Sem arma no momento.",
-      attrs:{FOR:16,DES:12,CON:14,INT:10,SAB:13,CAR:12},
-      info:[
-        {rot:"Sem arma ainda", txt:"Soco 1d4+3 ou improvisado. Com uma lâmina → ataque +5, dano 1d8+3."},
-        {rot:"Fôlego", txt:"1x/descanso: recupera 1d10+1 PV (ação bônus). Estilo Defesa (+1 CA incluso)."}
-      ],
-      assin:{nome:"Língua dos Corvos", txt:"1x/dia manda corvos espionar e trazer uma pista."}
-    },
-    {
-      id:"matheus", nome:"Matheus", cl:"Bárbaro · Humano", cor:"#9e2b16",
-      pvMax:16, pvAtual:16, ca:14, cond:"", notas:"Facão do Espantalho.",
-      attrs:{FOR:16,DES:14,CON:15,INT:8,SAB:12,CAR:10},
-      info:[
-        {rot:"Arma", txt:"Facão do Espantalho — ataque +5, dano 1d6+3."},
-        {rot:"Fúria (2x/dia)", txt:"+2 no dano corpo a corpo, resistência a dano físico, vantagem em testes de FOR."}
-      ],
-      assin:{nome:"Fúria do Facão", txt:"entra em Fúria e desce o facão sem dó."}
-    },
-    {
-      id:"caio", nome:"Caio", cl:"Ladino · Humano", cor:"#b5842f",
-      pvMax:12, pvAtual:12, ca:14, cond:"", notas:"Sem arma no momento.",
-      attrs:{FOR:10,DES:16,CON:13,INT:14,SAB:12,CAR:13},
-      info:[
-        {rot:"Sem arma ainda", txt:"Com uma adaga ou arco, liga o Ataque Furtivo (+1d6)."},
-        {rot:"Especialista", txt:"Furtividade e Ladinagem (fechaduras, armadilhas)."},
-        {rot:"Mochila", txt:"Corda de 15m · lampião · ferramentas de ladrão."}
-      ],
-      assin:{nome:"Nas Sombras", txt:"some no escuro e reaparece com um golpe furtivo."}
-    },
-    {
-      id:"thais", nome:"Thais", cl:"Feiticeira · Humana", cor:"#6e1d0f",
-      pvMax:12, pvAtual:12, ca:12, cond:"", notas:"",
-      attrs:{FOR:8,DES:14,CON:13,INT:12,SAB:10,CAR:16},
-      info:[
-        {rot:"Magia (CAR · CD 13)", txt:"Truques: Raio de Fogo (1d10), Prestidigitação. Nível 1 (2/dia): Mísseis Mágicos, Sono."},
-        {rot:"Sangue ancestral", txt:"Vantagem pra reconhecer criaturas do folclore. 1x/dia pede orientação a um espírito."}
-      ],
-      assin:{nome:"Mísseis Mágicos", txt:"3 dardos de 1d4+1 que sempre acertam."}
-    },
-    {
-      id:"edu", nome:"Edu", cl:"Guerreiro · Humano", cor:"#7a5a2e",
-      pvMax:14, pvAtual:14, ca:14, cond:"", notas:"Sem facas no momento.",
-      attrs:{FOR:16,DES:13,CON:15,INT:10,SAB:12,CAR:10},
-      info:[
-        {rot:"Sem facas no momento", txt:"Improvisa com o que tiver à mão até achar uma lâmina."},
-        {rot:"Facas e cortantes", txt:"Mestre da lâmina — faca +5, 1d4+3 (arremessa 6/18m). Estilo Duas Armas: 2 ataques de faca por ação."},
-        {rot:"Homem de fé", txt:"Terço e crucifixo. Reza Forte 1x/dia: acalma criatura do folclore (Religião CD 13) ou dá vantagem contra o medo. Fôlego 1x/descanso (1d10+1 PV)."}
-      ],
-      assin:{nome:"Corte em Cruz", txt:"dois talhos cruzados; contra o amaldiçoado ou do outro mundo, +1d6 por acerto."}
+  </main>
+  <script>
+    // acesso ao guia do mestre: valida pelo hash da senha e só então revela o arquivo
+    const MH="1e378b88e5d85e7b7328a0b3d4b945b430fc0115821d23c14361cf101ecf0441";
+    const ME="WwdBFVhdDF9LHRYMHg==";
+    async function sha256hex(str){
+      const buf=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
     }
-  ]
-};
-
-let state = JSON.parse(JSON.stringify(PADRAO));
-let gm = false;
-const abertos = new Set();
-let db=null, salaRef=null, desenhoRef=null, online=false;
-
-function mod(v){ const n=Math.floor((v-10)/2); return (n>=0?"+":"")+n; }
-function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
-function flash(msg){ const f=document.getElementById("flash"); f.textContent=msg; f.classList.add("on"); clearTimeout(f._t); f._t=setTimeout(()=>f.classList.remove("on"),1600); }
-function temConfig(){ const c=FIREBASE_CONFIG; return c&&c.databaseURL&&c.databaseURL.indexOf("COLE_AQUI")<0&&c.apiKey&&c.apiKey.indexOf("COLE_AQUI")<0; }
-function editando(){ const a=document.activeElement; return a&&a.classList&&a.classList.contains("live"); }
-
-/* ---------- Firebase ---------- */
-function initFirebase(){
-  if(!temConfig()){ mostraSetup(); return; }
-  try{
-    firebase.initializeApp(FIREBASE_CONFIG);
-    db = firebase.database();
-    salaRef = db.ref("salas/"+ROOM);
-    salaRef.on("value", snap=>{
-      const v=snap.val();
-      if(!v){ saveRemote(); return; }
-      if(editando()) return;
-      aplicaRemoto(v); render();
-    }, err=>{ console.error(err); online=false; atualizaSync(); flash("Erro de conexão"); });
-    // quadro de desenho
-    desenhoRef = db.ref("salas/"+ROOM+"/quadro");
-    desenhoRef.on("child_added", snap=> drawStroke(snap.val()));
-    desenhoRef.on("value", snap=>{ if(!snap.exists()) clearTela(); });
-    online=true;
-    document.getElementById("avisoBox").innerHTML="";
-    atualizaSync();
-  }catch(e){ console.error(e); online=false; mostraSetup(); }
-}
-function mostraSetup(){
-  online=false; atualizaSync();
-  document.getElementById("avisoBox").innerHTML =
-   '<div class="aviso"><b>Modo local (sem sincronizar).</b> Aqui na prévia o Firebase pode ser bloqueado — publicado no GitHub ele conecta sozinho. As fichas, anotações e o quadro funcionam localmente enquanto isso.</div>';
-}
-async function saveRemote(){
-  state.updated=Date.now(); state.updatedBy=gm?"Mestre":"";
-  if(!online){ atualizaSync(); return; }
-  const payload={ pin:state.pin, updated:state.updated, updatedBy:state.updatedBy, notasMestre:state.notasMestre||"", chars:{} };
-  state.chars.forEach(c=>{ payload.chars[c.id]={pvAtual:c.pvAtual,pvMax:c.pvMax,ca:c.ca,cond:c.cond||"",notas:c.notas||""}; });
-  try{ await salaRef.update(payload); }catch(e){ console.error(e); flash("Erro ao salvar"); }
-  atualizaSync();
-}
-function aplicaRemoto(r){
-  if(!r) return;
-  if(typeof r.pin==="string") state.pin=r.pin;
-  state.updated=r.updated||0; state.updatedBy=r.updatedBy||"";
-  if(typeof r.notasMestre==="string") state.notasMestre=r.notasMestre;
-  if(r.chars){
-    state.chars.forEach(c=>{
-      const rc=r.chars[c.id]; if(!rc) return;
-      if(typeof rc.pvAtual==="number") c.pvAtual=rc.pvAtual;
-      if(typeof rc.pvMax==="number")  c.pvMax =rc.pvMax;
-      if(typeof rc.ca==="number")     c.ca    =rc.ca;
-      if(typeof rc.cond==="string")   c.cond  =rc.cond;
-      if(typeof rc.notas==="string")  c.notas =rc.notas;
-    });
-  }
-  syncNotasUI();
-}
-function atualizaSync(){
-  const s=document.getElementById("sync");
-  if(!temConfig()){ s.innerHTML='<span class="dot off"></span>modo local'; return; }
-  if(!online){ s.innerHTML='<span class="dot off"></span>sem conexão'; return; }
-  let q="pronto";
-  if(state.updated){ const seg=Math.round((Date.now()-state.updated)/1000); q=seg<5?"agora":seg<60?"há "+seg+"s":"há "+Math.round(seg/60)+"min"; }
-  s.innerHTML='<span class="dot on"></span>sala “'+ROOM+'” · '+q+(state.updatedBy?(" · "+state.updatedBy):"");
-}
-
-/* ---------- modo / fichas ---------- */
-function setModo(){
-  const b=document.getElementById("modoBadge");
-  b.className="modo "+(gm?"mestre":"jogador"); b.textContent=gm?"Modo Mestre":"Modo Jogador";
-  document.getElementById("btnMestre").textContent=gm?"🚪 Sair do Modo Mestre":"🔑 Entrar como Mestre";
-  document.getElementById("btnPin").style.display  = gm?"":"none";
-  document.getElementById("btnReset").style.display= gm?"":"none";
-  atualizaExtra();
-}
-function ajustaHP(id,delta){
-  const c=state.chars.find(x=>x.id===id);
-  c.pvAtual=Math.max(0,Math.min(c.pvMax,c.pvAtual+delta));
-  render(); saveRemote();
-}
-function toggleFicha(id){
-  const el=document.getElementById("full-"+id), btn=document.getElementById("btnfull-"+id);
-  if(abertos.has(id)){ abertos.delete(id); el.classList.remove("open"); btn.textContent="▸ Ficha completa"; }
-  else { abertos.add(id); el.classList.add("open"); btn.textContent="▾ Ficha completa"; }
-}
-function render(){
-  const g=document.getElementById("grade"); g.innerHTML="";
-  state.chars.forEach(c=>{
-    const ratio=c.pvMax>0?c.pvAtual/c.pvMax:0;
-    const cor=ratio>0.5?"#42542f":ratio>0.25?"#b5842f":"#9e2b16";
-    const dis=gm?"":"disabled", aberto=abertos.has(c.id);
-    const attrsHTML=["FOR","DES","CON","INT","SAB","CAR"].map(k=>`<div class="attr"><b>${k}</b><span class="n">${c.attrs[k]}</span><span class="m">${mod(c.attrs[k])}</span></div>`).join("");
-    const infoHTML=c.info.map(i=>`<div class="info-line"><span class="rot">${i.rot}</span>${i.txt}</div>`).join("");
-    const card=document.createElement("div");
-    card.className="card"; card.style.borderLeftColor=c.cor;
-    card.innerHTML=`
-      <div class="cab"><span class="nome">${c.nome}</span><span class="cl">${c.cl}</span></div>
-      <div class="corpo">
-        <div class="hp"><span class="valor">${c.pvAtual}<small> / ${c.pvMax}</small></span></div>
-        <div class="barra-hp"><i style="width:${Math.round(ratio*100)}%;background:${cor}"></i></div>
-        ${gm?`<div class="hpbtns">
-          <button class="mini" onclick="ajustaHP('${c.id}',-5)">-5</button>
-          <button class="mini" onclick="ajustaHP('${c.id}',-1)">-1</button>
-          <button class="mini" onclick="ajustaHP('${c.id}',1)">+1</button>
-          <button class="mini" onclick="ajustaHP('${c.id}',5)">+5</button>
-          <button class="mini brasa" onclick="ajustaHP('${c.id}',999)">cheio</button>
-        </div>`:``}
-        <div class="duo">
-          <div class="campo"><label>PV máx</label>${gm?`<input class="live num-inline" type="number" value="${c.pvMax}" data-id="${c.id}" data-f="pvMax">`:`<div class="ro">${c.pvMax}</div>`}</div>
-          <div class="campo"><label>CA</label>${gm?`<input class="live num-inline" type="number" value="${c.ca}" data-id="${c.id}" data-f="ca">`:`<div class="ro">${c.ca}</div>`}</div>
-        </div>
-        <div class="campo"><label>Condições</label><input class="live" type="text" value="${esc(c.cond)}" placeholder="${gm?'ex: envenenado, caído…':'—'}" data-id="${c.id}" data-f="cond" ${dis}></div>
-        <div class="campo"><label>Anotações</label><textarea class="live" data-id="${c.id}" data-f="notas" ${dis} placeholder="${gm?'itens, pistas…':''}">${esc(c.notas)}</textarea></div>
-        <button class="mini togglefull" id="btnfull-${c.id}" onclick="toggleFicha('${c.id}')">${aberto?'▾':'▸'} Ficha completa</button>
-        <div class="fichafull ${aberto?'open':''}" id="full-${c.id}">
-          <div class="attrs">${attrsHTML}</div>
-          ${infoHTML}
-          <div class="assin"><span class="tag">Assinatura</span><br><b>${c.assin.nome}</b> — ${c.assin.txt}</div>
-        </div>
-      </div>`;
-    g.appendChild(card);
-  });
-  if(gm){
-    g.querySelectorAll("input.live, textarea.live").forEach(el=>{
-      const commit=()=>{
-        const c=state.chars.find(x=>x.id===el.dataset.id), f=el.dataset.f;
-        if(f==="pvMax"||f==="ca"){ let v=parseInt(el.value)||0; v=Math.max(0,v); c[f]=v; if(f==="pvMax")c.pvAtual=Math.min(c.pvAtual,v); }
-        else c[f]=el.value;
-        saveRemote();
-      };
-      el.addEventListener("change",()=>{ commit(); if(el.dataset.f==="pvMax"||el.dataset.f==="ca") render(); });
-      el.addEventListener("blur",commit);
-    });
-  }
-  atualizaSync();
-}
-
-/* ---------- anotações do Mestre ---------- */
-let notaTimer=null;
-function syncNotasUI(){
-  const t=document.getElementById("notasMestre"); if(!t) return;
-  t.disabled=!gm;
-  if(document.activeElement!==t) t.value=state.notasMestre||"";
-  t.placeholder = gm ? "O que os jogadores devem ver — o que está à vista, pistas, avisos…" : "— sem anotações —";
-}
-
-/* ---------- quadro (canvas) ---------- */
-let cor="#211a12", brush=3, borracha=false, desenhando=false, pts=[];
-const tela=document.getElementById("tela"), ctx=tela.getContext("2d");
-ctx.lineCap="round"; ctx.lineJoin="round";
-function setCor(c){ cor=c; borracha=false; const bb=document.getElementById("btnBorracha"); if(bb)bb.classList.remove("brasa"); const cp=document.getElementById("corPicker"); if(cp&&c.charAt(0)==="#")cp.value=c; }
-function toggleBorracha(){ borracha=!borracha; document.getElementById("btnBorracha").classList.toggle("brasa",borracha); }
-function clearTela(){ ctx.clearRect(0,0,tela.width,tela.height); }
-function limparTela(){ if(online&&db){ db.ref("salas/"+ROOM+"/quadro").remove(); } else { clearTela(); } }
-function drawStroke(s){
-  if(!s||!s.p||s.p.length<4) return;
-  ctx.save();
-  ctx.globalCompositeOperation = s.e ? "destination-out" : "source-over";
-  ctx.strokeStyle = s.c||"#211a12"; ctx.lineWidth = s.w||3;
-  ctx.beginPath(); ctx.moveTo(s.p[0]*tela.width, s.p[1]*tela.height);
-  for(let i=2;i<s.p.length;i+=2) ctx.lineTo(s.p[i]*tela.width, s.p[i+1]*tela.height);
-  ctx.stroke(); ctx.restore();
-}
-function posNorm(ev){ const r=tela.getBoundingClientRect(); return [(ev.clientX-r.left)/r.width,(ev.clientY-r.top)/r.height]; }
-function segLocal(){
-  const n=pts.length; if(n<4) return;
-  ctx.save(); ctx.globalCompositeOperation=borracha?"destination-out":"source-over";
-  ctx.strokeStyle=cor; ctx.lineWidth=brush;
-  ctx.beginPath(); ctx.moveTo(pts[n-4]*tela.width,pts[n-3]*tela.height); ctx.lineTo(pts[n-2]*tela.width,pts[n-1]*tela.height); ctx.stroke(); ctx.restore();
-}
-function fimTraco(){
-  if(!desenhando) return; desenhando=false;
-  if(pts.length>=4 && online && desenhoRef){ desenhoRef.push({c:cor,w:brush,e:borracha,p:pts.slice()}); }
-  pts=[];
-}
-function attachCanvas(){
-  tela.addEventListener("pointerdown",ev=>{ if(!gm) return; desenhando=true; pts=[]; const[x,y]=posNorm(ev); pts.push(x,y); try{tela.setPointerCapture(ev.pointerId);}catch(e){} });
-  tela.addEventListener("pointermove",ev=>{ if(!desenhando) return; const[x,y]=posNorm(ev); pts.push(x,y); segLocal(); });
-  tela.addEventListener("pointerup",fimTraco);
-  tela.addEventListener("pointercancel",fimTraco);
-  const bshdr=document.getElementById("brush"); bshdr.addEventListener("input",e=>{ brush=parseInt(e.target.value)||3; });
-}
-function atualizaExtra(){
-  const cc=document.getElementById("canvasCtrl"); if(cc) cc.style.display=gm?"flex":"none";
-  const cn=document.getElementById("canvasNota"); if(cn) cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real.";
-  if(tela) tela.style.cursor=gm?"crosshair":"default";
-  syncNotasUI();
-}
-
-/* ---------- controles ---------- */
-document.getElementById("btnMestre").addEventListener("click",()=>{
-  if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; }
-  const p=prompt("Digite o PIN do Mestre:"); if(p===null) return;
-  if(p===state.pin){ gm=true; setModo(); render(); flash("Modo Mestre ativado"); } else alert("PIN incorreto.");
-});
-document.getElementById("btnPin").addEventListener("click",async()=>{
-  const novo=prompt("Novo PIN do Mestre:",state.pin);
-  if(novo&&novo.trim()){ state.pin=novo.trim(); await saveRemote(); flash("PIN atualizado"); }
-});
-document.getElementById("btnReset").addEventListener("click",async()=>{
-  if(!confirm("Zerar PV, condições e anotações das fichas para o padrão? (o quadro e as anotações do Mestre não mudam)")) return;
-  const pin=state.pin, nm=state.notasMestre; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin; state.notasMestre=nm;
-  await saveRemote(); render(); flash("Fichas zeradas");
-});
-(function(){
-  const t=document.getElementById("notasMestre");
-  t.addEventListener("input",()=>{ if(!gm)return; state.notasMestre=t.value; clearTimeout(notaTimer); notaTimer=setTimeout(saveRemote,500); });
-  t.addEventListener("blur",()=>{ if(!gm)return; state.notasMestre=t.value; saveRemote(); });
-})();
-
-/* ---------- início ---------- */
-(function init(){
-  const m=location.hash.match(/sala=([^&]+)/); if(m) ROOM=decodeURIComponent(m[1]);
-  attachCanvas();
-  setModo(); render(); atualizaExtra();
-  initFirebase();
-})();
-</script>
+    function xorDec(b64,key){ const raw=atob(b64); let o=""; for(let i=0;i<raw.length;i++)o+=String.fromCharCode(raw.charCodeAt(i)^key.charCodeAt(i%key.length)); return o; }
+    async function abrirMestre(){
+      var s=prompt("Senha do Mestre:"); if(s===null) return;
+      s=s.trim().toLowerCase();
+      try{
+        const h=await sha256hex(s);
+        if(h===MH){ window.location.href=xorDec(ME,s); } else { alert("Senha incorreta."); }
+      }catch(e){ alert("Este recurso precisa de uma conexão segura (https)."); }
+    }
+  </script>
 </body>
 </html>
