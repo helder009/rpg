@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&family=Vollkorn:wght@400;600;700&display=swap" rel="stylesheet">
-<!-- Firebase (SDK compat, carrega direto do CDN) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
@@ -28,7 +27,6 @@
   button.brasa{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
   button.mini{padding:3px 8px;font-size:.72rem;box-shadow:1px 1px 0 var(--tinta)}
   button.menu-btn{padding:9px 16px;font-size:.82rem}
-  input[type=text],input[type=number]{font-family:inherit;font-size:.92rem;border:2px solid var(--tinta);background:#fff;color:var(--tinta);padding:5px 7px}
   .sync{font-family:"Special Elite",monospace;font-size:.7rem;color:var(--tinta-suave);margin-left:auto}
   .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#b5842f;margin-right:5px;vertical-align:middle}
   .dot.on{background:#4a7a2e}.dot.off{background:#9e2b16}
@@ -70,8 +68,18 @@
   .assin{border-top:1px dashed var(--linha);padding-top:6px}
   .assin .tag{display:inline-block;background:var(--brasa);color:var(--papel);font-family:"Special Elite",monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;padding:2px 7px;margin-bottom:3px}
   .assin b{font-family:"Rye",serif;font-weight:400;font-size:1rem}
-  .rodape{margin-top:22px;border-top:2px solid var(--tinta);padding-top:14px;font-size:.86rem;color:var(--tinta-suave)}
-  .rodape b{color:var(--brasa-esc);font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px}
+  /* painéis extras */
+  .painel-extra{border:2.5px solid var(--tinta);background:var(--papel-esc);box-shadow:5px 5px 0 var(--tinta);margin-top:16px;padding:12px 14px}
+  .painel-extra h3{font-family:"Rye",serif;font-weight:400;font-size:1.15rem;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+  .tagm{font-family:"Special Elite",monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.1em;background:var(--brasa);color:var(--papel);padding:2px 7px}
+  #notasMestre{width:100%;min-height:92px;font-family:inherit;font-size:.98rem;line-height:1.5;border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);padding:8px 10px;resize:vertical}
+  #notasMestre:disabled{background:transparent;opacity:1;cursor:default}
+  .canvas-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+  .canvas-ctrl label{font-family:"Special Elite",monospace;font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta-suave)}
+  .swatch{width:26px;height:26px;border:2px solid var(--tinta);padding:0;cursor:pointer;box-shadow:none}
+  .canvas-wrap{border:2px solid var(--tinta);background:#f3ead0;line-height:0}
+  #tela{width:100%;height:auto;display:block;touch-action:none}
+  #canvasNota{font-size:.8rem;color:var(--tinta-suave);margin-top:5px}
   .flash{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--tinta);color:var(--papel);font-family:"Special Elite",monospace;font-size:.74rem;padding:8px 16px;box-shadow:3px 3px 0 var(--brasa);opacity:0;transition:opacity .25s;pointer-events:none;z-index:20}
   .flash.on{opacity:1}
 </style>
@@ -81,7 +89,7 @@
 
   <header class="top">
     <div>
-      <div class="eyebrow">Painel de fichas · tempo real</div>
+      <div class="eyebrow">Painel de fichas · Firebase · tempo real</div>
       <h1>RPG: Sítio SS</h1>
     </div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -101,15 +109,38 @@
   </div>
 
   <div id="grade" class="grade"></div>
+
+  <section class="painel-extra">
+    <h3>Anotações do Mestre <span class="tagm">ao vivo</span></h3>
+    <textarea id="notasMestre" placeholder="—" disabled></textarea>
+  </section>
+
+  <section class="painel-extra">
+    <h3>Quadro do Mestre <span class="tagm">ao vivo</span></h3>
+    <div id="canvasCtrl" class="canvas-ctrl" style="display:none">
+      <label>Cor</label>
+      <button class="swatch" style="background:#211a12" onclick="setCor('#211a12')"></button>
+      <button class="swatch" style="background:#9e2b16" onclick="setCor('#9e2b16')"></button>
+      <button class="swatch" style="background:#2f6b3a" onclick="setCor('#2f6b3a')"></button>
+      <button class="swatch" style="background:#2b5a8c" onclick="setCor('#2b5a8c')"></button>
+      <button class="swatch" style="background:#b5842f" onclick="setCor('#b5842f')"></button>
+      <input type="color" id="corPicker" value="#211a12" onchange="setCor(this.value)" style="width:34px;height:28px;padding:0;border:2px solid var(--tinta);box-shadow:none;cursor:pointer">
+      <label>Traço</label>
+      <input type="range" id="brush" min="1" max="22" value="3" style="width:90px">
+      <button class="mini" id="btnBorracha" onclick="toggleBorracha()">Borracha</button>
+      <button class="mini brasa" onclick="limparTela()">Limpar</button>
+    </div>
+    <div class="canvas-wrap"><canvas id="tela" width="900" height="520"></canvas></div>
+    <div id="canvasNota">Somente o Mestre desenha; vocês veem em tempo real.</div>
+  </section>
+
 </div>
 
 <div id="flash" class="flash"></div>
 
 <script>
 /* ============================================================
-   1) COLE AQUI a configuração do SEU Firebase.
-      (Console Firebase → ⚙ Configurações do projeto → Seus apps →
-       Web </> → copie o objeto firebaseConfig. Inclua databaseURL!)
+   Configuração do Firebase (projeto rpg-deberg)
    ============================================================ */
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyAt-PlL34BpKlKynoOd2qU4Ll6dOFQpLkE",
@@ -121,8 +152,6 @@ const FIREBASE_CONFIG = {
   appId:             "1:493974534263:web:e9bd28ee5d3955b601ee72",
   measurementId:     "G-G9ZHDMPV4P"
 };
-/* Código da sala: separa grupos diferentes que usam o mesmo arquivo.
-   Pode ser sobrescrito pela URL com #sala=nome */
 let ROOM = "sitio-ss";
 /* ============================================================ */
 
@@ -130,10 +159,11 @@ const PADRAO = {
   pin: "DEBERG",
   updated: 0,
   updatedBy: "",
+  notasMestre: "",
   chars: [
     {
       id:"duda", nome:"Duda", cl:"Druida · Elfa", cor:"#42542f",
-      pvMax:9, pvAtual:9, ca:14, cond:"", notas:"",
+      pvMax:12, pvAtual:12, ca:14, cond:"", notas:"",
       attrs:{FOR:8,DES:15,CON:13,INT:12,SAB:16,CAR:10},
       info:[
         {rot:"Sem armas", txt:"Luta com a magia da natureza — brasa, cipós e cura."},
@@ -144,7 +174,7 @@ const PADRAO = {
     },
     {
       id:"vlad", nome:"Vlad", cl:"Guerreiro · Humano", cor:"#4a3d2c",
-      pvMax:12, pvAtual:12, ca:16, cond:"", notas:"Sem arma no momento.",
+      pvMax:14, pvAtual:14, ca:16, cond:"", notas:"Sem arma no momento.",
       attrs:{FOR:16,DES:12,CON:14,INT:10,SAB:13,CAR:12},
       info:[
         {rot:"Sem arma ainda", txt:"Soco 1d4+3 ou improvisado. Com uma lâmina → ataque +5, dano 1d8+3."},
@@ -154,7 +184,7 @@ const PADRAO = {
     },
     {
       id:"matheus", nome:"Matheus", cl:"Bárbaro · Humano", cor:"#9e2b16",
-      pvMax:14, pvAtual:14, ca:14, cond:"", notas:"Facão do Espantalho.",
+      pvMax:16, pvAtual:16, ca:14, cond:"", notas:"Facão do Espantalho.",
       attrs:{FOR:16,DES:14,CON:15,INT:8,SAB:12,CAR:10},
       info:[
         {rot:"Arma", txt:"Facão do Espantalho — ataque +5, dano 1d6+3."},
@@ -164,7 +194,7 @@ const PADRAO = {
     },
     {
       id:"caio", nome:"Caio", cl:"Ladino · Humano", cor:"#b5842f",
-      pvMax:9, pvAtual:9, ca:14, cond:"", notas:"Sem arma no momento.",
+      pvMax:12, pvAtual:12, ca:14, cond:"", notas:"Sem arma no momento.",
       attrs:{FOR:10,DES:16,CON:13,INT:14,SAB:12,CAR:13},
       info:[
         {rot:"Sem arma ainda", txt:"Com uma adaga ou arco, liga o Ataque Furtivo (+1d6)."},
@@ -175,7 +205,7 @@ const PADRAO = {
     },
     {
       id:"thais", nome:"Thais", cl:"Feiticeira · Humana", cor:"#6e1d0f",
-      pvMax:9, pvAtual:9, ca:12, cond:"", notas:"",
+      pvMax:12, pvAtual:12, ca:12, cond:"", notas:"",
       attrs:{FOR:8,DES:14,CON:13,INT:12,SAB:10,CAR:16},
       info:[
         {rot:"Magia (CAR · CD 13)", txt:"Truques: Raio de Fogo (1d10), Prestidigitação. Nível 1 (2/dia): Mísseis Mágicos, Sono."},
@@ -185,7 +215,7 @@ const PADRAO = {
     },
     {
       id:"edu", nome:"Edu", cl:"Guerreiro · Humano", cor:"#7a5a2e",
-      pvMax:12, pvAtual:12, ca:14, cond:"", notas:"Sem facas no momento.",
+      pvMax:14, pvAtual:14, ca:14, cond:"", notas:"Sem facas no momento.",
       attrs:{FOR:16,DES:13,CON:15,INT:10,SAB:12,CAR:10},
       info:[
         {rot:"Sem facas no momento", txt:"Improvisa com o que tiver à mão até achar uma lâmina."},
@@ -200,70 +230,54 @@ const PADRAO = {
 let state = JSON.parse(JSON.stringify(PADRAO));
 let gm = false;
 const abertos = new Set();
-let db=null, salaRef=null, online=false;
+let db=null, salaRef=null, desenhoRef=null, online=false;
 
 function mod(v){ const n=Math.floor((v-10)/2); return (n>=0?"+":"")+n; }
 function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
 function flash(msg){ const f=document.getElementById("flash"); f.textContent=msg; f.classList.add("on"); clearTimeout(f._t); f._t=setTimeout(()=>f.classList.remove("on"),1600); }
-
-function temConfig(){
-  const c=FIREBASE_CONFIG;
-  return c && c.databaseURL && c.databaseURL.indexOf("COLE_AQUI")<0 && c.apiKey && c.apiKey.indexOf("COLE_AQUI")<0;
-}
+function temConfig(){ const c=FIREBASE_CONFIG; return c&&c.databaseURL&&c.databaseURL.indexOf("COLE_AQUI")<0&&c.apiKey&&c.apiKey.indexOf("COLE_AQUI")<0; }
 function editando(){ const a=document.activeElement; return a&&a.classList&&a.classList.contains("live"); }
 
 /* ---------- Firebase ---------- */
 function initFirebase(){
-  if(!temConfig()){
-    mostraSetup();
-    return;
-  }
+  if(!temConfig()){ mostraSetup(); return; }
   try{
     firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.database();
     salaRef = db.ref("salas/"+ROOM);
     salaRef.on("value", snap=>{
-      const v = snap.val();
-      if(!v){ saveRemote(); return; }      // primeira vez: grava o padrão
-      if(editando()) return;               // não atropela quem está digitando
+      const v=snap.val();
+      if(!v){ saveRemote(); return; }
+      if(editando()) return;
       aplicaRemoto(v); render();
     }, err=>{ console.error(err); online=false; atualizaSync(); flash("Erro de conexão"); });
-    online = true;
+    // quadro de desenho
+    desenhoRef = db.ref("salas/"+ROOM+"/quadro");
+    desenhoRef.on("child_added", snap=> drawStroke(snap.val()));
+    desenhoRef.on("value", snap=>{ if(!snap.exists()) clearTela(); });
+    online=true;
     document.getElementById("avisoBox").innerHTML="";
     atualizaSync();
   }catch(e){ console.error(e); online=false; mostraSetup(); }
 }
 function mostraSetup(){
   online=false; atualizaSync();
-  document.getElementById("avisoBox").innerHTML = `
-    <div class="aviso">
-      <b>Modo local (sem sincronizar).</b> Para os jogadores verem tudo ao vivo, ligue o Firebase — é grátis e leva ~5 min.
-      <details class="setup"><summary>▸ Passo a passo do Firebase</summary>
-        <ol>
-          <li>Entre em <code>console.firebase.google.com</code> e crie um projeto (plano <b>Spark</b>, sem cartão).</li>
-          <li>Menu <b>Criar → Realtime Database → Criar banco de dados</b> → escolha um local → <b>modo de teste</b>.</li>
-          <li><b>⚙ Configurações do projeto → Seus apps → Web (&lt;/&gt;)</b> → registre o app → copie o objeto <code>firebaseConfig</code>.</li>
-          <li>Cole em <code>FIREBASE_CONFIG</code> no topo deste arquivo (mantendo a linha <code>databaseURL</code>) e salve.</li>
-          <li>Publique no GitHub Pages e compartilhe o link. Pronto — todos veem ao vivo.</li>
-        </ol>
-        <p style="font-size:.85em">No “modo de teste” as regras ficam abertas por ~30 dias (qualquer um com o link edita). Para um jogo entre colegas, tudo bem — e o PIN do Mestre fica visível no código, então não é senha de verdade.</p>
-      </details>
-    </div>`;
+  document.getElementById("avisoBox").innerHTML =
+   '<div class="aviso"><b>Modo local (sem sincronizar).</b> Aqui na prévia o Firebase pode ser bloqueado — publicado no GitHub ele conecta sozinho. As fichas, anotações e o quadro funcionam localmente enquanto isso.</div>';
 }
-
 async function saveRemote(){
-  state.updated = Date.now();
-  state.updatedBy = gm ? "Mestre" : "";
+  state.updated=Date.now(); state.updatedBy=gm?"Mestre":"";
   if(!online){ atualizaSync(); return; }
-  const payload = { pin:state.pin, updated:state.updated, updatedBy:state.updatedBy, chars:{} };
-  state.chars.forEach(c=>{ payload.chars[c.id] = {pvAtual:c.pvAtual, pvMax:c.pvMax, ca:c.ca, cond:c.cond||"", notas:c.notas||""}; });
-  try{ await salaRef.set(payload); }catch(e){ console.error(e); flash("Erro ao salvar"); }
+  const payload={ pin:state.pin, updated:state.updated, updatedBy:state.updatedBy, notasMestre:state.notasMestre||"", chars:{} };
+  state.chars.forEach(c=>{ payload.chars[c.id]={pvAtual:c.pvAtual,pvMax:c.pvMax,ca:c.ca,cond:c.cond||"",notas:c.notas||""}; });
+  try{ await salaRef.update(payload); }catch(e){ console.error(e); flash("Erro ao salvar"); }
   atualizaSync();
 }
 function aplicaRemoto(r){
   if(!r) return;
   if(typeof r.pin==="string") state.pin=r.pin;
   state.updated=r.updated||0; state.updatedBy=r.updatedBy||"";
+  if(typeof r.notasMestre==="string") state.notasMestre=r.notasMestre;
   if(r.chars){
     state.chars.forEach(c=>{
       const rc=r.chars[c.id]; if(!rc) return;
@@ -274,24 +288,25 @@ function aplicaRemoto(r){
       if(typeof rc.notas==="string")  c.notas =rc.notas;
     });
   }
+  syncNotasUI();
 }
 function atualizaSync(){
   const s=document.getElementById("sync");
-  if(!temConfig()){ s.innerHTML='<span class="dot off"></span>modo local (Firebase desligado)'; return; }
+  if(!temConfig()){ s.innerHTML='<span class="dot off"></span>modo local'; return; }
   if(!online){ s.innerHTML='<span class="dot off"></span>sem conexão'; return; }
   let q="pronto";
-  if(state.updated){ const seg=Math.round((Date.now()-state.updated)/1000);
-    q = seg<5?"agora":seg<60?"há "+seg+"s":"há "+Math.round(seg/60)+"min"; }
+  if(state.updated){ const seg=Math.round((Date.now()-state.updated)/1000); q=seg<5?"agora":seg<60?"há "+seg+"s":"há "+Math.round(seg/60)+"min"; }
   s.innerHTML='<span class="dot on"></span>sala “'+ROOM+'” · '+q+(state.updatedBy?(" · "+state.updatedBy):"");
 }
 
-/* ---------- UI ---------- */
+/* ---------- modo / fichas ---------- */
 function setModo(){
   const b=document.getElementById("modoBadge");
   b.className="modo "+(gm?"mestre":"jogador"); b.textContent=gm?"Modo Mestre":"Modo Jogador";
   document.getElementById("btnMestre").textContent=gm?"🚪 Sair do Modo Mestre":"🔑 Entrar como Mestre";
   document.getElementById("btnPin").style.display  = gm?"":"none";
   document.getElementById("btnReset").style.display= gm?"":"none";
+  atualizaExtra();
 }
 function ajustaHP(id,delta){
   const c=state.chars.find(x=>x.id===id);
@@ -330,7 +345,7 @@ function render(){
           <div class="campo"><label>CA</label>${gm?`<input class="live num-inline" type="number" value="${c.ca}" data-id="${c.id}" data-f="ca">`:`<div class="ro">${c.ca}</div>`}</div>
         </div>
         <div class="campo"><label>Condições</label><input class="live" type="text" value="${esc(c.cond)}" placeholder="${gm?'ex: envenenado, caído…':'—'}" data-id="${c.id}" data-f="cond" ${dis}></div>
-        <div class="campo"><label>Anotações</label><textarea class="live" data-id="${c.id}" data-f="notas" ${dis} placeholder="${gm?'itens, pistas, lembretes…':''}">${esc(c.notas)}</textarea></div>
+        <div class="campo"><label>Anotações</label><textarea class="live" data-id="${c.id}" data-f="notas" ${dis} placeholder="${gm?'itens, pistas…':''}">${esc(c.notas)}</textarea></div>
         <button class="mini togglefull" id="btnfull-${c.id}" onclick="toggleFicha('${c.id}')">${aberto?'▾':'▸'} Ficha completa</button>
         <div class="fichafull ${aberto?'open':''}" id="full-${c.id}">
           <div class="attrs">${attrsHTML}</div>
@@ -355,6 +370,58 @@ function render(){
   atualizaSync();
 }
 
+/* ---------- anotações do Mestre ---------- */
+let notaTimer=null;
+function syncNotasUI(){
+  const t=document.getElementById("notasMestre"); if(!t) return;
+  t.disabled=!gm;
+  if(document.activeElement!==t) t.value=state.notasMestre||"";
+  t.placeholder = gm ? "O que os jogadores devem ver — o que está à vista, pistas, avisos…" : "— sem anotações —";
+}
+
+/* ---------- quadro (canvas) ---------- */
+let cor="#211a12", brush=3, borracha=false, desenhando=false, pts=[];
+const tela=document.getElementById("tela"), ctx=tela.getContext("2d");
+ctx.lineCap="round"; ctx.lineJoin="round";
+function setCor(c){ cor=c; borracha=false; const bb=document.getElementById("btnBorracha"); if(bb)bb.classList.remove("brasa"); const cp=document.getElementById("corPicker"); if(cp&&c.charAt(0)==="#")cp.value=c; }
+function toggleBorracha(){ borracha=!borracha; document.getElementById("btnBorracha").classList.toggle("brasa",borracha); }
+function clearTela(){ ctx.clearRect(0,0,tela.width,tela.height); }
+function limparTela(){ if(online&&db){ db.ref("salas/"+ROOM+"/quadro").remove(); } else { clearTela(); } }
+function drawStroke(s){
+  if(!s||!s.p||s.p.length<4) return;
+  ctx.save();
+  ctx.globalCompositeOperation = s.e ? "destination-out" : "source-over";
+  ctx.strokeStyle = s.c||"#211a12"; ctx.lineWidth = s.w||3;
+  ctx.beginPath(); ctx.moveTo(s.p[0]*tela.width, s.p[1]*tela.height);
+  for(let i=2;i<s.p.length;i+=2) ctx.lineTo(s.p[i]*tela.width, s.p[i+1]*tela.height);
+  ctx.stroke(); ctx.restore();
+}
+function posNorm(ev){ const r=tela.getBoundingClientRect(); return [(ev.clientX-r.left)/r.width,(ev.clientY-r.top)/r.height]; }
+function segLocal(){
+  const n=pts.length; if(n<4) return;
+  ctx.save(); ctx.globalCompositeOperation=borracha?"destination-out":"source-over";
+  ctx.strokeStyle=cor; ctx.lineWidth=brush;
+  ctx.beginPath(); ctx.moveTo(pts[n-4]*tela.width,pts[n-3]*tela.height); ctx.lineTo(pts[n-2]*tela.width,pts[n-1]*tela.height); ctx.stroke(); ctx.restore();
+}
+function fimTraco(){
+  if(!desenhando) return; desenhando=false;
+  if(pts.length>=4 && online && desenhoRef){ desenhoRef.push({c:cor,w:brush,e:borracha,p:pts.slice()}); }
+  pts=[];
+}
+function attachCanvas(){
+  tela.addEventListener("pointerdown",ev=>{ if(!gm) return; desenhando=true; pts=[]; const[x,y]=posNorm(ev); pts.push(x,y); try{tela.setPointerCapture(ev.pointerId);}catch(e){} });
+  tela.addEventListener("pointermove",ev=>{ if(!desenhando) return; const[x,y]=posNorm(ev); pts.push(x,y); segLocal(); });
+  tela.addEventListener("pointerup",fimTraco);
+  tela.addEventListener("pointercancel",fimTraco);
+  const bshdr=document.getElementById("brush"); bshdr.addEventListener("input",e=>{ brush=parseInt(e.target.value)||3; });
+}
+function atualizaExtra(){
+  const cc=document.getElementById("canvasCtrl"); if(cc) cc.style.display=gm?"flex":"none";
+  const cn=document.getElementById("canvasNota"); if(cn) cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real.";
+  if(tela) tela.style.cursor=gm?"crosshair":"default";
+  syncNotasUI();
+}
+
 /* ---------- controles ---------- */
 document.getElementById("btnMestre").addEventListener("click",()=>{
   if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; }
@@ -366,16 +433,21 @@ document.getElementById("btnPin").addEventListener("click",async()=>{
   if(novo&&novo.trim()){ state.pin=novo.trim(); await saveRemote(); flash("PIN atualizado"); }
 });
 document.getElementById("btnReset").addEventListener("click",async()=>{
-  if(!confirm("Zerar todos os PV, condições e anotações para o padrão?")) return;
-  const pin=state.pin; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin;
-  await saveRemote(); render(); flash("Painel zerado");
+  if(!confirm("Zerar PV, condições e anotações das fichas para o padrão? (o quadro e as anotações do Mestre não mudam)")) return;
+  const pin=state.pin, nm=state.notasMestre; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin; state.notasMestre=nm;
+  await saveRemote(); render(); flash("Fichas zeradas");
 });
+(function(){
+  const t=document.getElementById("notasMestre");
+  t.addEventListener("input",()=>{ if(!gm)return; state.notasMestre=t.value; clearTimeout(notaTimer); notaTimer=setTimeout(saveRemote,500); });
+  t.addEventListener("blur",()=>{ if(!gm)return; state.notasMestre=t.value; saveRemote(); });
+})();
 
 /* ---------- início ---------- */
 (function init(){
-  const m=location.hash.match(/sala=([^&]+)/);
-  if(m) ROOM=decodeURIComponent(m[1]);
-  setModo(); render();
+  const m=location.hash.match(/sala=([^&]+)/); if(m) ROOM=decodeURIComponent(m[1]);
+  attachCanvas();
+  setModo(); render(); atualizaExtra();
   initFirebase();
 })();
 </script>
