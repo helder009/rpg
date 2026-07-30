@@ -52,6 +52,16 @@
   .hpbtns{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
   .duo{display:flex;gap:8px}.campo{flex:1}
   .campo label{display:block;font-family:"Special Elite",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tinta-suave);margin-bottom:2px}
+  .campo label.lbl-forte{color:var(--brasa);font-weight:700;font-size:.66rem}
+  .vitais-top{display:flex;gap:8px;align-items:stretch;margin-bottom:2px}
+  .vt{border:2px solid var(--tinta);background:rgba(255,255,255,.16);padding:5px 6px;text-align:center;min-width:66px;display:flex;flex-direction:column;justify-content:center}
+  .vt b{font-family:"Special Elite",monospace;font-size:.58rem;letter-spacing:.1em;color:var(--tinta-suave)}
+  .vt .vt-n{font-family:"Rye",serif;font-size:1.25rem;line-height:1.15}
+  .vt.pv .vt-n{color:var(--brasa)}
+  .vt .vt-in{width:42px;font-family:inherit;font-size:.9rem;text-align:center;padding:1px 0;border:1px solid var(--tinta);background:var(--papel);box-shadow:none;vertical-align:middle}
+  .vt-cond{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .vt-cond label{display:block;font-family:"Special Elite",monospace;text-transform:uppercase;letter-spacing:.1em;font-size:.62rem;font-weight:700;color:var(--brasa);margin-bottom:3px}
+  .vt-cond .txt{font-size:.9rem}
   .campo .ro{font-weight:700}.campo .txt{font-size:.9rem;line-height:1.45}
   input,textarea{width:100%;font-family:inherit;font-size:.92rem;border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);padding:5px 7px}
   input[type=number]{text-align:center}
@@ -145,6 +155,7 @@
           <button onclick="rolarAtaque()">Ataque</button>
         </div>
         <div class="resultado"><div class="big" id="resBig">—</div><div class="det" id="resDet">escolha um dado ou uma rolagem</div></div>
+        <div id="rollTools" style="display:none;text-align:right;margin-bottom:4px"><button class="mini" onclick="limparRolls()">🗑 Limpar histórico</button></div>
         <div class="log" id="log"></div>
       </div>
       <div class="painel">
@@ -232,7 +243,7 @@ const SKILLS={"Acrobacia":"DES","Arcanismo":"INT","Atletismo":"FOR","Atuação":
 
 let state=JSON.parse(JSON.stringify(PADRAO));
 let gm=false, atual=state.chars[0].id, adv="none";
-let db=null, salaRef=null, desenhoRef=null, online=false;
+let db=null, salaRef=null, desenhoRef=null, rollsRef=null, online=false;
 const $=id=>document.getElementById(id);
 function mod(v){ const n=Math.floor((v-10)/2); return (n>=0?"+":"")+n; }
 function modN(v){ return Math.floor((v-10)/2); }
@@ -252,6 +263,8 @@ function initFirebase(){
     desenhoRef=db.ref("salas/"+ROOM+"/quadro");
     desenhoRef.on("child_added",snap=>drawStroke(snap.val()));
     desenhoRef.on("value",snap=>{ if(!snap.exists()) clearTela(); });
+    rollsRef=db.ref("salas/"+ROOM+"/rolls");
+    rollsRef.limitToLast(50).on("value",snap=>renderLogSnap(snap.val()));
     online=true; $("avisoBox").innerHTML=""; atualizaSync();
   }catch(e){ console.error(e); online=false; mostraSetup(); }
 }
@@ -318,9 +331,9 @@ function renderFicha(){
         </div>
         <div class="campo"><label>Condições</label><input class="live" type="text" value="${esc(c.cond)}" placeholder="${gm?'ex: envenenado, caído…':'—'}" data-id="${c.id}" data-f="cond" ${dis}></div>
         <div class="attrs">${attrsHTML}</div>
-        <div class="campo"><label>Armas / Magia</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="armas" style="min-height:78px">${esc(c.armas)}</textarea>`:`<div class="txt">${escLines(c.armas)||"—"}</div>`}</div>
-        <div class="campo"><label>Objetos</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="objetos" style="min-height:46px">${esc(c.objetos)}</textarea>`:`<div class="txt">${escLines(c.objetos)||"—"}</div>`}</div>
-        <div class="campo"><label>Anotações</label><textarea class="live" data-id="${c.id}" data-f="notas" ${dis} placeholder="${gm?'lembretes rápidos…':''}">${esc(c.notas)}</textarea></div>
+        <div class="campo"><label class="lbl-forte">Armas / Magia</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="armas" style="min-height:78px">${esc(c.armas)}</textarea>`:`<div class="txt">${escLines(c.armas)||"—"}</div>`}</div>
+        <div class="campo"><label class="lbl-forte">Objetos</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="objetos" style="min-height:46px">${esc(c.objetos)}</textarea>`:`<div class="txt">${escLines(c.objetos)||"—"}</div>`}</div>
+        <div class="campo"><label class="lbl-forte">Anotações</label><textarea class="live" data-id="${c.id}" data-f="notas" ${dis} placeholder="${gm?'lembretes rápidos…':''}">${esc(c.notas)}</textarea></div>
         <div class="assin"><span class="tag">Assinatura</span><br><b>${c.assin.nome}</b> — ${c.assin.txt}</div>
       </div>
     </div>`;
@@ -343,13 +356,18 @@ function setAdv(a){ adv=a; $("pNorm").classList.toggle("on",a==="none"); $("pAdv
 function d(n){ return 1+Math.floor(Math.random()*n); }
 function d20adv(){ if(adv==="adv"){const a=d(20),b=d(20);return{v:Math.max(a,b),rolls:[a,b]};} if(adv==="dis"){const a=d(20),b=d(20);return{v:Math.min(a,b),rolls:[a,b]};} const a=d(20); return{v:a,rolls:[a]}; }
 function detTxt(r,m){ const s=m>=0?"+"+m:""+m; const base=r.rolls.length>1?"["+r.rolls.join(", ")+"]→"+r.v:"["+r.v+"]"; return base+(m!==0?" "+s:"")+" = "+(r.v+m); }
-function mostra(label,r,m){ const total=r.v+m; $("resBig").textContent=total; $("resDet").textContent=label+" · "+detTxt(r,m); addLog(total,label,detTxt(r,m)); }
-function addLog(total,label,det){ const hora=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); const e=document.createElement("div"); e.innerHTML=`<span class="t">${total}</span> — ${label}: ${det} <span style="color:var(--tinta-suave)">· ${hora}</span>`; const L=$("log"); L.insertBefore(e,L.firstChild); while(L.children.length>16)L.removeChild(L.lastChild); }
-function rolarPuro(sides){ const m=parseInt($("modMan").value)||0; let r; if(sides===20){ r=d20adv(); } else { const a=d(sides); r={v:a,rolls:[a]}; } const advtxt=(sides===20&&adv!=="none")?(" ("+(adv==="adv"?"vantagem":"desvantagem")+")"):""; mostra("d"+sides+advtxt,r,m); }
+function mostra(label,r,m,quem){ const total=r.v+m, det=detTxt(r,m); $("resBig").textContent=total; $("resDet").textContent=(quem?quem+" · ":"")+label+" · "+det; pushRoll({t:total,l:label,d:det,q:quem||"",ts:Date.now()}); }
+let localRolls=[];
+function entryHTML(e){ const hora=e.ts?new Date(e.ts).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):""; const quem=e.q?`<b>${esc(e.q)}</b> · `:""; return `<div><span class="t">${e.t}</span> — ${quem}${esc(e.l)}: ${esc(e.d)} <span style="color:var(--tinta-suave)">· ${hora}</span></div>`; }
+function renderLogArr(arr){ const L=$("log"); L.innerHTML=""; arr.slice(-50).reverse().forEach(e=>L.insertAdjacentHTML("beforeend", entryHTML(e))); }
+function renderLogSnap(val){ if(!val){ $("log").innerHTML=""; return; } const arr=Object.keys(val).map(k=>val[k]).filter(Boolean).sort((a,b)=>(a.ts||0)-(b.ts||0)); renderLogArr(arr); }
+function pushRoll(e){ if(online&&rollsRef){ rollsRef.push(e); } else { localRolls.push(e); if(localRolls.length>80)localRolls=localRolls.slice(-80); renderLogArr(localRolls); } }
+function limparRolls(){ if(online&&rollsRef){ rollsRef.remove(); } else { localRolls=[]; renderLogArr([]); } }
+function rolarPuro(sides){ const m=parseInt($("modMan").value)||0; let r; if(sides===20){ r=d20adv(); } else { const a=d(sides); r={v:a,rolls:[a]}; } const advtxt=(sides===20&&adv!=="none")?(" ("+(adv==="adv"?"vantagem":"desvantagem")+")"):""; mostra("d"+sides+advtxt,r,m,charAtual().nome); }
 function profDe(c,skill){ if(c.expert&&c.expert.indexOf(skill)>=0)return PROF*2; if(c.pericias&&c.pericias.indexOf(skill)>=0)return PROF; return 0; }
 function popularTestes(){ const s=$("selTeste"), prev=s.value; let html=""; for(const k in ATRIBS) html+=`<option value="attr:${k}">Teste de ${ATRIBS[k]} (${k})</option>`; const c=charAtual(); Object.keys(SKILLS).forEach(sk=>{ const p=profDe(c,sk); const mk=p>=PROF*2?" ✦✦":p>=PROF?" ✦":""; html+=`<option value="skill:${sk}">${sk} (${SKILLS[sk]})${mk}</option>`; }); s.innerHTML=html; s.value=prev||"skill:Percepção"; if(!s.value)s.value="skill:Percepção"; }
-function rolarTeste(){ const c=charAtual(), val=$("selTeste").value, parts=val.split(":"), tipo=parts[0], chave=parts[1]; let attr,prof=0,label; if(tipo==="attr"){ attr=chave; label="Teste de "+ATRIBS[attr]+" ("+attr+")"; } else { attr=SKILLS[chave]; prof=profDe(c,chave); label=chave+" ("+attr+")"; } const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(label+" · "+c.nome+advtxt, d20adv(), modN(c.attrs[attr])+prof); }
-function rolarAtaque(){ const c=charAtual(), tipo=$("selAtaque").value; let attr,nome; if(tipo==="FOR"){ attr="FOR"; nome="Ataque corpo a corpo"; } else if(tipo==="DES"){ attr="DES"; nome="Ataque à distância/fino"; } else { attr=c.conjura||["INT","SAB","CAR"].reduce((a,b)=>modN(c.attrs[b])>modN(c.attrs[a])?b:a,"INT"); nome="Ataque mágico ("+attr+")"; } const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(nome+" · "+c.nome+advtxt, d20adv(), modN(c.attrs[attr])+PROF); }
+function rolarTeste(){ const c=charAtual(), val=$("selTeste").value, parts=val.split(":"), tipo=parts[0], chave=parts[1]; let attr,prof=0,label; if(tipo==="attr"){ attr=chave; label="Teste de "+ATRIBS[attr]+" ("+attr+")"; } else { attr=SKILLS[chave]; prof=profDe(c,chave); label=chave+" ("+attr+")"; } const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(label+advtxt, d20adv(), modN(c.attrs[attr])+prof, c.nome); }
+function rolarAtaque(){ const c=charAtual(), tipo=$("selAtaque").value; let attr,nome; if(tipo==="FOR"){ attr="FOR"; nome="Ataque corpo a corpo"; } else if(tipo==="DES"){ attr="DES"; nome="Ataque à distância/fino"; } else { attr=c.conjura||["INT","SAB","CAR"].reduce((a,b)=>modN(c.attrs[b])>modN(c.attrs[a])?b:a,"INT"); nome="Ataque mágico ("+attr+")"; } const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(nome+advtxt, d20adv(), modN(c.attrs[attr])+PROF, c.nome); }
 
 let notaTimer=null;
 function syncNotasUI(){ const t=$("notasMestre"); if(!t)return; t.disabled=!gm; if(document.activeElement!==t)t.value=state.notasMestre||""; t.placeholder=gm?"O que os jogadores devem ver — o que está à vista, pistas, avisos…":"— sem anotações —"; }
@@ -370,7 +388,7 @@ function attachCanvas(){
   tela.addEventListener("pointerup",fimTraco); tela.addEventListener("pointercancel",fimTraco);
   $("brush").addEventListener("input",e=>{ brush=parseInt(e.target.value)||3; });
 }
-function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; syncNotasUI(); }
+function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; const rt=$("rollTools"); if(rt)rt.style.display=gm?"block":"none"; syncNotasUI(); }
 
 $("btnMestre").addEventListener("click",()=>{ if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; } const p=prompt("Digite o PIN do Mestre:"); if(p===null)return; if(p===state.pin){ gm=true; setModo(); render(); flash("Modo Mestre ativado"); } else alert("PIN incorreto."); });
 $("btnPin").addEventListener("click",async()=>{ const n=prompt("Novo PIN do Mestre:",state.pin); if(n&&n.trim()){ state.pin=n.trim(); await saveRemote(); flash("PIN atualizado"); } });
