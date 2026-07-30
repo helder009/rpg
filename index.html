@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel de Fichas — O Sítio SS (Firebase)</title>
+<title>RPG: Sítio SS — Painel de Fichas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&family=Vollkorn:wght@400;600;700&display=swap" rel="stylesheet">
@@ -27,6 +27,7 @@
   button:hover{background:var(--papel)}button:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--tinta)}
   button.brasa{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
   button.mini{padding:3px 8px;font-size:.72rem;box-shadow:1px 1px 0 var(--tinta)}
+  button.menu-btn{padding:9px 16px;font-size:.82rem}
   input[type=text],input[type=number]{font-family:inherit;font-size:.92rem;border:2px solid var(--tinta);background:#fff;color:var(--tinta);padding:5px 7px}
   .sync{font-family:"Special Elite",monospace;font-size:.7rem;color:var(--tinta-suave);margin-left:auto}
   .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#b5842f;margin-right:5px;vertical-align:middle}
@@ -81,26 +82,25 @@
   <header class="top">
     <div>
       <div class="eyebrow">Painel de fichas · Firebase · tempo real</div>
-      <h1>O Sítio SS</h1>
+      <h1>RPG: Sítio SS</h1>
     </div>
-    <span id="modoBadge" class="modo jogador">Modo Jogador</span>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button id="btnMestre" class="brasa">🔑 Entrar como Mestre</button>
+      <span id="modoBadge" class="modo jogador">Modo Jogador</span>
+    </div>
   </header>
 
   <div id="avisoBox"></div>
 
   <div class="barra">
-    <button id="btnMestre" class="brasa">🔑 Entrar como Mestre</button>
+    <button class="menu-btn" onclick="window.open('guia-do-jogador.html','_blank')">📖 Guia do Jogador ↗</button>
+    <button class="menu-btn" onclick="window.open('https://www.google.com/search?q=roll+a+d20','_blank')">🎲 D20 online ↗</button>
     <button id="btnPin" style="display:none" class="mini">Trocar PIN</button>
     <button id="btnReset" style="display:none" class="mini">Zerar painel</button>
     <span id="sync" class="sync"><span class="dot"></span>iniciando…</span>
   </div>
 
   <div id="grade" class="grade"></div>
-
-  <div class="rodape">
-    <b>Como usar na mesa</b>
-    No <b>Modo Mestre</b> (PIN padrão <b>DEBERG</b>), os botões de dano/cura ajustam o PV, e você edita CA, condições e anotações — tudo sincroniza <b>na hora</b> pra todos que abrirem a mesma sala. Toque em <b>“Ficha completa”</b> pra ver atributos, magias e a assinatura (referência fixa). Para separar grupos, mude o código da <b>sala</b> no endereço (<code>#sala=nome</code>) e compartilhe esse link.
-  </div>
 </div>
 
 <div id="flash" class="flash"></div>
