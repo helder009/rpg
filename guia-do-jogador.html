@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&family=Vollkorn:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
   :root{--papel:#e6d9b8;--papel-esc:#d8c69c;--tinta:#211a12;--tinta-suave:#4a3d2c;--brasa:#9e2b16;--brasa-esc:#6e1d0f;--mata:#42542f;--ocre:#b5842f;--linha:rgba(33,26,18,.28)}
   *{box-sizing:border-box}html{scroll-behavior:smooth}
@@ -58,6 +60,8 @@
   .recap{border-left:5px solid var(--brasa);padding:4px 0 4px 18px;margin:16px 0}
   .recap ul{margin:.4em 0;padding-left:1.1em}.recap li{margin:.28em 0}
   .feito::marker{content:"✓  ";color:var(--mata);font-weight:700}
+  .live-ind{font-family:"Special Elite",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border:2px solid var(--linha);color:var(--tinta-suave)}
+  .live-ind.on{border-color:var(--mata);color:var(--mata)}
   footer{border-top:2px solid var(--tinta);margin-top:44px;padding:18px 0;text-align:center;font-family:"Special Elite",monospace;font-size:.72rem;letter-spacing:.1em;color:var(--tinta-suave)}
   @media (max-width:520px){.titulo-secao .num{display:none}}
 </style>
@@ -78,14 +82,12 @@
     <p class="lume">Vocês acordaram sem memória. Só sabem o que os olhos mostram: uma estrada de terra, um portão de ferro com duas letras, e um sítio velho que não parece querer visita.</p>
   </header>
 
-  <!-- ONDE VOCÊS ESTÃO (resumo) -->
   <section>
     <div class="titulo-secao"><span class="num">?</span><h2>Onde vocês estão</h2></div>
     <div class="prosa">
       <p>Seis desconhecidos despertaram numa carroça parada na beira da estrada. Ninguém lembra o próprio passado — nem como chegou ali. À frente, um portão marcado <b>SS</b> e, atrás dele, um sítio: espantalho no pátio, colmeias zunindo, um muro de madeira cercando a casa principal.</p>
       <p>Alguma coisa nesse lugar guarda as respostas — e talvez as memórias de vocês. O jeito é entrar e descobrir.</p>
     </div>
-
     <div class="recap">
       <div class="eyebrow" style="margin-bottom:6px">O caminho até aqui</div>
       <ul>
@@ -100,108 +102,12 @@
     </div>
   </section>
 
-  <!-- FICHAS -->
   <section>
     <div class="titulo-secao"><span class="num">I</span><h2>Suas fichas</h2></div>
-    <p class="sub-secao">Fichas de nível 1. Cada herói tem seus atributos, o que sabe fazer e uma jogada de assinatura (o quadro ★).</p>
-    <div class="fichas">
-
-      <!-- DUDA -->
-      <div class="ficha">
-        <div class="topo">
-          <svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.4" fill="none"><path d="M25 46 V22"/><path d="M25 30 q-12 -2 -16 -14 q14 0 16 14"/><path d="M25 24 q12 -4 16 -16 q-14 -1 -16 16"/><circle cx="25" cy="14" r="6" fill="#42542f" stroke="#211a12"/></svg>
-          <div><p class="nome">Duda</p><div class="classe">Druida · Elfa</div></div>
-        </div>
-        <div class="corpo">
-          <div class="vitais"><div class="vital pv"><b>PV</b><span class="v">12</span></div><div class="vital"><b>CA</b><span class="v">14</span></div><div class="vital"><b>Prof.</b><span class="v">+2</span></div></div>
-          <div class="attrs"><div class="attr"><b>FOR</b><span class="n">8</span><span class="m">-1</span></div><div class="attr"><b>DES</b><span class="n">15</span><span class="m">+2</span></div><div class="attr"><b>CON</b><span class="n">13</span><span class="m">+1</span></div><div class="attr"><b>INT</b><span class="n">12</span><span class="m">+1</span></div><div class="attr"><b>SAB</b><span class="n">16</span><span class="m">+3</span></div><div class="attr"><b>CAR</b><span class="n">10</span><span class="m">+0</span></div></div>
-          <div class="linha-item"><span class="rot">Magia (SAB · CD 13)</span>Truques: Produzir Chama, Orientação. Nível 1 (2/dia): Curar Ferimentos, Emaranhar.</div>
-          <div class="linha-item"><span class="rot">Traços de elfa</span>Visão no escuro · vantagem contra encantos · não dorme (transe).</div>
-          <div class="assinatura"><span class="tag">★ Assinatura</span><br><b>Toque da Mata</b> — cura 1d8+3 PV num aliado.</div>
-        </div>
-      </div>
-
-      <!-- VLAD -->
-      <div class="ficha">
-        <div class="topo">
-          <svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.2" fill="#211a12"><path d="M8 30 q10 -14 26 -12 q6 1 8 6 l6 -1 -4 5 3 3 -6 0 q-2 8 -10 10 q4 4 2 8 q-6 -3 -8 -6 q-10 1 -17 -6 q8 1 10 -3 q-10 -2 -12 -8 q6 4 12 1 z" stroke="#211a12" stroke-width="1.5"/><circle cx="34" cy="24" r="1.6" fill="#e6d9b8"/></svg>
-          <div><p class="nome">Vlad</p><div class="classe">Guerreiro · Humano</div></div>
-        </div>
-        <div class="corpo">
-          <div class="vitais"><div class="vital pv"><b>PV</b><span class="v">14</span></div><div class="vital"><b>CA</b><span class="v">16</span></div><div class="vital"><b>Prof.</b><span class="v">+2</span></div></div>
-          <div class="attrs"><div class="attr"><b>FOR</b><span class="n">16</span><span class="m">+3</span></div><div class="attr"><b>DES</b><span class="n">12</span><span class="m">+1</span></div><div class="attr"><b>CON</b><span class="n">14</span><span class="m">+2</span></div><div class="attr"><b>INT</b><span class="n">10</span><span class="m">+0</span></div><div class="attr"><b>SAB</b><span class="n">13</span><span class="m">+1</span></div><div class="attr"><b>CAR</b><span class="n">12</span><span class="m">+1</span></div></div>
-          <div class="semarma">⚔ <b>Sem arma no momento.</b> Por enquanto: soco 1d4+3 ou algo improvisado.</div>
-          <div class="linha-item"><span class="rot">Fôlego</span>1x/descanso: recupera 1d10+1 PV (ação bônus). Estilo Defesa (+1 CA incluso).</div>
-          <div class="assinatura"><span class="tag">★ Assinatura</span><br><b>Língua dos Corvos</b> — 1x/dia manda corvos espionar e trazer uma pista.</div>
-        </div>
-      </div>
-
-      <!-- MATHEUS -->
-      <div class="ficha">
-        <div class="topo">
-          <svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.4" fill="none"><path d="M14 40 L40 14" stroke="#211a12" stroke-width="4"/><path d="M40 14 q6 -4 4 4 q-1 6 -8 6 z" fill="#9e2b16" stroke="#211a12"/><rect x="10" y="38" width="10" height="6" rx="1" transform="rotate(-45 15 41)" fill="#211a12"/></svg>
-          <div><p class="nome">Matheus</p><div class="classe">Bárbaro · Humano</div></div>
-        </div>
-        <div class="corpo">
-          <div class="vitais"><div class="vital pv"><b>PV</b><span class="v">16</span></div><div class="vital"><b>CA</b><span class="v">14</span></div><div class="vital"><b>Prof.</b><span class="v">+2</span></div></div>
-          <div class="attrs"><div class="attr"><b>FOR</b><span class="n">16</span><span class="m">+3</span></div><div class="attr"><b>DES</b><span class="n">14</span><span class="m">+2</span></div><div class="attr"><b>CON</b><span class="n">15</span><span class="m">+2</span></div><div class="attr"><b>INT</b><span class="n">8</span><span class="m">-1</span></div><div class="attr"><b>SAB</b><span class="n">12</span><span class="m">+1</span></div><div class="attr"><b>CAR</b><span class="n">10</span><span class="m">+0</span></div></div>
-          <div class="linha-item"><span class="rot">Arma</span>Facão do Espantalho — ataque +5, dano 1d6+3.</div>
-          <div class="linha-item"><span class="rot">Fúria (2x/dia)</span>+2 no dano corpo a corpo, resistência a dano físico, vantagem em FOR.</div>
-          <div class="assinatura"><span class="tag">★ Assinatura</span><br><b>Fúria do Facão</b> — entra em Fúria e desce o facão sem dó.</div>
-        </div>
-      </div>
-
-      <!-- CAIO -->
-      <div class="ficha">
-        <div class="topo">
-          <svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.2" fill="none"><rect x="17" y="16" width="16" height="22" rx="2" fill="#211a12"/><rect x="21" y="20" width="8" height="14" fill="#b5842f"/><path d="M20 16 q5 -8 10 0" stroke="#211a12" fill="none"/><line x1="25" y1="8" x2="25" y2="12"/></svg>
-          <div><p class="nome">Caio</p><div class="classe">Ladino · Humano</div></div>
-        </div>
-        <div class="corpo">
-          <div class="vitais"><div class="vital pv"><b>PV</b><span class="v">12</span></div><div class="vital"><b>CA</b><span class="v">14</span></div><div class="vital"><b>Prof.</b><span class="v">+2</span></div></div>
-          <div class="attrs"><div class="attr"><b>FOR</b><span class="n">10</span><span class="m">+0</span></div><div class="attr"><b>DES</b><span class="n">16</span><span class="m">+3</span></div><div class="attr"><b>CON</b><span class="n">13</span><span class="m">+1</span></div><div class="attr"><b>INT</b><span class="n">14</span><span class="m">+2</span></div><div class="attr"><b>SAB</b><span class="n">12</span><span class="m">+1</span></div><div class="attr"><b>CAR</b><span class="n">13</span><span class="m">+1</span></div></div>
-          <div class="semarma">🗡 <b>Sem arma no momento.</b> Por enquanto, improvisa com o que tiver à mão.</div>
-          <div class="linha-item"><span class="rot">Especialista</span>Furtividade e Ladinagem (fechaduras, armadilhas).</div>
-          <div class="linha-item"><span class="rot">Mochila</span>Corda de 15m · lampião · ferramentas de ladrão.</div>
-          <div class="assinatura"><span class="tag">★ Assinatura</span><br><b>Nas Sombras</b> — some no escuro e reaparece com um golpe furtivo.</div>
-        </div>
-      </div>
-
-      <!-- THAIS -->
-      <div class="ficha">
-        <div class="topo">
-          <svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.2" fill="none"><path d="M25 8 q8 10 6 18 q-2 6 -6 8 q-4 -2 -6 -8 q-2 -8 6 -18z" fill="#9e2b16" stroke="#211a12"/><path d="M25 20 q3 6 0 14" stroke="#e6d9b8" stroke-width="1.6"/><path d="M18 40 q7 6 14 0" stroke="#211a12"/></svg>
-          <div><p class="nome">Thais</p><div class="classe">Feiticeira · Humana</div></div>
-        </div>
-        <div class="corpo">
-          <div class="vitais"><div class="vital pv"><b>PV</b><span class="v">12</span></div><div class="vital"><b>CA</b><span class="v">12</span></div><div class="vital"><b>Prof.</b><span class="v">+2</span></div></div>
-          <div class="attrs"><div class="attr"><b>FOR</b><span class="n">8</span><span class="m">-1</span></div><div class="attr"><b>DES</b><span class="n">14</span><span class="m">+2</span></div><div class="attr"><b>CON</b><span class="n">13</span><span class="m">+1</span></div><div class="attr"><b>INT</b><span class="n">12</span><span class="m">+1</span></div><div class="attr"><b>SAB</b><span class="n">10</span><span class="m">+0</span></div><div class="attr"><b>CAR</b><span class="n">16</span><span class="m">+3</span></div></div>
-          <div class="linha-item"><span class="rot">Magia (CAR · CD 13)</span>Truques: Raio de Fogo (1d10), Prestidigitação. Nível 1 (2/dia): Mísseis Mágicos, Sono.</div>
-          <div class="linha-item"><span class="rot">Sangue ancestral</span>Vantagem pra reconhecer criaturas do folclore. 1x/dia pede orientação a um espírito.</div>
-          <div class="assinatura"><span class="tag">★ Assinatura</span><br><b>Mísseis Mágicos</b> — 3 dardos de 1d4+1 que sempre acertam.</div>
-        </div>
-      </div>
-
-      <!-- EDU -->
-      <div class="ficha">
-        <div class="topo">
-          <svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="3" fill="none"><line x1="11" y1="39" x2="35" y2="15"/><line x1="39" y1="39" x2="15" y2="15"/><path d="M35 15 l3 -4 1 5 z" fill="#211a12"/><path d="M15 15 l-3 -4 -1 5 z" fill="#211a12"/><rect x="7" y="37" width="8" height="4" rx="1" transform="rotate(-45 11 39)" fill="#211a12"/><rect x="35" y="37" width="8" height="4" rx="1" transform="rotate(45 39 39)" fill="#211a12"/><path d="M25 21 v9 M20 25 h10" stroke="#9e2b16" stroke-width="2.5"/></svg>
-          <div><p class="nome">Edu</p><div class="classe">Guerreiro · Humano</div></div>
-        </div>
-        <div class="corpo">
-          <div class="vitais"><div class="vital pv"><b>PV</b><span class="v">14</span></div><div class="vital"><b>CA</b><span class="v">14</span></div><div class="vital"><b>Prof.</b><span class="v">+2</span></div></div>
-          <div class="attrs"><div class="attr"><b>FOR</b><span class="n">16</span><span class="m">+3</span></div><div class="attr"><b>DES</b><span class="n">13</span><span class="m">+1</span></div><div class="attr"><b>CON</b><span class="n">15</span><span class="m">+2</span></div><div class="attr"><b>INT</b><span class="n">10</span><span class="m">+0</span></div><div class="attr"><b>SAB</b><span class="n">12</span><span class="m">+1</span></div><div class="attr"><b>CAR</b><span class="n">10</span><span class="m">+0</span></div></div>
-          <div class="semarma">🔪 <b>Sem facas no momento.</b> Por enquanto, improvisa com o que tiver à mão.</div>
-          <div class="linha-item"><span class="rot">Facas &amp; cortantes</span>Mestre da lâmina — usa bem qualquer faca ou utensílio cortante. Faca: ataque +5, dano 1d4+3 (arremessa 6/18m). Estilo Duas Armas: <b>2 ataques de faca</b> por ação.</div>
-          <div class="linha-item"><span class="rot">Homem de fé</span>Carrega o terço e o crucifixo. <b>Reza Forte</b> (1x/dia): acalma uma criatura do folclore (Religião CD 13) ou dá vantagem a um aliado contra o medo. Fôlego 1x/descanso (1d10+1 PV).</div>
-          <div class="assinatura"><span class="tag">★ Assinatura</span><br><b>Corte em Cruz</b> — dois talhos cruzados com as facas; contra o amaldiçoado ou do outro mundo, cada acerto causa +1d6.</div>
-        </div>
-      </div>
-
-    </div>
+    <p class="sub-secao">Fichas de nível 1 — alimentadas pelo painel do Mestre em tempo real. <span id="liveInd" class="live-ind">local</span></p>
+    <div id="fichasLive" class="fichas"></div>
   </section>
 
-  <!-- COMO SE JOGA -->
   <section>
     <div class="titulo-secao"><span class="num">II</span><h2>Como se joga</h2></div>
     <p class="sub-secao">O essencial. O resto o Mestre explica na hora.</p>
@@ -213,13 +119,93 @@
       <div class="regra"><b>No seu turno</b> Você pode <b>mover</b> e fazer <b>1 ação</b> (atacar, magia, ajudar, examinar…).</div>
       <div class="regra"><b>Vantagem</b> Role 2 d20 e pegue o maior. Desvantagem: o menor.</div>
       <div class="regra"><b>PV = vida</b> Zerou, você cai. Um descanso longo recupera tudo.</div>
-      <div class="regra"><b>Truques (magia)</b> Magias simples, usadas <b>à vontade</b> — quantas vezes quiser, sem gastar nada. Role o ataque de magia (d20 + bônus) contra a CA, ou o alvo resiste com uma salvaguarda. Ex.: Produzir Chama, Raio de Fogo.</div>
-      <div class="regra"><b>Magias (nível 1)</b> As poderosas. Cada uso gasta <b>1 espaço de magia</b>; no nível 1 vocês têm <b>2 por dia</b>. Recuperam num descanso longo — então escolham a hora. Ex.: Curar Ferimentos, Mísseis Mágicos.</div>
-      <div class="regra"><b>Jogada de assinatura</b> A marca registrada de cada herói (o quadro ★ da ficha). <b>Uma vez por cena</b>, faça a sua com estilo — é o seu momento de brilhar. Descreva bonito e o Mestre deixa acontecer.</div>
+      <div class="regra"><b>Truques (magia)</b> Magias simples, usadas <b>à vontade</b> — sem gastar nada. Role o ataque de magia (d20 + bônus) contra a CA, ou o alvo resiste com uma salvaguarda. Ex.: Produzir Chama, Raio de Fogo.</div>
+      <div class="regra"><b>Magias (nível 1)</b> As poderosas. Cada uso gasta <b>1 espaço</b>; no nível 1 vocês têm <b>2 por dia</b>. Recuperam num descanso longo. Ex.: Curar Ferimentos, Mísseis Mágicos.</div>
+      <div class="regra"><b>Jogada de assinatura</b> A marca de cada herói (o quadro ★). <b>Uma vez por cena</b>, faça a sua com estilo — é o seu momento de brilhar.</div>
     </div>
   </section>
 
   <footer>O Sítio SS · Guia do Jogador · o que vocês não sabem ainda é o que mais importa</footer>
 </div>
+
+<script>
+const FIREBASE_CONFIG = {
+  apiKey:"AIzaSyAt-PlL34BpKlKynoOd2qU4Ll6dOFQpLkE", authDomain:"rpg-deberg.firebaseapp.com",
+  databaseURL:"https://rpg-deberg-default-rtdb.firebaseio.com", projectId:"rpg-deberg",
+  storageBucket:"rpg-deberg.firebasestorage.app", messagingSenderId:"493974534263",
+  appId:"1:493974534263:web:e9bd28ee5d3955b601ee72", measurementId:"G-G9ZHDMPV4P"
+};
+let ROOM="sitio-ss";
+const EMB={
+  duda:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.4" fill="none"><path d="M25 46 V22"/><path d="M25 30 q-12 -2 -16 -14 q14 0 16 14"/><path d="M25 24 q12 -4 16 -16 q-14 -1 -16 16"/><circle cx="25" cy="14" r="6" fill="#42542f" stroke="#211a12"/></svg>',
+  vlad:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.2" fill="#211a12"><path d="M8 30 q10 -14 26 -12 q6 1 8 6 l6 -1 -4 5 3 3 -6 0 q-2 8 -10 10 q4 4 2 8 q-6 -3 -8 -6 q-10 1 -17 -6 q8 1 10 -3 q-10 -2 -12 -8 q6 4 12 1 z" stroke="#211a12" stroke-width="1.5"/><circle cx="34" cy="24" r="1.6" fill="#e6d9b8"/></svg>',
+  matheus:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.4" fill="none"><path d="M14 40 L40 14" stroke="#211a12" stroke-width="4"/><path d="M40 14 q6 -4 4 4 q-1 6 -8 6 z" fill="#9e2b16" stroke="#211a12"/><rect x="10" y="38" width="10" height="6" rx="1" transform="rotate(-45 15 41)" fill="#211a12"/></svg>',
+  caio:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.2" fill="none"><rect x="17" y="16" width="16" height="22" rx="2" fill="#211a12"/><rect x="21" y="20" width="8" height="14" fill="#b5842f"/><path d="M20 16 q5 -8 10 0" stroke="#211a12" fill="none"/><line x1="25" y1="8" x2="25" y2="12"/></svg>',
+  thais:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.2" fill="none"><path d="M25 8 q8 10 6 18 q-2 6 -6 8 q-4 -2 -6 -8 q-2 -8 6 -18z" fill="#9e2b16" stroke="#211a12"/><path d="M25 20 q3 6 0 14" stroke="#e6d9b8" stroke-width="1.6"/><path d="M18 40 q7 6 14 0" stroke="#211a12"/></svg>',
+  edu:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="3" fill="none"><line x1="11" y1="39" x2="35" y2="15"/><line x1="39" y1="39" x2="15" y2="15"/><path d="M35 15 l3 -4 1 5 z" fill="#211a12"/><path d="M15 15 l-3 -4 -1 5 z" fill="#211a12"/><rect x="7" y="37" width="8" height="4" rx="1" transform="rotate(-45 11 39)" fill="#211a12"/><rect x="35" y="37" width="8" height="4" rx="1" transform="rotate(45 39 39)" fill="#211a12"/><path d="M25 21 v9 M20 25 h10" stroke="#9e2b16" stroke-width="2.5"/></svg>'
+};
+const BASE=[
+  {id:"duda",nome:"Duda",cl:"Druida · Elfa",cor:"#42542f",pvMax:12,pvAtual:12,ca:14,cond:"",attrs:{FOR:8,DES:15,CON:13,INT:12,SAB:16,CAR:10},
+   armas:"Sem armas: luta com a magia da natureza.\nMagia (SAB · CD 13) — Truques: Produzir Chama, Orientação. Nível 1 (2/dia): Curar Ferimentos, Emaranhar.\nTraços de elfa: visão no escuro, vantagem contra encantos, não dorme (transe).",
+   objetos:"Cajado, foice pequena, símbolo druídico, bolsa de ervas, armadura de peles.",assin:{nome:"Toque da Mata",txt:"cura 1d8+3 PV num aliado."}},
+  {id:"vlad",nome:"Vlad",cl:"Guerreiro · Humano",cor:"#4a3d2c",pvMax:14,pvAtual:14,ca:16,cond:"",attrs:{FOR:16,DES:12,CON:14,INT:10,SAB:13,CAR:12},
+   armas:"Sem arma no momento (soco 1d4+3 ou improvisado). Com uma lâmina: ataque +5, dano 1d8+3.\nFôlego: 1x/descanso recupera 1d10+1 PV. Estilo Defesa (+1 CA já incluso).\nLíngua dos Corvos.",
+   objetos:"Cota de malha, mochila. Sem arma no momento.",assin:{nome:"Língua dos Corvos",txt:"1x/dia manda corvos espionar e trazer uma pista."}},
+  {id:"matheus",nome:"Matheus",cl:"Bárbaro · Humano",cor:"#9e2b16",pvMax:16,pvAtual:16,ca:14,cond:"",attrs:{FOR:16,DES:14,CON:15,INT:8,SAB:12,CAR:10},
+   armas:"Facão do Espantalho — ataque +5, dano 1d6+3.\nFúria (2x/dia): +2 no dano corpo a corpo, resistência a dano físico, vantagem em testes de FOR.",
+   objetos:"Facão do Espantalho, roupas de couro, saco de mantimentos.",assin:{nome:"Fúria do Facão",txt:"entra em Fúria e desce o facão sem dó."}},
+  {id:"caio",nome:"Caio",cl:"Ladino · Humano",cor:"#b5842f",pvMax:12,pvAtual:12,ca:14,cond:"",attrs:{FOR:10,DES:16,CON:13,INT:14,SAB:12,CAR:13},
+   armas:"Sem arma no momento. Com adaga ou arco, liga o Ataque Furtivo (+1d6).\nEspecialista: Furtividade e Ladinagem (proficiência dobrada).",
+   objetos:"Armadura de couro, mochila: corda de 15 m, lampião, ferramentas de ladrão.",assin:{nome:"Nas Sombras",txt:"some no escuro e reaparece com um golpe furtivo."}},
+  {id:"thais",nome:"Thais",cl:"Feiticeira · Humana",cor:"#6e1d0f",pvMax:12,pvAtual:12,ca:12,cond:"",attrs:{FOR:8,DES:14,CON:13,INT:12,SAB:10,CAR:16},
+   armas:"Magia (CAR · CD 13) — Truques: Raio de Fogo (1d10), Prestidigitação. Nível 1 (2/dia): Mísseis Mágicos, Sono.\nSangue ancestral: vantagem pra reconhecer criaturas do folclore; 1x/dia pede orientação a um espírito.",
+   objetos:"Foco arcano (colar de sementes), vestes, bolsa de componentes.",assin:{nome:"Mísseis Mágicos",txt:"3 dardos de 1d4+1 que sempre acertam."}},
+  {id:"edu",nome:"Edu",cl:"Guerreiro · Humano",cor:"#7a5a2e",pvMax:14,pvAtual:14,ca:14,cond:"",attrs:{FOR:16,DES:13,CON:15,INT:10,SAB:12,CAR:10},
+   armas:"Sem facas no momento (improvisa). Faca +5, 1d4+3 (arremessa 6/18m). Estilo Duas Armas: 2 ataques de faca por ação.\nHomem de fé: Reza Forte 1x/dia (acalma criatura do folclore, CD 13, ou vantagem contra medo). Fôlego 1x/descanso (1d10+1 PV).",
+   objetos:"Armadura de couro, terço e crucifixo, cinto de facas vazio, mochila.",assin:{nome:"Corte em Cruz",txt:"dois talhos cruzados; contra o amaldiçoado, +1d6 por acerto."}}
+];
+
+let dados=JSON.parse(JSON.stringify(BASE));
+function mod(v){ const n=Math.floor((v-10)/2); return (n>=0?"+":"")+n; }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+function escLines(s){ return esc(s).replace(/\n/g,"<br>"); }
+function aplicar(r){
+  if(!r||!r.chars)return;
+  dados.forEach(c=>{ const rc=r.chars[c.id]; if(!rc)return;
+    ["pvAtual","pvMax","ca","cond","armas","objetos"].forEach(k=>{ if(rc[k]!==undefined&&rc[k]!==null)c[k]=rc[k]; });
+    if(rc.attrs){ for(const k in c.attrs){ if(typeof rc.attrs[k]==="number")c.attrs[k]=rc.attrs[k]; } }
+  });
+}
+function cardHTML(c){
+  const attrs=["FOR","DES","CON","INT","SAB","CAR"].map(k=>`<div class="attr"><b>${k}</b><span class="n">${c.attrs[k]}</span><span class="m">${mod(c.attrs[k])}</span></div>`).join("");
+  const condHTML=c.cond?`<div class="semarma">⚠ <b>Condições:</b> ${esc(c.cond)}</div>`:"";
+  return `<div class="ficha" style="border-left:7px solid ${c.cor}">
+    <div class="topo">${EMB[c.id]||""}<div><p class="nome">${c.nome}</p><div class="classe">${c.cl}</div></div></div>
+    <div class="corpo">
+      <div class="vitais">
+        <div class="vital pv"><b>PV</b><span class="v">${c.pvAtual}<small style="font-size:.62em;color:var(--tinta-suave)"> /${c.pvMax}</small></span></div>
+        <div class="vital"><b>CA</b><span class="v">${c.ca}</span></div>
+        <div class="vital"><b>Prof.</b><span class="v">+2</span></div>
+      </div>
+      <div class="attrs">${attrs}</div>
+      <div class="linha-item"><span class="rot">Armas / Magia</span>${escLines(c.armas)||"—"}</div>
+      <div class="linha-item"><span class="rot">Objetos</span>${escLines(c.objetos)||"—"}</div>
+      ${condHTML}
+      <div class="assinatura"><span class="tag">★ Assinatura</span><br><b>${c.assin.nome}</b> — ${c.assin.txt}</div>
+    </div></div>`;
+}
+function render(){ document.getElementById("fichasLive").innerHTML=dados.map(cardHTML).join(""); }
+function setLive(on){ const el=document.getElementById("liveInd"); el.textContent=on?"● ao vivo":"local"; el.classList.toggle("on",!!on); }
+
+(function init(){
+  const m=location.hash.match(/sala=([^&]+)/); if(m)ROOM=decodeURIComponent(m[1]);
+  render();
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const db=firebase.database();
+    db.ref("salas/"+ROOM).on("value",snap=>{ const v=snap.val(); if(v){ aplicar(v); render(); setLive(true); } }, ()=>setLive(false));
+  }catch(e){ console.error(e); setLive(false); }
+})();
+</script>
 </body>
 </html>
