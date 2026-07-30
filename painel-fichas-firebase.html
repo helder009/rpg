@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPG: Sítio SS — Painel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&family=Vollkorn:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  :root{--papel:#e6d9b8;--papel-esc:#d8c69c;--tinta:#211a12;--tinta-suave:#4a3d2c;--brasa:#9e2b16;--brasa-esc:#6e1d0f;--mata:#42542f;--ocre:#b5842f;--linha:rgba(33,26,18,.28)}
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--tinta);font-family:"Vollkorn",Georgia,serif;font-size:16px;line-height:1.5;
+    background:var(--papel);background-image:repeating-linear-gradient(0deg,rgba(120,90,50,.03) 0 2px,transparent 2px 4px)}
+  .wrap{max-width:1040px;margin:0 auto;padding:18px}
+  h1{font-family:"Rye",serif;font-weight:400;font-size:clamp(1.5rem,5vw,2.4rem);margin:0;line-height:1}
+  h3{font-family:"Rye",serif;font-weight:400;font-size:1.15rem;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+  .eyebrow{font-family:"Special Elite",monospace;text-transform:uppercase;letter-spacing:.24em;font-size:.66rem;color:var(--brasa-esc)}
+  header.top{border:3px solid var(--tinta);background:var(--papel-esc);padding:14px 16px;box-shadow:6px 6px 0 var(--tinta);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .modo{font-family:"Special Elite",monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;padding:4px 10px;border:2px solid var(--tinta)}
+  .modo.jogador{background:var(--papel);color:var(--tinta-suave)}
+  .modo.mestre{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
+  .barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  button{font-family:"Special Elite",monospace;font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:2px solid var(--tinta);background:var(--papel-esc);color:var(--tinta);padding:7px 12px;box-shadow:2px 2px 0 var(--tinta)}
+  button:hover{filter:brightness(1.03)}button:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--tinta)}
+  button.brasa{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
+  button.mini{padding:3px 8px;font-size:.72rem;box-shadow:1px 1px 0 var(--tinta)}
+  button.menu-btn{padding:9px 16px;font-size:.82rem}
+  select{font-family:inherit;font-size:.95rem;border:2px solid var(--tinta);background:#fff;color:var(--tinta);padding:6px 8px}
+  .sync{font-family:"Special Elite",monospace;font-size:.7rem;color:var(--tinta-suave);margin-left:auto}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#b5842f;margin-right:5px;vertical-align:middle}
+  .dot.on{background:#4a7a2e}.dot.off{background:#9e2b16}
+  .aviso{border:2px dashed var(--brasa);background:rgba(158,43,22,.07);padding:10px 14px;font-size:.88rem;margin-bottom:12px}
+  .aviso b{color:var(--brasa-esc)}
+  .layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  @media (max-width:840px){.layout{grid-template-columns:1fr}}
+  .col{display:flex;flex-direction:column;gap:14px}
+  .sel-wrap label{display:block;font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--brasa-esc);margin-bottom:3px}
+  .sel-wrap select{width:100%;font-size:1.02rem;font-weight:700}
+  .card{border:2.5px solid var(--tinta);background:var(--papel-esc);box-shadow:5px 5px 0 var(--tinta);border-left-width:8px;margin-top:12px}
+  .card .cab{display:flex;justify-content:space-between;align-items:baseline;padding:10px 14px 6px;border-bottom:2px solid var(--tinta)}
+  .card .nome{font-family:"Rye",serif;font-size:1.35rem;line-height:.9}
+  .card .cl{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--brasa)}
+  .card .corpo{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+  .hp{display:flex;align-items:center;gap:8px;justify-content:center}
+  .hp .valor{font-family:"Rye",serif;font-size:2rem;line-height:1;color:var(--brasa)}
+  .hp .valor small{font-size:1rem;color:var(--tinta-suave)}
+  .barra-hp{height:10px;border:2px solid var(--tinta);background:var(--papel);overflow:hidden}
+  .barra-hp i{display:block;height:100%;transition:width .2s,background .2s}
+  .hpbtns{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
+  .duo{display:flex;gap:8px}.campo{flex:1}
+  .campo label{display:block;font-family:"Special Elite",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tinta-suave);margin-bottom:2px}
+  .campo .ro{font-weight:700}.campo .txt{font-size:.9rem;line-height:1.45}
+  input,textarea{width:100%;font-family:inherit;font-size:.92rem;border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);padding:5px 7px}
+  input[type=number]{text-align:center}
+  textarea{resize:vertical;min-height:38px}
+  input:disabled,textarea:disabled{background:transparent;border-color:var(--linha);color:var(--tinta);cursor:default;opacity:1}
+  .num-inline{width:52px}
+  .attrs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;border-top:2px dashed var(--linha);padding-top:10px}
+  .attr{text-align:center;border:1px solid var(--linha);padding:4px 2px;background:rgba(255,255,255,.14)}
+  .attr b{display:block;font-family:"Special Elite",monospace;font-size:.55rem;color:var(--brasa-esc)}
+  .attr .n{font-weight:700;font-size:.95rem}.attr .m{font-size:.66rem;color:var(--tinta-suave)}
+  .attr input{width:100%;padding:2px 0;font-size:.9rem;text-align:center;border:1px solid var(--tinta);background:var(--papel);box-shadow:none}
+  .assin{border-top:1px dashed var(--linha);padding-top:6px}
+  .assin .tag{display:inline-block;background:var(--brasa);color:var(--papel);font-family:"Special Elite",monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;padding:2px 7px;margin-bottom:3px}
+  .assin b{font-family:"Rye",serif;font-weight:400;font-size:1rem}
+  .painel{border:2.5px solid var(--tinta);background:var(--papel-esc);box-shadow:5px 5px 0 var(--tinta);padding:12px 14px}
+  .painel.dados-box{background:#918b7c}
+  .tagm{font-family:"Special Elite",monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.1em;background:var(--brasa);color:var(--papel);padding:2px 7px}
+  .adv-row{display:flex;gap:6px;margin-bottom:8px}
+  .pill{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;padding:5px 9px;border:2px solid var(--tinta);cursor:pointer;background:var(--papel)}
+  .pill.on{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
+  .dados-puros{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+  .die{font-family:"Rye",serif;font-size:1rem;padding:8px 14px}
+  .modman{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;color:var(--tinta);display:flex;align-items:center;gap:4px;margin-left:auto}
+  .modman input{width:46px}
+  .linha-roll{display:flex;gap:8px;margin:7px 0}.linha-roll select{flex:1}
+  .resultado{border:2px solid var(--tinta);background:#fff;text-align:center;padding:10px;margin:8px 0}
+  .resultado .big{font-family:"Rye",serif;font-size:2.6rem;line-height:1;color:var(--brasa)}
+  .resultado .det{font-family:"Special Elite",monospace;font-size:.72rem;color:var(--tinta-suave);margin-top:4px}
+  .log{max-height:150px;overflow:auto;border-top:2px dashed rgba(33,26,18,.4);padding-top:6px}
+  .log div{font-size:.82rem;padding:2px 0;border-bottom:1px solid rgba(33,26,18,.25)}
+  .log .t{font-family:"Special Elite",monospace;color:var(--brasa-esc);font-weight:700}
+  #notasMestre{width:100%;min-height:120px;font-family:inherit;font-size:.98rem;line-height:1.5;border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);padding:8px 10px;resize:vertical}
+  #notasMestre:disabled{background:transparent;opacity:1;cursor:default}
+  .canvas-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+  .canvas-ctrl label{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta-suave)}
+  .swatch{width:26px;height:26px;border:2px solid var(--tinta);padding:0;cursor:pointer;box-shadow:none}
+  .canvas-wrap{border:2px solid var(--tinta);background:#f3ead0;line-height:0}
+  #tela{width:100%;height:auto;display:block;touch-action:none}
+  #canvasNota{font-size:.8rem;color:var(--tinta-suave);margin-top:5px}
+  .flash{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--tinta);color:var(--papel);font-family:"Special Elite",monospace;font-size:.74rem;padding:8px 16px;box-shadow:3px 3px 0 var(--brasa);opacity:0;transition:opacity .25s;pointer-events:none;z-index:20}
+  .flash.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div><div class="eyebrow">Painel · Firebase · tempo real</div><h1>RPG: Sítio SS</h1></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button id="btnMestre" class="brasa">🔑 Entrar como Mestre</button>
+      <span id="modoBadge" class="modo jogador">Modo Jogador</span>
+    </div>
+  </header>
+
+  <div id="avisoBox"></div>
+
+  <div class="barra">
+    <button class="menu-btn" onclick="window.open('guia-do-jogador.html','_blank')">📖 Guia do Jogador ↗</button>
+    <button class="menu-btn" onclick="window.open('https://www.google.com/search?q=roll+a+d20','_blank')">🎲 D20 online ↗</button>
+    <button id="btnPin" style="display:none" class="mini">Trocar PIN</button>
+    <button id="btnReset" style="display:none" class="mini">Zerar fichas</button>
+    <span id="sync" class="sync"><span class="dot"></span>iniciando…</span>
+  </div>
+
+  <div class="layout">
+    <div class="col">
+      <div class="sel-wrap"><label>Ficha visível</label><select id="selFicha"></select></div>
+      <div id="ficha"></div>
+    </div>
+    <div class="col">
+      <div class="painel dados-box">
+        <h3>Dados</h3>
+        <div class="adv-row">
+          <span class="pill on" id="pNorm" onclick="setAdv('none')">Normal</span>
+          <span class="pill" id="pAdv" onclick="setAdv('adv')">Vantagem</span>
+          <span class="pill" id="pDis" onclick="setAdv('dis')">Desvantagem</span>
+        </div>
+        <div class="dados-puros">
+          <button class="die brasa" onclick="rolarPuro(20)">d20</button>
+          <button class="die brasa" onclick="rolarPuro(6)">d6</button>
+          <button class="die brasa" onclick="rolarPuro(4)">d4</button>
+          <span class="modman">mod <input id="modMan" type="number" value="0"></span>
+        </div>
+        <div class="linha-roll"><select id="selTeste"></select><button onclick="rolarTeste()">Teste</button></div>
+        <div class="linha-roll">
+          <select id="selAtaque">
+            <option value="FOR">Ataque corpo a corpo (FOR)</option>
+            <option value="DES">Ataque à distância / fino (DES)</option>
+            <option value="MAG">Ataque mágico</option>
+          </select>
+          <button onclick="rolarAtaque()">Ataque</button>
+        </div>
+        <div class="resultado"><div class="big" id="resBig">—</div><div class="det" id="resDet">escolha um dado ou uma rolagem</div></div>
+        <div class="log" id="log"></div>
+      </div>
+      <div class="painel">
+        <h3>Anotações do Mestre <span class="tagm">ao vivo</span></h3>
+        <textarea id="notasMestre" placeholder="—" disabled></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="painel" style="margin-top:14px">
+    <h3>Quadro do Mestre <span class="tagm">ao vivo</span></h3>
+    <div id="canvasCtrl" class="canvas-ctrl" style="display:none">
+      <label>Cor</label>
+      <button class="swatch" style="background:#211a12" onclick="setCor('#211a12')"></button>
+      <button class="swatch" style="background:#9e2b16" onclick="setCor('#9e2b16')"></button>
+      <button class="swatch" style="background:#2f6b3a" onclick="setCor('#2f6b3a')"></button>
+      <button class="swatch" style="background:#2b5a8c" onclick="setCor('#2b5a8c')"></button>
+      <button class="swatch" style="background:#b5842f" onclick="setCor('#b5842f')"></button>
+      <input type="color" id="corPicker" value="#211a12" onchange="setCor(this.value)" style="width:34px;height:28px;padding:0;border:2px solid var(--tinta);box-shadow:none;cursor:pointer">
+      <label>Traço</label>
+      <input type="range" id="brush" min="1" max="22" value="3" style="width:90px">
+      <button class="mini" id="btnBorracha" onclick="toggleBorracha()">Borracha</button>
+      <button class="mini brasa" onclick="limparTela()">Limpar</button>
+    </div>
+    <div class="canvas-wrap"><canvas id="tela" width="900" height="480"></canvas></div>
+    <div id="canvasNota">Somente o Mestre desenha; vocês veem em tempo real.</div>
+  </div>
+
+</div>
+<div id="flash" class="flash"></div>
+
+<script>
+const FIREBASE_CONFIG = {
+  apiKey:"AIzaSyAt-PlL34BpKlKynoOd2qU4Ll6dOFQpLkE", authDomain:"rpg-deberg.firebaseapp.com",
+  databaseURL:"https://rpg-deberg-default-rtdb.firebaseio.com", projectId:"rpg-deberg",
+  storageBucket:"rpg-deberg.firebasestorage.app", messagingSenderId:"493974534263",
+  appId:"1:493974534263:web:e9bd28ee5d3955b601ee72", measurementId:"G-G9ZHDMPV4P"
+};
+let ROOM="sitio-ss"; const PROF=2;
+
+const PADRAO = {
+  pin:"DEBERG", updated:0, updatedBy:"", notasMestre:"",
+  chars:[
+    { id:"duda", nome:"Duda", cl:"Druida · Elfa", cor:"#42542f", pvMax:12, pvAtual:12, ca:14, cond:"", notas:"",
+      attrs:{FOR:8,DES:15,CON:13,INT:12,SAB:16,CAR:10}, conjura:"SAB",
+      pericias:["Percepção","Natureza","Medicina","Intuição"], expert:[],
+      armas:"Sem armas: luta com a magia da natureza.\nMagia (SAB · CD 13) — Truques: Produzir Chama, Orientação. Nível 1 (2/dia): Curar Ferimentos, Emaranhar.\nTraços de elfa: visão no escuro, vantagem contra encantos, não dorme (transe).",
+      objetos:"Cajado, foice pequena, símbolo druídico, bolsa de ervas, armadura de peles.",
+      assin:{nome:"Toque da Mata",txt:"cura 1d8+3 PV num aliado."} },
+    { id:"vlad", nome:"Vlad", cl:"Guerreiro · Humano", cor:"#4a3d2c", pvMax:14, pvAtual:14, ca:16, cond:"", notas:"Sem arma no momento.",
+      attrs:{FOR:16,DES:12,CON:14,INT:10,SAB:13,CAR:12}, conjura:null,
+      pericias:["Atletismo","Intimidação","Percepção"], expert:[],
+      armas:"Sem arma no momento (soco 1d4+3 ou improvisado). Com uma lâmina: ataque +5, dano 1d8+3.\nFôlego: 1x/descanso recupera 1d10+1 PV. Estilo Defesa (+1 CA já incluso).\nLíngua dos Corvos.",
+      objetos:"Cota de malha, mochila. Sem arma no momento.",
+      assin:{nome:"Língua dos Corvos",txt:"1x/dia manda corvos espionar e trazer uma pista."} },
+    { id:"matheus", nome:"Matheus", cl:"Bárbaro · Humano", cor:"#9e2b16", pvMax:16, pvAtual:16, ca:14, cond:"", notas:"Facão do Espantalho.",
+      attrs:{FOR:16,DES:14,CON:15,INT:8,SAB:12,CAR:10}, conjura:null,
+      pericias:["Atletismo","Sobrevivência","Intimidação"], expert:[],
+      armas:"Facão do Espantalho — ataque +5, dano 1d6+3.\nFúria (2x/dia): +2 no dano corpo a corpo, resistência a dano físico, vantagem em testes de FOR.",
+      objetos:"Facão do Espantalho, roupas de couro, saco de mantimentos.",
+      assin:{nome:"Fúria do Facão",txt:"entra em Fúria e desce o facão sem dó."} },
+    { id:"caio", nome:"Caio", cl:"Ladino · Humano", cor:"#b5842f", pvMax:12, pvAtual:12, ca:14, cond:"", notas:"Sem arma no momento.",
+      attrs:{FOR:10,DES:16,CON:13,INT:14,SAB:12,CAR:13}, conjura:null,
+      pericias:["Furtividade","Ladinagem","Percepção","Acrobacia","Enganação"], expert:["Furtividade","Ladinagem"],
+      armas:"Sem arma no momento. Com adaga ou arco, liga o Ataque Furtivo (+1d6).\nEspecialista: Furtividade e Ladinagem (proficiência dobrada).",
+      objetos:"Armadura de couro, mochila: corda de 15 m, lampião, ferramentas de ladrão.",
+      assin:{nome:"Nas Sombras",txt:"some no escuro e reaparece com um golpe furtivo."} },
+    { id:"thais", nome:"Thais", cl:"Feiticeira · Humana", cor:"#6e1d0f", pvMax:12, pvAtual:12, ca:12, cond:"", notas:"",
+      attrs:{FOR:8,DES:14,CON:13,INT:12,SAB:10,CAR:16}, conjura:"CAR",
+      pericias:["Arcanismo","História","Religião","Persuasão"], expert:[],
+      armas:"Magia (CAR · CD 13) — Truques: Raio de Fogo (1d10), Prestidigitação. Nível 1 (2/dia): Mísseis Mágicos, Sono.\nSangue ancestral: vantagem pra reconhecer criaturas do folclore; 1x/dia pede orientação a um espírito.",
+      objetos:"Foco arcano (colar de sementes), vestes, bolsa de componentes.",
+      assin:{nome:"Mísseis Mágicos",txt:"3 dardos de 1d4+1 que sempre acertam."} },
+    { id:"edu", nome:"Edu", cl:"Guerreiro · Humano", cor:"#7a5a2e", pvMax:14, pvAtual:14, ca:14, cond:"", notas:"Sem facas no momento.",
+      attrs:{FOR:16,DES:13,CON:15,INT:10,SAB:12,CAR:10}, conjura:null,
+      pericias:["Atletismo","Intimidação","Percepção","Religião"], expert:[],
+      armas:"Sem facas no momento (improvisa). Faca +5, 1d4+3 (arremessa 6/18m). Estilo Duas Armas: 2 ataques de faca por ação.\nHomem de fé: Reza Forte 1x/dia (acalma criatura do folclore, CD 13, ou vantagem contra medo). Fôlego 1x/descanso (1d10+1 PV).",
+      objetos:"Armadura de couro, terço e crucifixo, cinto de facas vazio, mochila.",
+      assin:{nome:"Corte em Cruz",txt:"dois talhos cruzados; contra o amaldiçoado, +1d6 por acerto."} }
+  ]
+};
+
+const ATRIBS={FOR:"Força",DES:"Destreza",CON:"Constituição",INT:"Inteligência",SAB:"Sabedoria",CAR:"Carisma"};
+const SKILLS={"Acrobacia":"DES","Arcanismo":"INT","Atletismo":"FOR","Atuação":"CAR","Enganação":"CAR","Furtividade":"DES","História":"INT","Intimidação":"CAR","Intuição":"SAB","Investigação":"INT","Ladinagem":"DES","Lidar com Animais":"SAB","Medicina":"SAB","Natureza":"INT","Percepção":"SAB","Persuasão":"CAR","Religião":"INT","Sobrevivência":"SAB"};
+
+let state=JSON.parse(JSON.stringify(PADRAO));
+let gm=false, atual=state.chars[0].id, adv="none";
+let db=null, salaRef=null, desenhoRef=null, online=false;
+const $=id=>document.getElementById(id);
+function mod(v){ const n=Math.floor((v-10)/2); return (n>=0?"+":"")+n; }
+function modN(v){ return Math.floor((v-10)/2); }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+function escLines(s){ return esc(s).replace(/\n/g,"<br>"); }
+function flash(m){ const f=$("flash"); f.textContent=m; f.classList.add("on"); clearTimeout(f._t); f._t=setTimeout(()=>f.classList.remove("on"),1600); }
+function temConfig(){ const c=FIREBASE_CONFIG; return c&&c.databaseURL&&c.databaseURL.indexOf("COLE_AQUI")<0&&c.apiKey&&c.apiKey.indexOf("COLE_AQUI")<0; }
+function editando(){ const a=document.activeElement; return a&&a.classList&&a.classList.contains("live"); }
+function charAtual(){ return state.chars.find(c=>c.id===atual)||state.chars[0]; }
+
+function initFirebase(){
+  if(!temConfig()){ mostraSetup(); return; }
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG); db=firebase.database(); salaRef=db.ref("salas/"+ROOM);
+    salaRef.on("value",snap=>{ const v=snap.val(); if(!v){ saveRemote(); return; } if(editando())return; aplicaRemoto(v); render(); },
+      err=>{ console.error(err); online=false; atualizaSync(); flash("Erro de conexão"); });
+    desenhoRef=db.ref("salas/"+ROOM+"/quadro");
+    desenhoRef.on("child_added",snap=>drawStroke(snap.val()));
+    desenhoRef.on("value",snap=>{ if(!snap.exists()) clearTela(); });
+    online=true; $("avisoBox").innerHTML=""; atualizaSync();
+  }catch(e){ console.error(e); online=false; mostraSetup(); }
+}
+function mostraSetup(){ online=false; atualizaSync(); $("avisoBox").innerHTML='<div class="aviso"><b>Modo local (sem sincronizar).</b> Na prévia o Firebase pode ser bloqueado — publicado no GitHub ele conecta sozinho.</div>'; }
+async function saveRemote(){
+  state.updated=Date.now(); state.updatedBy=gm?"Mestre":"";
+  if(!online){ atualizaSync(); return; }
+  const p={pin:state.pin,updated:state.updated,updatedBy:state.updatedBy,notasMestre:state.notasMestre||"",chars:{}};
+  state.chars.forEach(c=>{ p.chars[c.id]={pvAtual:c.pvAtual,pvMax:c.pvMax,ca:c.ca,cond:c.cond||"",notas:c.notas||"",attrs:Object.assign({},c.attrs),armas:c.armas||"",objetos:c.objetos||""}; });
+  try{ await salaRef.update(p); }catch(e){ console.error(e); flash("Erro ao salvar"); }
+  atualizaSync();
+}
+function aplicaRemoto(r){
+  if(!r)return;
+  if(typeof r.pin==="string")state.pin=r.pin;
+  state.updated=r.updated||0; state.updatedBy=r.updatedBy||"";
+  if(typeof r.notasMestre==="string")state.notasMestre=r.notasMestre;
+  if(r.chars) state.chars.forEach(c=>{ const rc=r.chars[c.id]; if(!rc)return;
+    if(typeof rc.pvAtual==="number")c.pvAtual=rc.pvAtual;
+    if(typeof rc.pvMax==="number")c.pvMax=rc.pvMax;
+    if(typeof rc.ca==="number")c.ca=rc.ca;
+    if(typeof rc.cond==="string")c.cond=rc.cond;
+    if(typeof rc.notas==="string")c.notas=rc.notas;
+    if(rc.attrs){ for(const k in ATRIBS){ if(typeof rc.attrs[k]==="number")c.attrs[k]=rc.attrs[k]; } }
+    if(typeof rc.armas==="string")c.armas=rc.armas;
+    if(typeof rc.objetos==="string")c.objetos=rc.objetos; });
+  syncNotasUI();
+}
+function atualizaSync(){
+  const s=$("sync");
+  if(!temConfig()){ s.innerHTML='<span class="dot off"></span>modo local'; return; }
+  if(!online){ s.innerHTML='<span class="dot off"></span>sem conexão'; return; }
+  let q="pronto"; if(state.updated){ const seg=Math.round((Date.now()-state.updated)/1000); q=seg<5?"agora":seg<60?"há "+seg+"s":"há "+Math.round(seg/60)+"min"; }
+  s.innerHTML='<span class="dot on"></span>sala “'+ROOM+'” · '+q+(state.updatedBy?(" · "+state.updatedBy):"");
+}
+
+function setModo(){
+  const b=$("modoBadge"); b.className="modo "+(gm?"mestre":"jogador"); b.textContent=gm?"Modo Mestre":"Modo Jogador";
+  $("btnMestre").textContent=gm?"🚪 Sair do Modo Mestre":"🔑 Entrar como Mestre";
+  $("btnPin").style.display=gm?"":"none"; $("btnReset").style.display=gm?"":"none"; atualizaExtra();
+}
+function ajustaHP(id,delta){ const c=state.chars.find(x=>x.id===id); c.pvAtual=Math.max(0,Math.min(c.pvMax,c.pvAtual+delta)); render(); saveRemote(); }
+
+function popularSelect(){ const s=$("selFicha"); s.innerHTML=state.chars.map(c=>`<option value="${c.id}">${c.nome} · ${c.pvAtual}/${c.pvMax} PV</option>`).join(""); s.value=atual; }
+function renderFicha(){
+  const c=charAtual(), dis=gm?"":"disabled";
+  const ratio=c.pvMax>0?c.pvAtual/c.pvMax:0, cor=ratio>0.5?"#42542f":ratio>0.25?"#b5842f":"#9e2b16";
+  const attrsHTML=["FOR","DES","CON","INT","SAB","CAR"].map(k=>`<div class="attr"><b>${k}</b>${gm?`<input class="live" type="number" value="${c.attrs[k]}" data-id="${c.id}" data-attr="${k}">`:`<span class="n">${c.attrs[k]}</span>`}<span class="m">${mod(c.attrs[k])}</span></div>`).join("");
+  $("ficha").innerHTML=`
+    <div class="card" style="border-left-color:${c.cor}">
+      <div class="cab"><span class="nome">${c.nome}</span><span class="cl">${c.cl}</span></div>
+      <div class="corpo">
+        <div class="hp"><span class="valor">${c.pvAtual}<small> / ${c.pvMax}</small></span></div>
+        <div class="barra-hp"><i style="width:${Math.round(ratio*100)}%;background:${cor}"></i></div>
+        ${gm?`<div class="hpbtns">
+          <button class="mini" onclick="ajustaHP('${c.id}',-5)">-5</button>
+          <button class="mini" onclick="ajustaHP('${c.id}',-1)">-1</button>
+          <button class="mini" onclick="ajustaHP('${c.id}',1)">+1</button>
+          <button class="mini" onclick="ajustaHP('${c.id}',5)">+5</button>
+          <button class="mini brasa" onclick="ajustaHP('${c.id}',999)">cheio</button></div>`:``}
+        <div class="duo">
+          <div class="campo"><label>PV máx</label>${gm?`<input class="live num-inline" type="number" value="${c.pvMax}" data-id="${c.id}" data-f="pvMax">`:`<div class="ro">${c.pvMax}</div>`}</div>
+          <div class="campo"><label>CA</label>${gm?`<input class="live num-inline" type="number" value="${c.ca}" data-id="${c.id}" data-f="ca">`:`<div class="ro">${c.ca}</div>`}</div>
+        </div>
+        <div class="campo"><label>Condições</label><input class="live" type="text" value="${esc(c.cond)}" placeholder="${gm?'ex: envenenado, caído…':'—'}" data-id="${c.id}" data-f="cond" ${dis}></div>
+        <div class="attrs">${attrsHTML}</div>
+        <div class="campo"><label>Armas / Magia</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="armas" style="min-height:78px">${esc(c.armas)}</textarea>`:`<div class="txt">${escLines(c.armas)||"—"}</div>`}</div>
+        <div class="campo"><label>Objetos</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="objetos" style="min-height:46px">${esc(c.objetos)}</textarea>`:`<div class="txt">${escLines(c.objetos)||"—"}</div>`}</div>
+        <div class="campo"><label>Anotações</label><textarea class="live" data-id="${c.id}" data-f="notas" ${dis} placeholder="${gm?'lembretes rápidos…':''}">${esc(c.notas)}</textarea></div>
+        <div class="assin"><span class="tag">Assinatura</span><br><b>${c.assin.nome}</b> — ${c.assin.txt}</div>
+      </div>
+    </div>`;
+  if(gm){
+    $("ficha").querySelectorAll("input.live, textarea.live").forEach(el=>{
+      const commit=()=>{ const c2=state.chars.find(x=>x.id===el.dataset.id);
+        if(el.dataset.attr){ let v=parseInt(el.value)||0; v=Math.max(1,Math.min(30,v)); c2.attrs[el.dataset.attr]=v; saveRemote(); return; }
+        const f=el.dataset.f;
+        if(f==="pvMax"||f==="ca"){ let v=parseInt(el.value)||0; v=Math.max(0,v); c2[f]=v; if(f==="pvMax")c2.pvAtual=Math.min(c2.pvAtual,v); }
+        else c2[f]=el.value;
+        saveRemote(); };
+      el.addEventListener("change",()=>{ commit(); if(el.dataset.attr||el.dataset.f==="pvMax"||el.dataset.f==="ca") render(); });
+      el.addEventListener("blur",commit);
+    });
+  }
+}
+function render(){ popularSelect(); renderFicha(); syncNotasUI(); atualizaSync(); }
+
+function setAdv(a){ adv=a; $("pNorm").classList.toggle("on",a==="none"); $("pAdv").classList.toggle("on",a==="adv"); $("pDis").classList.toggle("on",a==="dis"); }
+function d(n){ return 1+Math.floor(Math.random()*n); }
+function d20adv(){ if(adv==="adv"){const a=d(20),b=d(20);return{v:Math.max(a,b),rolls:[a,b]};} if(adv==="dis"){const a=d(20),b=d(20);return{v:Math.min(a,b),rolls:[a,b]};} const a=d(20); return{v:a,rolls:[a]}; }
+function detTxt(r,m){ const s=m>=0?"+"+m:""+m; const base=r.rolls.length>1?"["+r.rolls.join(", ")+"]→"+r.v:"["+r.v+"]"; return base+(m!==0?" "+s:"")+" = "+(r.v+m); }
+function mostra(label,r,m){ const total=r.v+m; $("resBig").textContent=total; $("resDet").textContent=label+" · "+detTxt(r,m); addLog(total,label,detTxt(r,m)); }
+function addLog(total,label,det){ const hora=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); const e=document.createElement("div"); e.innerHTML=`<span class="t">${total}</span> — ${label}: ${det} <span style="color:var(--tinta-suave)">· ${hora}</span>`; const L=$("log"); L.insertBefore(e,L.firstChild); while(L.children.length>16)L.removeChild(L.lastChild); }
+function rolarPuro(sides){ const m=parseInt($("modMan").value)||0; let r; if(sides===20){ r=d20adv(); } else { const a=d(sides); r={v:a,rolls:[a]}; } const advtxt=(sides===20&&adv!=="none")?(" ("+(adv==="adv"?"vantagem":"desvantagem")+")"):""; mostra("d"+sides+advtxt,r,m); }
+function profDe(c,skill){ if(c.expert&&c.expert.indexOf(skill)>=0)return PROF*2; if(c.pericias&&c.pericias.indexOf(skill)>=0)return PROF; return 0; }
+function popularTestes(){ const s=$("selTeste"), prev=s.value; let html=""; for(const k in ATRIBS) html+=`<option value="attr:${k}">Teste de ${ATRIBS[k]} (${k})</option>`; const c=charAtual(); Object.keys(SKILLS).forEach(sk=>{ const p=profDe(c,sk); const mk=p>=PROF*2?" ✦✦":p>=PROF?" ✦":""; html+=`<option value="skill:${sk}">${sk} (${SKILLS[sk]})${mk}</option>`; }); s.innerHTML=html; s.value=prev||"skill:Percepção"; if(!s.value)s.value="skill:Percepção"; }
+function rolarTeste(){ const c=charAtual(), val=$("selTeste").value, parts=val.split(":"), tipo=parts[0], chave=parts[1]; let attr,prof=0,label; if(tipo==="attr"){ attr=chave; label="Teste de "+ATRIBS[attr]+" ("+attr+")"; } else { attr=SKILLS[chave]; prof=profDe(c,chave); label=chave+" ("+attr+")"; } const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(label+" · "+c.nome+advtxt, d20adv(), modN(c.attrs[attr])+prof); }
+function rolarAtaque(){ const c=charAtual(), tipo=$("selAtaque").value; let attr,nome; if(tipo==="FOR"){ attr="FOR"; nome="Ataque corpo a corpo"; } else if(tipo==="DES"){ attr="DES"; nome="Ataque à distância/fino"; } else { attr=c.conjura||["INT","SAB","CAR"].reduce((a,b)=>modN(c.attrs[b])>modN(c.attrs[a])?b:a,"INT"); nome="Ataque mágico ("+attr+")"; } const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(nome+" · "+c.nome+advtxt, d20adv(), modN(c.attrs[attr])+PROF); }
+
+let notaTimer=null;
+function syncNotasUI(){ const t=$("notasMestre"); if(!t)return; t.disabled=!gm; if(document.activeElement!==t)t.value=state.notasMestre||""; t.placeholder=gm?"O que os jogadores devem ver — o que está à vista, pistas, avisos…":"— sem anotações —"; }
+
+let cor="#211a12", brush=3, borracha=false, desenhando=false, pts=[];
+const tela=$("tela"), ctx=tela.getContext("2d"); ctx.lineCap="round"; ctx.lineJoin="round";
+function setCor(c){ cor=c; borracha=false; const bb=$("btnBorracha"); if(bb)bb.classList.remove("brasa"); const cp=$("corPicker"); if(cp&&c.charAt(0)==="#")cp.value=c; }
+function toggleBorracha(){ borracha=!borracha; $("btnBorracha").classList.toggle("brasa",borracha); }
+function clearTela(){ ctx.clearRect(0,0,tela.width,tela.height); }
+function limparTela(){ if(online&&db){ db.ref("salas/"+ROOM+"/quadro").remove(); } else { clearTela(); } }
+function drawStroke(s){ if(!s||!s.p||s.p.length<4)return; ctx.save(); ctx.globalCompositeOperation=s.e?"destination-out":"source-over"; ctx.strokeStyle=s.c||"#211a12"; ctx.lineWidth=s.w||3; ctx.beginPath(); ctx.moveTo(s.p[0]*tela.width,s.p[1]*tela.height); for(let i=2;i<s.p.length;i+=2)ctx.lineTo(s.p[i]*tela.width,s.p[i+1]*tela.height); ctx.stroke(); ctx.restore(); }
+function posNorm(ev){ const r=tela.getBoundingClientRect(); return [(ev.clientX-r.left)/r.width,(ev.clientY-r.top)/r.height]; }
+function segLocal(){ const n=pts.length; if(n<4)return; ctx.save(); ctx.globalCompositeOperation=borracha?"destination-out":"source-over"; ctx.strokeStyle=cor; ctx.lineWidth=brush; ctx.beginPath(); ctx.moveTo(pts[n-4]*tela.width,pts[n-3]*tela.height); ctx.lineTo(pts[n-2]*tela.width,pts[n-1]*tela.height); ctx.stroke(); ctx.restore(); }
+function fimTraco(){ if(!desenhando)return; desenhando=false; if(pts.length>=4&&online&&desenhoRef){ desenhoRef.push({c:cor,w:brush,e:borracha,p:pts.slice()}); } pts=[]; }
+function attachCanvas(){
+  tela.addEventListener("pointerdown",ev=>{ if(!gm)return; desenhando=true; pts=[]; const[x,y]=posNorm(ev); pts.push(x,y); try{tela.setPointerCapture(ev.pointerId);}catch(e){} });
+  tela.addEventListener("pointermove",ev=>{ if(!desenhando)return; const[x,y]=posNorm(ev); pts.push(x,y); segLocal(); });
+  tela.addEventListener("pointerup",fimTraco); tela.addEventListener("pointercancel",fimTraco);
+  $("brush").addEventListener("input",e=>{ brush=parseInt(e.target.value)||3; });
+}
+function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; syncNotasUI(); }
+
+$("btnMestre").addEventListener("click",()=>{ if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; } const p=prompt("Digite o PIN do Mestre:"); if(p===null)return; if(p===state.pin){ gm=true; setModo(); render(); flash("Modo Mestre ativado"); } else alert("PIN incorreto."); });
+$("btnPin").addEventListener("click",async()=>{ const n=prompt("Novo PIN do Mestre:",state.pin); if(n&&n.trim()){ state.pin=n.trim(); await saveRemote(); flash("PIN atualizado"); } });
+$("btnReset").addEventListener("click",async()=>{ if(!confirm("Zerar as fichas para o padrão? (o quadro e as anotações do Mestre não mudam)"))return; const pin=state.pin,nm=state.notasMestre; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin; state.notasMestre=nm; await saveRemote(); render(); flash("Fichas zeradas"); });
+$("selFicha").addEventListener("change",e=>{ atual=e.target.value; renderFicha(); popularTestes(); });
+(function(){ const t=$("notasMestre"); t.addEventListener("input",()=>{ if(!gm)return; state.notasMestre=t.value; clearTimeout(notaTimer); notaTimer=setTimeout(saveRemote,500); }); t.addEventListener("blur",()=>{ if(!gm)return; state.notasMestre=t.value; saveRemote(); }); })();
+
+(function init(){ const m=location.hash.match(/sala=([^&]+)/); if(m)ROOM=decodeURIComponent(m[1]); attachCanvas(); setModo(); render(); popularTestes(); atualizaExtra(); initFirebase(); })();
+</script>
+</body>
+</html>
