@@ -1,1 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Fichas — O Sítio SS (Firebase)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&family=Vollkorn:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Firebase (SDK compat, carrega direto do CDN) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  :root{--papel:#e6d9b8;--papel-esc:#d8c69c;--tinta:#211a12;--tinta-suave:#4a3d2c;--brasa:#9e2b16;--brasa-esc:#6e1d0f;--mata:#42542f;--ocre:#b5842f;--linha:rgba(33,26,18,.28)}
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--tinta);font-family:"Vollkorn",Georgia,serif;font-size:16px;line-height:1.5;
+    background:var(--papel);background-image:repeating-linear-gradient(0deg,rgba(120,90,50,.03) 0 2px,transparent 2px 4px)}
+  .wrap{max-width:960px;margin:0 auto;padding:18px}
+  h1{font-family:"Rye",serif;font-weight:400;font-size:clamp(1.6rem,6vw,2.6rem);margin:0;line-height:1}
+  .eyebrow{font-family:"Special Elite",monospace;text-transform:uppercase;letter-spacing:.24em;font-size:.68rem;color:var(--brasa-esc)}
+  header.top{border:3px solid var(--tinta);background:var(--papel-esc);padding:16px 18px;box-shadow:6px 6px 0 var(--tinta);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .modo{font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;padding:4px 10px;border:2px solid var(--tinta)}
+  .modo.jogador{background:var(--papel);color:var(--tinta-suave)}
+  .modo.mestre{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
+  .barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  button{font-family:"Special Elite",monospace;font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:2px solid var(--tinta);background:var(--papel-esc);color:var(--tinta);padding:7px 12px;box-shadow:2px 2px 0 var(--tinta)}
+  button:hover{background:var(--papel)}button:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--tinta)}
+  button.brasa{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
+  button.mini{padding:3px 8px;font-size:.72rem;box-shadow:1px 1px 0 var(--tinta)}
+  input[type=text],input[type=number]{font-family:inherit;font-size:.92rem;border:2px solid var(--tinta);background:#fff;color:var(--tinta);padding:5px 7px}
+  .sync{font-family:"Special Elite",monospace;font-size:.7rem;color:var(--tinta-suave);margin-left:auto}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#b5842f;margin-right:5px;vertical-align:middle}
+  .dot.on{background:#4a7a2e}.dot.off{background:#9e2b16}
+  .aviso{border:2px dashed var(--brasa);background:rgba(158,43,22,.07);padding:12px 15px;font-size:.9rem;margin-bottom:14px}
+  .aviso b{color:var(--brasa-esc)}
+  details.setup{margin-top:8px}
+  details.setup summary{cursor:pointer;font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--brasa-esc)}
+  details.setup ol{margin:8px 0 0;padding-left:1.3em}details.setup li{margin:.3em 0}
+  code{background:rgba(33,26,18,.1);padding:1px 5px;font-family:"Special Elite",monospace;font-size:.85em}
+  .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+  .card{border:2.5px solid var(--tinta);background:var(--papel-esc);box-shadow:5px 5px 0 var(--tinta);border-left-width:8px;display:flex;flex-direction:column}
+  .card .cab{display:flex;justify-content:space-between;align-items:baseline;padding:10px 14px 6px;border-bottom:2px solid var(--tinta)}
+  .card .nome{font-family:"Rye",serif;font-size:1.3rem;line-height:.9}
+  .card .cl{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--brasa)}
+  .card .corpo{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+  .hp{display:flex;align-items:center;gap:8px;justify-content:center}
+  .hp .valor{font-family:"Rye",serif;font-size:2rem;line-height:1;color:var(--brasa)}
+  .hp .valor small{font-size:1rem;color:var(--tinta-suave)}
+  .barra-hp{height:10px;border:2px solid var(--tinta);background:var(--papel);overflow:hidden}
+  .barra-hp i{display:block;height:100%;transition:width .2s,background .2s}
+  .hpbtns{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
+  .duo{display:flex;gap:8px}.campo{flex:1}
+  .campo label{display:block;font-family:"Special Elite",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tinta-suave);margin-bottom:2px}
+  .campo .ro{font-weight:700}
+  input,textarea{width:100%;font-family:inherit;font-size:.92rem;border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);padding:5px 7px}
+  input[type=number]{text-align:center}
+  textarea{resize:vertical;min-height:38px}
+  input:disabled,textarea:disabled{background:transparent;border-color:var(--linha);color:var(--tinta);cursor:default;opacity:1}
+  .num-inline{width:52px}
+  .togglefull{width:100%;text-align:center;margin-top:2px}
+  .fichafull{border-top:2px dashed var(--linha);margin-top:2px;padding-top:10px;display:none;flex-direction:column;gap:8px}
+  .fichafull.open{display:flex}
+  .attrs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+  .attr{text-align:center;border:1px solid var(--linha);padding:4px 0;background:rgba(255,255,255,.14)}
+  .attr b{display:block;font-family:"Special Elite",monospace;font-size:.55rem;color:var(--brasa-esc)}
+  .attr .n{font-weight:700;font-size:.9rem}.attr .m{font-size:.66rem;color:var(--tinta-suave)}
+  .info-line{font-size:.86rem}
+  .info-line .rot{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--brasa-esc);display:block}
+  .assin{border-top:1px dashed var(--linha);padding-top:6px}
+  .assin .tag{display:inline-block;background:var(--brasa);color:var(--papel);font-family:"Special Elite",monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;padding:2px 7px;margin-bottom:3px}
+  .assin b{font-family:"Rye",serif;font-weight:400;font-size:1rem}
+  .rodape{margin-top:22px;border-top:2px solid var(--tinta);padding-top:14px;font-size:.86rem;color:var(--tinta-suave)}
+  .rodape b{color:var(--brasa-esc);font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px}
+  .flash{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--tinta);color:var(--papel);font-family:"Special Elite",monospace;font-size:.74rem;padding:8px 16px;box-shadow:3px 3px 0 var(--brasa);opacity:0;transition:opacity .25s;pointer-events:none;z-index:20}
+  .flash.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
 
+  <header class="top">
+    <div>
+      <div class="eyebrow">Painel de fichas · Firebase · tempo real</div>
+      <h1>O Sítio SS</h1>
+    </div>
+    <span id="modoBadge" class="modo jogador">Modo Jogador</span>
+  </header>
+
+  <div id="avisoBox"></div>
+
+  <div class="barra">
+    <button id="btnMestre" class="brasa">🔑 Entrar como Mestre</button>
+    <button id="btnPin" style="display:none" class="mini">Trocar PIN</button>
+    <button id="btnReset" style="display:none" class="mini">Zerar painel</button>
+    <span id="sync" class="sync"><span class="dot"></span>iniciando…</span>
+  </div>
+
+  <div id="grade" class="grade"></div>
+
+  <div class="rodape">
+    <b>Como usar na mesa</b>
+    No <b>Modo Mestre</b> (PIN padrão <b>DEBERG</b>), os botões de dano/cura ajustam o PV, e você edita CA, condições e anotações — tudo sincroniza <b>na hora</b> pra todos que abrirem a mesma sala. Toque em <b>“Ficha completa”</b> pra ver atributos, magias e a assinatura (referência fixa). Para separar grupos, mude o código da <b>sala</b> no endereço (<code>#sala=nome</code>) e compartilhe esse link.
+  </div>
+</div>
+
+<div id="flash" class="flash"></div>
+
+<script>
+/* ============================================================
+   1) COLE AQUI a configuração do SEU Firebase.
+      (Console Firebase → ⚙ Configurações do projeto → Seus apps →
+       Web </> → copie o objeto firebaseConfig. Inclua databaseURL!)
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyAt-PlL34BpKlKynoOd2qU4Ll6dOFQpLkE",
+  authDomain:        "rpg-deberg.firebaseapp.com",
+  databaseURL:       "https://rpg-deberg-default-rtdb.firebaseio.com",
+  projectId:         "rpg-deberg",
+  storageBucket:     "rpg-deberg.firebasestorage.app",
+  messagingSenderId: "493974534263",
+  appId:             "1:493974534263:web:e9bd28ee5d3955b601ee72",
+  measurementId:     "G-G9ZHDMPV4P"
+};
+/* Código da sala: separa grupos diferentes que usam o mesmo arquivo.
+   Pode ser sobrescrito pela URL com #sala=nome */
+let ROOM = "sitio-ss";
+/* ============================================================ */
+
+const PADRAO = {
+  pin: "DEBERG",
+  updated: 0,
+  updatedBy: "",
+  chars: [
+    {
+      id:"duda", nome:"Duda", cl:"Druida · Elfa", cor:"#42542f",
+      pvMax:9, pvAtual:9, ca:14, cond:"", notas:"",
+      attrs:{FOR:8,DES:15,CON:13,INT:12,SAB:16,CAR:10},
+      info:[
+        {rot:"Sem armas", txt:"Luta com a magia da natureza — brasa, cipós e cura."},
+        {rot:"Magia (SAB · CD 13)", txt:"Truques: Produzir Chama, Orientação. Nível 1 (2/dia): Curar Ferimentos, Emaranhar."},
+        {rot:"Traços de elfa", txt:"Visão no escuro · vantagem contra encantos · não dorme (transe)."}
+      ],
+      assin:{nome:"Toque da Mata", txt:"cura 1d8+3 PV num aliado."}
+    },
+    {
+      id:"vlad", nome:"Vlad", cl:"Guerreiro · Humano", cor:"#4a3d2c",
+      pvMax:12, pvAtual:12, ca:16, cond:"", notas:"Sem arma no momento.",
+      attrs:{FOR:16,DES:12,CON:14,INT:10,SAB:13,CAR:12},
+      info:[
+        {rot:"Sem arma ainda", txt:"Soco 1d4+3 ou improvisado. Com uma lâmina → ataque +5, dano 1d8+3."},
+        {rot:"Fôlego", txt:"1x/descanso: recupera 1d10+1 PV (ação bônus). Estilo Defesa (+1 CA incluso)."}
+      ],
+      assin:{nome:"Língua dos Corvos", txt:"1x/dia manda corvos espionar e trazer uma pista."}
+    },
+    {
+      id:"matheus", nome:"Matheus", cl:"Bárbaro · Humano", cor:"#9e2b16",
+      pvMax:14, pvAtual:14, ca:14, cond:"", notas:"Facão do Espantalho.",
+      attrs:{FOR:16,DES:14,CON:15,INT:8,SAB:12,CAR:10},
+      info:[
+        {rot:"Arma", txt:"Facão do Espantalho — ataque +5, dano 1d6+3."},
+        {rot:"Fúria (2x/dia)", txt:"+2 no dano corpo a corpo, resistência a dano físico, vantagem em testes de FOR."}
+      ],
+      assin:{nome:"Fúria do Facão", txt:"entra em Fúria e desce o facão sem dó."}
+    },
+    {
+      id:"caio", nome:"Caio", cl:"Ladino · Humano", cor:"#b5842f",
+      pvMax:9, pvAtual:9, ca:14, cond:"", notas:"Sem arma no momento.",
+      attrs:{FOR:10,DES:16,CON:13,INT:14,SAB:12,CAR:13},
+      info:[
+        {rot:"Sem arma ainda", txt:"Com uma adaga ou arco, liga o Ataque Furtivo (+1d6)."},
+        {rot:"Especialista", txt:"Furtividade e Ladinagem (fechaduras, armadilhas)."},
+        {rot:"Mochila", txt:"Corda de 15m · lampião · ferramentas de ladrão."}
+      ],
+      assin:{nome:"Nas Sombras", txt:"some no escuro e reaparece com um golpe furtivo."}
+    },
+    {
+      id:"thais", nome:"Thais", cl:"Feiticeira · Humana", cor:"#6e1d0f",
+      pvMax:9, pvAtual:9, ca:12, cond:"", notas:"",
+      attrs:{FOR:8,DES:14,CON:13,INT:12,SAB:10,CAR:16},
+      info:[
+        {rot:"Magia (CAR · CD 13)", txt:"Truques: Raio de Fogo (1d10), Prestidigitação. Nível 1 (2/dia): Mísseis Mágicos, Sono."},
+        {rot:"Sangue ancestral", txt:"Vantagem pra reconhecer criaturas do folclore. 1x/dia pede orientação a um espírito."}
+      ],
+      assin:{nome:"Mísseis Mágicos", txt:"3 dardos de 1d4+1 que sempre acertam."}
+    },
+    {
+      id:"edu", nome:"Edu", cl:"Guerreiro · Humano", cor:"#7a5a2e",
+      pvMax:12, pvAtual:12, ca:14, cond:"", notas:"Sem facas no momento.",
+      attrs:{FOR:16,DES:13,CON:15,INT:10,SAB:12,CAR:10},
+      info:[
+        {rot:"Sem facas no momento", txt:"Improvisa com o que tiver à mão até achar uma lâmina."},
+        {rot:"Facas e cortantes", txt:"Mestre da lâmina — faca +5, 1d4+3 (arremessa 6/18m). Estilo Duas Armas: 2 ataques de faca por ação."},
+        {rot:"Homem de fé", txt:"Terço e crucifixo. Reza Forte 1x/dia: acalma criatura do folclore (Religião CD 13) ou dá vantagem contra o medo. Fôlego 1x/descanso (1d10+1 PV)."}
+      ],
+      assin:{nome:"Corte em Cruz", txt:"dois talhos cruzados; contra o amaldiçoado ou do outro mundo, +1d6 por acerto."}
+    }
+  ]
+};
+
+let state = JSON.parse(JSON.stringify(PADRAO));
+let gm = false;
+const abertos = new Set();
+let db=null, salaRef=null, online=false;
+
+function mod(v){ const n=Math.floor((v-10)/2); return (n>=0?"+":"")+n; }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+function flash(msg){ const f=document.getElementById("flash"); f.textContent=msg; f.classList.add("on"); clearTimeout(f._t); f._t=setTimeout(()=>f.classList.remove("on"),1600); }
+
+function temConfig(){
+  const c=FIREBASE_CONFIG;
+  return c && c.databaseURL && c.databaseURL.indexOf("COLE_AQUI")<0 && c.apiKey && c.apiKey.indexOf("COLE_AQUI")<0;
+}
+function editando(){ const a=document.activeElement; return a&&a.classList&&a.classList.contains("live"); }
+
+/* ---------- Firebase ---------- */
+function initFirebase(){
+  if(!temConfig()){
+    mostraSetup();
+    return;
+  }
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.database();
+    salaRef = db.ref("salas/"+ROOM);
+    salaRef.on("value", snap=>{
+      const v = snap.val();
+      if(!v){ saveRemote(); return; }      // primeira vez: grava o padrão
+      if(editando()) return;               // não atropela quem está digitando
+      aplicaRemoto(v); render();
+    }, err=>{ console.error(err); online=false; atualizaSync(); flash("Erro de conexão"); });
+    online = true;
+    document.getElementById("avisoBox").innerHTML="";
+    atualizaSync();
+  }catch(e){ console.error(e); online=false; mostraSetup(); }
+}
+function mostraSetup(){
+  online=false; atualizaSync();
+  document.getElementById("avisoBox").innerHTML = `
+    <div class="aviso">
+      <b>Modo local (sem sincronizar).</b> Para os jogadores verem tudo ao vivo, ligue o Firebase — é grátis e leva ~5 min.
+      <details class="setup"><summary>▸ Passo a passo do Firebase</summary>
+        <ol>
+          <li>Entre em <code>console.firebase.google.com</code> e crie um projeto (plano <b>Spark</b>, sem cartão).</li>
+          <li>Menu <b>Criar → Realtime Database → Criar banco de dados</b> → escolha um local → <b>modo de teste</b>.</li>
+          <li><b>⚙ Configurações do projeto → Seus apps → Web (&lt;/&gt;)</b> → registre o app → copie o objeto <code>firebaseConfig</code>.</li>
+          <li>Cole em <code>FIREBASE_CONFIG</code> no topo deste arquivo (mantendo a linha <code>databaseURL</code>) e salve.</li>
+          <li>Publique no GitHub Pages e compartilhe o link. Pronto — todos veem ao vivo.</li>
+        </ol>
+        <p style="font-size:.85em">No “modo de teste” as regras ficam abertas por ~30 dias (qualquer um com o link edita). Para um jogo entre colegas, tudo bem — e o PIN do Mestre fica visível no código, então não é senha de verdade.</p>
+      </details>
+    </div>`;
+}
+
+async function saveRemote(){
+  state.updated = Date.now();
+  state.updatedBy = gm ? "Mestre" : "";
+  if(!online){ atualizaSync(); return; }
+  const payload = { pin:state.pin, updated:state.updated, updatedBy:state.updatedBy, chars:{} };
+  state.chars.forEach(c=>{ payload.chars[c.id] = {pvAtual:c.pvAtual, pvMax:c.pvMax, ca:c.ca, cond:c.cond||"", notas:c.notas||""}; });
+  try{ await salaRef.set(payload); }catch(e){ console.error(e); flash("Erro ao salvar"); }
+  atualizaSync();
+}
+function aplicaRemoto(r){
+  if(!r) return;
+  if(typeof r.pin==="string") state.pin=r.pin;
+  state.updated=r.updated||0; state.updatedBy=r.updatedBy||"";
+  if(r.chars){
+    state.chars.forEach(c=>{
+      const rc=r.chars[c.id]; if(!rc) return;
+      if(typeof rc.pvAtual==="number") c.pvAtual=rc.pvAtual;
+      if(typeof rc.pvMax==="number")  c.pvMax =rc.pvMax;
+      if(typeof rc.ca==="number")     c.ca    =rc.ca;
+      if(typeof rc.cond==="string")   c.cond  =rc.cond;
+      if(typeof rc.notas==="string")  c.notas =rc.notas;
+    });
+  }
+}
+function atualizaSync(){
+  const s=document.getElementById("sync");
+  if(!temConfig()){ s.innerHTML='<span class="dot off"></span>modo local (Firebase desligado)'; return; }
+  if(!online){ s.innerHTML='<span class="dot off"></span>sem conexão'; return; }
+  let q="pronto";
+  if(state.updated){ const seg=Math.round((Date.now()-state.updated)/1000);
+    q = seg<5?"agora":seg<60?"há "+seg+"s":"há "+Math.round(seg/60)+"min"; }
+  s.innerHTML='<span class="dot on"></span>sala “'+ROOM+'” · '+q+(state.updatedBy?(" · "+state.updatedBy):"");
+}
+
+/* ---------- UI ---------- */
+function setModo(){
+  const b=document.getElementById("modoBadge");
+  b.className="modo "+(gm?"mestre":"jogador"); b.textContent=gm?"Modo Mestre":"Modo Jogador";
+  document.getElementById("btnMestre").textContent=gm?"🚪 Sair do Modo Mestre":"🔑 Entrar como Mestre";
+  document.getElementById("btnPin").style.display  = gm?"":"none";
+  document.getElementById("btnReset").style.display= gm?"":"none";
+}
+function ajustaHP(id,delta){
+  const c=state.chars.find(x=>x.id===id);
+  c.pvAtual=Math.max(0,Math.min(c.pvMax,c.pvAtual+delta));
+  render(); saveRemote();
+}
+function toggleFicha(id){
+  const el=document.getElementById("full-"+id), btn=document.getElementById("btnfull-"+id);
+  if(abertos.has(id)){ abertos.delete(id); el.classList.remove("open"); btn.textContent="▸ Ficha completa"; }
+  else { abertos.add(id); el.classList.add("open"); btn.textContent="▾ Ficha completa"; }
+}
+function render(){
+  const g=document.getElementById("grade"); g.innerHTML="";
+  state.chars.forEach(c=>{
+    const ratio=c.pvMax>0?c.pvAtual/c.pvMax:0;
+    const cor=ratio>0.5?"#42542f":ratio>0.25?"#b5842f":"#9e2b16";
+    const dis=gm?"":"disabled", aberto=abertos.has(c.id);
+    const attrsHTML=["FOR","DES","CON","INT","SAB","CAR"].map(k=>`<div class="attr"><b>${k}</b><span class="n">${c.attrs[k]}</span><span class="m">${mod(c.attrs[k])}</span></div>`).join("");
+    const infoHTML=c.info.map(i=>`<div class="info-line"><span class="rot">${i.rot}</span>${i.txt}</div>`).join("");
+    const card=document.createElement("div");
+    card.className="card"; card.style.borderLeftColor=c.cor;
+    card.innerHTML=`
+      <div class="cab"><span class="nome">${c.nome}</span><span class="cl">${c.cl}</span></div>
+      <div class="corpo">
+        <div class="hp"><span class="valor">${c.pvAtual}<small> / ${c.pvMax}</small></span></div>
+        <div class="barra-hp"><i style="width:${Math.round(ratio*100)}%;background:${cor}"></i></div>
+        ${gm?`<div class="hpbtns">
+          <button class="mini" onclick="ajustaHP('${c.id}',-5)">-5</button>
+          <button class="mini" onclick="ajustaHP('${c.id}',-1)">-1</button>
+          <button class="mini" onclick="ajustaHP('${c.id}',1)">+1</button>
+          <button class="mini" onclick="ajustaHP('${c.id}',5)">+5</button>
+          <button class="mini brasa" onclick="ajustaHP('${c.id}',999)">cheio</button>
+        </div>`:``}
+        <div class="duo">
+          <div class="campo"><label>PV máx</label>${gm?`<input class="live num-inline" type="number" value="${c.pvMax}" data-id="${c.id}" data-f="pvMax">`:`<div class="ro">${c.pvMax}</div>`}</div>
+          <div class="campo"><label>CA</label>${gm?`<input class="live num-inline" type="number" value="${c.ca}" data-id="${c.id}" data-f="ca">`:`<div class="ro">${c.ca}</div>`}</div>
+        </div>
+        <div class="campo"><label>Condições</label><input class="live" type="text" value="${esc(c.cond)}" placeholder="${gm?'ex: envenenado, caído…':'—'}" data-id="${c.id}" data-f="cond" ${dis}></div>
+        <div class="campo"><label>Anotações</label><textarea class="live" data-id="${c.id}" data-f="notas" ${dis} placeholder="${gm?'itens, pistas, lembretes…':''}">${esc(c.notas)}</textarea></div>
+        <button class="mini togglefull" id="btnfull-${c.id}" onclick="toggleFicha('${c.id}')">${aberto?'▾':'▸'} Ficha completa</button>
+        <div class="fichafull ${aberto?'open':''}" id="full-${c.id}">
+          <div class="attrs">${attrsHTML}</div>
+          ${infoHTML}
+          <div class="assin"><span class="tag">Assinatura</span><br><b>${c.assin.nome}</b> — ${c.assin.txt}</div>
+        </div>
+      </div>`;
+    g.appendChild(card);
+  });
+  if(gm){
+    g.querySelectorAll("input.live, textarea.live").forEach(el=>{
+      const commit=()=>{
+        const c=state.chars.find(x=>x.id===el.dataset.id), f=el.dataset.f;
+        if(f==="pvMax"||f==="ca"){ let v=parseInt(el.value)||0; v=Math.max(0,v); c[f]=v; if(f==="pvMax")c.pvAtual=Math.min(c.pvAtual,v); }
+        else c[f]=el.value;
+        saveRemote();
+      };
+      el.addEventListener("change",()=>{ commit(); if(el.dataset.f==="pvMax"||el.dataset.f==="ca") render(); });
+      el.addEventListener("blur",commit);
+    });
+  }
+  atualizaSync();
+}
+
+/* ---------- controles ---------- */
+document.getElementById("btnMestre").addEventListener("click",()=>{
+  if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; }
+  const p=prompt("Digite o PIN do Mestre:"); if(p===null) return;
+  if(p===state.pin){ gm=true; setModo(); render(); flash("Modo Mestre ativado"); } else alert("PIN incorreto.");
+});
+document.getElementById("btnPin").addEventListener("click",async()=>{
+  const novo=prompt("Novo PIN do Mestre:",state.pin);
+  if(novo&&novo.trim()){ state.pin=novo.trim(); await saveRemote(); flash("PIN atualizado"); }
+});
+document.getElementById("btnReset").addEventListener("click",async()=>{
+  if(!confirm("Zerar todos os PV, condições e anotações para o padrão?")) return;
+  const pin=state.pin; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin;
+  await saveRemote(); render(); flash("Painel zerado");
+});
+
+/* ---------- início ---------- */
+(function init(){
+  const m=location.hash.match(/sala=([^&]+)/);
+  if(m) ROOM=decodeURIComponent(m[1]);
+  setModo(); render();
+  initFirebase();
+})();
+</script>
+</body>
+</html>
