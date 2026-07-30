@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Sítio SS — Guia do Mestre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&family=Vollkorn:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--papel:#221c1a;--papel-esc:#2b2320;--tinta:#e9dcc4;--tinta-suave:#b9a888;--brasa:#d4562f;--brasa-cl:#f0a35f;--mata:#8bab5c;--corvo:#9fb6d6;--linha:rgba(233,220,196,.25)}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;color:var(--tinta);font-family:"Vollkorn",Georgia,serif;font-size:17px;line-height:1.62;
+    background:var(--papel);
+    background-image:repeating-linear-gradient(0deg,rgba(255,220,180,.02) 0 2px,transparent 2px 4px),radial-gradient(circle at 15% 5%,rgba(212,86,47,.10),transparent 40%),radial-gradient(circle at 90% 90%,rgba(0,0,0,.35),transparent 45%)}
+  .wrap{max-width:1000px;margin:0 auto;padding:22px}
+  .eyebrow{font-family:"Special Elite",monospace;text-transform:uppercase;letter-spacing:.28em;font-size:.72rem;color:var(--brasa-cl)}
+  .capa{border:3px solid var(--brasa);padding:32px 26px 28px;text-align:center;position:relative;background:var(--papel-esc);box-shadow:8px 8px 0 #000;margin-bottom:14px}
+  .capa::before{content:"";position:absolute;inset:8px;border:1px solid var(--linha);pointer-events:none}
+  .capa .selo{margin:0 auto 6px;width:110px;height:110px;display:block}
+  .capa h1{font-family:"Rye",serif;font-weight:400;font-size:clamp(2rem,7vw,3.6rem);line-height:.98;margin:.1em 0;color:var(--tinta)}
+  .capa .faixa{display:inline-block;background:var(--brasa);color:#221c1a;font-family:"Special Elite",monospace;letter-spacing:.2em;text-transform:uppercase;font-size:.75rem;padding:4px 16px;margin-top:6px}
+  .capa p.lume{max-width:660px;margin:12px auto 0;font-style:italic;color:var(--tinta-suave)}
+  section{margin:38px 0}
+  .titulo-secao{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .titulo-secao h2{font-family:"Rye",serif;font-weight:400;font-size:clamp(1.5rem,4vw,2.2rem);margin:0;line-height:1}
+  .titulo-secao .num{font-family:"Special Elite",monospace;font-size:1.3rem;color:var(--brasa);border:2px solid var(--brasa);border-radius:50%;width:2.4em;height:2.4em;display:grid;place-items:center;flex:none;transform:rotate(-4deg)}
+  .sub-secao{color:var(--tinta-suave);margin:.2em 0 1.2em;max-width:820px}
+  .prosa{max-width:840px}.prosa p{margin:.6em 0}
+  .segredo{border:3px solid var(--brasa);background:rgba(212,86,47,.10);padding:20px 22px;box-shadow:6px 6px 0 #000}
+  .segredo .rot{font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.16em;color:var(--brasa-cl);display:block;margin-bottom:8px}
+  .segredo h3{font-family:"Rye",serif;font-weight:400;font-size:1.4rem;margin:.6em 0 .2em;color:var(--brasa-cl)}
+  .segredo p{margin:.5em 0}
+  .destaque{color:var(--brasa-cl);font-weight:700}
+  .ato{border-left:5px solid var(--brasa);padding:4px 0 4px 18px;margin:22px 0}
+  .ato h3{font-family:"Rye",serif;font-weight:400;font-size:1.35rem;margin:0 0 2px}
+  .ato .quando{font-family:"Special Elite",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--tinta-suave)}
+  .ato ul{margin:.5em 0 0;padding-left:1.1em}.ato li{margin:.3em 0}
+  .feito::marker{content:"✓  ";color:var(--mata);font-weight:700}
+  .cena{border:2px solid var(--linha);background:var(--papel-esc);padding:12px 16px;margin:12px 0}
+  .cena.corvo{border-color:var(--corvo);background:rgba(159,182,214,.07)}
+  .cena h4{font-family:"Rye",serif;font-weight:400;font-size:1.1rem;margin:0 0 4px;color:var(--brasa-cl)}
+  .cena.corvo h4{color:var(--corvo)}
+  .cena .lead{font-style:italic;color:var(--tinta-suave);margin:.2em 0 .5em}
+  .cena ul{margin:.3em 0 0;padding-left:1.1em}.cena li{margin:.25em 0;font-size:.95rem}
+  .caixa{border:2px dashed var(--brasa);background:rgba(212,86,47,.07);padding:14px 16px;margin:16px 0}
+  .caixa.corvo{border-color:var(--corvo);background:rgba(159,182,214,.08)}
+  .caixa .rot{font-family:"Special Elite",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;color:var(--brasa-cl);display:block;margin-bottom:6px}
+  .caixa.corvo .rot{color:var(--corvo)}
+  .senha{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+  .digito{border:2px solid var(--brasa);background:#000;color:var(--brasa-cl);font-family:"Special Elite",monospace;padding:8px 12px;text-align:center;min-width:120px}
+  .digito b{display:block;font-size:1.8rem;font-family:"Rye",serif;color:var(--tinta)}
+  .digito small{font-size:.62rem;letter-spacing:.06em;color:var(--tinta-suave)}
+  .bestas{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+  .besta{border:2px solid var(--linha);padding:12px 14px;background:var(--papel-esc)}
+  .besta h4{font-family:"Rye",serif;font-weight:400;font-size:1.12rem;margin:0 0 4px}
+  .besta .stats{font-family:"Special Elite",monospace;font-size:.72rem;color:var(--brasa-cl);margin-bottom:6px}
+  .besta p{margin:.2em 0;font-size:.9rem}
+  .besta .fraq{color:var(--mata);font-size:.85rem;font-style:italic}
+  .chefe{grid-column:1/-1;border:3px solid var(--brasa);background:rgba(212,86,47,.12);box-shadow:6px 6px 0 #000}
+  .chefe h4{color:var(--brasa-cl);font-size:1.35rem}
+  .item{border:2px solid var(--brasa-cl);background:rgba(240,163,95,.08);padding:12px 14px;margin:12px 0}
+  .item h4{font-family:"Rye",serif;font-weight:400;margin:0 0 4px;color:var(--brasa-cl)}
+  .item .stats{font-family:"Special Elite",monospace;font-size:.72rem;color:var(--tinta-suave)}
+  .loot{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .lootcard{border:2px solid var(--linha);padding:12px 14px;background:var(--papel-esc)}
+  .lootcard b{display:block;font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--brasa-cl);margin-bottom:4px}
+  .memcard b{color:var(--mata)}
+  footer{border-top:2px solid var(--brasa);margin-top:44px;padding:18px 0;text-align:center;font-family:"Special Elite",monospace;font-size:.72rem;letter-spacing:.1em;color:var(--tinta-suave)}
+  @media (max-width:520px){.titulo-secao .num{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="capa">
+    <svg class="selo" viewBox="0 0 100 100" fill="none" stroke="#e9dcc4" stroke-width="3">
+      <circle cx="50" cy="52" r="26" fill="#d4562f" stroke="#e9dcc4"/>
+      <path d="M34 34 q6 -14 16 -6 M66 34 q-6 -14 -16 -6" stroke="#221c1a" stroke-width="3" fill="none"/>
+      <circle cx="42" cy="50" r="3" fill="#221c1a"/><circle cx="58" cy="50" r="3" fill="#221c1a"/>
+      <path d="M40 62 q10 10 20 0" stroke="#221c1a" stroke-width="3" fill="none"/>
+      <path d="M40 66 l3 4 3 -4 3 4 3 -4 3 4 3 -4" stroke="#221c1a" stroke-width="2" fill="none"/>
+    </svg>
+    <div class="eyebrow">Confidencial · só o Mestre lê</div>
+    <h1>O Sítio SS</h1>
+    <span class="faixa">Guia do Mestre</span>
+    <p class="lume">Não há velho na varanda. A casa está vazia — e é justamente isso que assusta. O homem da colina dorme no porão, de quatro patas, esperando um coração mole soltar a corrente.</p>
+  </header>
+
+  <!-- SEGREDO CENTRAL -->
+  <section>
+    <div class="titulo-secao"><span class="num">✦</span><h2>O grande segredo</h2></div>
+    <div class="segredo">
+      <span class="rot">A verdade por trás do sítio</span>
+
+      <h3>Quem é o vilão</h3>
+      <p>O dono do sítio é o <span class="destaque">velho Anhanguera</span> — na língua tupi, "anhangüera" quer dizer <i>diabo velho</i>. Em vida foi <span class="destaque">Sebastião Salustiano</span> (as iniciais no portão: <b>SS</b>), o sitiante do alto do morro que a região chamava de <span class="destaque">o homem da colina</span>. Fez um pacto para nunca morrer, roubando as <b>memórias</b> de viajantes para alimentar o que dorme sob a terra. Os heróis foram trazidos como a próxima colheita — por isso acordaram sem lembrar de nada.</p>
+
+      <h3>Onde ele está agora: é o cão</h3>
+      <p>O pacto cobrou seu preço. Hoje o Anhanguera está <span class="destaque">preso na forma de um cão preto</span>, acorrentado sobre um <span class="destaque">círculo de magia negra antiga</span> no porão. O círculo o segura nessa forma indefesa e mansa. <b>Soltá-lo do círculo</b> — tirar a coleira, quebrar a corrente ou apagar os símbolos — faz o <span class="destaque">cão se transformar</span>: cresce, a pele vira brasa, e ali surge o diabo velho. <b>É o único momento em que o Anhanguera aparece.</b></p>
+
+      <h3>"Não confie no homem da colina"</h3>
+      <p>O bilhete do baú não fala de um estranho: <span class="destaque">"o homem da colina" é o próprio Anhanguera</span>. É o aviso desesperado de uma vítima antiga — <i>não confie no que espera no alto, não solte o que chora no porão</i>. Os heróis só ligam os pontos quando o cão se transforma. Use isso como presságio: espalhe o apelido pela casa (numa carta, no verso de um retrato, num verso de reza), para que, no clímax, <b>a ficha caia</b> e o bilhete ganhe sentido retroativo.</p>
+      <p class="destaque">Nunca diga o nome "Anhanguera" antes da transformação. Até lá é só "o bicho", "o cachorro", "o homem da colina".</p>
+    </div>
+  </section>
+
+  <!-- GOBLINS, TATUAGENS E O BAÚ -->
+  <section>
+    <div class="titulo-secao"><span class="num">⚿</span><h2>Os goblins e o baú trancado</h2></div>
+    <div class="prosa">
+      <p>O pequeno baú achado no espantalho <b>continua fechado</b> — cadeado de <b>três discos numéricos</b> (foi ele que o Edu tentou forçar com o facão, tocando fogo na palha). A senha não está na casa: está <span class="destaque">tatuada na pele dos goblins</span>, um algarismo em cada, com marca de ordem (I, II, III).</p>
+    </div>
+
+    <div class="caixa">
+      <span class="rot">Senha do baú (padrão — troque à vontade)</span>
+      <div class="senha">
+        <div class="digito"><small>I · Goblin Arqueiro</small><b>7</b></div>
+        <div class="digito"><small>II · Lanceiro da cicatriz</small><b>2</b></div>
+        <div class="digito"><small>III · Lanceiro caolho</small><b>4</b></div>
+      </div>
+      <p style="margin:.2em 0">Combinação: <span class="destaque">7 – 2 – 4</span>. Se ninguém reparou nas tatuagens na luta, deixe um goblin caído como pista ou peça Percepção CD 12 para lembrar.</p>
+    </div>
+
+    <div class="item">
+      <h4>Dentro do baú</h4>
+      <p>Uma <b>pistola</b>, um punhado de <b>munição</b> e um <b>bilhete</b>: <span class="destaque">"não confie no homem da colina"</span> (ou seja, no Anhanguera — veja o segredo acima).</p>
+      <div class="stats" style="margin-top:8px">PISTOLA ENFERRUJADA — ataque à distância +5 (DES), dano <b>1d10</b> perfurante, alcance 9/36 m. Recarga: 1 ação após cada tiro. Munição: <b>6 balas</b>.</div>
+      <p style="margin-top:8px;font-size:.92rem">Arma forte, porém lenta — ideal para armar o <b>Vlad</b> ou o <b>Caio</b>. Um dos goblins também traz o bilhete <i>"não solte o bicho"</i>.</p>
+    </div>
+  </section>
+
+  <!-- ESTRUTURA -->
+  <section>
+    <div class="titulo-secao"><span class="num">I</span><h2>Estrutura em atos</h2></div>
+    <p class="sub-secao">✓ = já jogado. O resto é o caminho à frente.</p>
+
+    <div class="ato">
+      <h3>Ato 1 — O Pátio</h3><div class="quando">Concluído</div>
+      <ul>
+        <li class="feito">Despertar na carroça · Thais achou a chave sob o capacho e <b>abriu o portão do sítio</b> (chave já usada).</li>
+        <li class="feito">Armadilha de urso na Duda · abelhas · espantalho · facão (com o Matheus).</li>
+        <li>O <b>baú do espantalho</b> ficou trancado (3 dígitos). Conteúdo revelado só com a senha dos goblins.</li>
+      </ul>
+    </div>
+
+    <div class="ato">
+      <h3>Ato 2 — O Muro de Madeira</h3><div class="quando">Jogado hoje</div>
+      <ul>
+        <li class="feito"><b>Emboscada:</b> 1 goblin arqueiro + 2 lanceiros em tamanduás. Guardiões do "bicho".</li>
+        <li>Cada goblin tem um <b>algarismo tatuado</b> (senha do baú). <b>Loot:</b> arco + flechas (Caio) e lanças (Vlad).</li>
+      </ul>
+    </div>
+
+    <div class="ato">
+      <h3>Ato 3 — A Casa Silenciosa</h3><div class="quando">A seguir · cena a cena</div>
+
+      <div class="cena corvo">
+        <h4>Cena 1 — Os corvos no telhado <span style="font-size:.8rem">(a hora do Vlad)</span></h4>
+        <p class="lead">Uma revoada de corvos forra o telhado e os postes — mas nenhum pousa na casa. Algo ali os repele.</p>
+        <ul>
+          <li>Se o <b>Vlad usar a Língua dos Corvos</b>, eles respondem em grasnados. Escolha 1–2 pistas para soltar:
+            <ul>
+              <li>"O homem virou bicho." (presságio do cão)</li>
+              <li>"Não solta o que chora lá embaixo."</li>
+              <li>Apontam a <b>gaveta escondida</b> (as memórias) ou o caminho seguro pela casa.</li>
+              <li>Avisam de um perigo antes (Mula no curral, Saci no sótão) — evita uma emboscada.</li>
+              <li>Grasnam um nome meio comido: "Bas… tião…" — plante a fraqueza sem entregar tudo.</li>
+            </ul>
+          </li>
+          <li>Se o Vlad não estiver por perto, os corvos apenas observam em silêncio arrepiante.</li>
+        </ul>
+      </div>
+
+      <div class="cena">
+        <h4>Cena 2 — A porta que range</h4>
+        <p class="lead">A chave já foi gasta no portão; aqui a casa se abre sozinha.</p>
+        <ul>
+          <li>A porta da frente está <b>destrancada</b>, entreaberta, as dobradiças rangendo ao vento.</li>
+          <li>Dentro: móveis sob lençóis, um <b>café ainda morno</b> no fogão, uma <b>cadeira de balanço</b> se movendo sozinha.</li>
+          <li>Percepção CD 13: a poeira no chão está <b>intocada</b> — ninguém pisa ali há anos. O café morno não faz sentido. (Deixe o arrepio; não explique.)</li>
+        </ul>
+      </div>
+
+      <div class="cena">
+        <h4>Cena 3 — As pistas da casa</h4>
+        <p class="lead">Quanto mais olham, pior fica.</p>
+        <ul>
+          <li><b>Parede de retratos:</b> o rosto de um mesmo homem está queimado/apagado em todos. No verso de um, a lápis: <i>"o homem da colina mente"</i>.</li>
+          <li><b>Caderno de pactos:</b> páginas de nomes riscados. Na última, sem riscar, <b>os nomes dos próprios heróis</b>.</li>
+          <li><b>Gaveta trancada</b> (Ladinagem CD 13) com um objeto pessoal de cada herói — cada um dispara um <b>fragmento de memória</b> (veja a seção II).</li>
+          <li>Num quarto, uma <b>cama de cachorro vazia</b> e uma <b>corrente</b> que desce pelo assoalho. De baixo, um <b>ganido</b>.</li>
+        </ul>
+      </div>
+
+      <div class="cena">
+        <h4>Cena 4 — Abrindo o baú</h4>
+        <ul>
+          <li>Com a senha <b>7 – 2 – 4</b>: pistola, munição e o bilhete do "homem da colina". Poder de fogo + um mistério que só fecha no porão.</li>
+        </ul>
+      </div>
+
+      <div class="cena">
+        <h4>Cena 5 — O porão e o dilema</h4>
+        <p class="lead">A escada range. O lampião do Caio corta o breu.</p>
+        <ul>
+          <li>Um <b>círculo de magia negra</b> riscado no chão de terra, símbolos pulsando fraco. No centro, acorrentado, um <b>cão preto</b> magro, de olhos tristes, ganindo.</li>
+          <li>Arcanismo/Percepção CD 13 (Thais com <b>vantagem</b>): o círculo não protege o cão — ele <b>sela</b> algo <i>dentro</i> dele. É antigo e é muito errado.</li>
+          <li><b>O dilema:</b> tudo grita "liberte-me". Os bilhetes pesam. <b>Não avise</b> do perigo — deixe ser escolha de mesa. Se travarem, o ganido vira quase-choro humano até alguém agir.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ato">
+      <h3>Ato 4 — A Transformação</h3><div class="quando">Clímax</div>
+      <ul>
+        <li>Soltaram o cão: silêncio. Ele se ergue, cresce, a pele vira brasa — e ali está o <span class="destaque">Anhanguera</span>. O homem da colina, enfim. O nome aparece.</li>
+        <li><b>Como derrotá-lo:</b> ferir com o <b>Facão do Espantalho</b> (ignora a resistência) · gritar <span class="destaque">"Sebastião Salustiano!"</span> (vulnerável 1 turno) · <b>destruir o caderno de pactos</b> (−½ PV na hora <b>e</b> devolve todas as memórias — veja II).</li>
+        <li><b>Final:</b> o pacto se rompe, o sítio vira só um sítio ao amanhecer, e cada herói volta a ser quem era.</li>
+      </ul>
+    </div>
+
+    <div class="caixa corvo">
+      <span class="rot">A Língua dos Corvos como ferramenta de dica</span>
+      <p>Além da Cena 1, deixe os corvos serem seu <b>plano B de pistas</b>: sempre que o grupo empacar num enigma ou perder o rumo, um corvo pode pousar perto do Vlad e soltar um grasnado com a próxima migalha. É uma válvula elegante para destravar a mesa sem entregar de graça — e faz o traço dele brilhar a aventura inteira.</p>
+    </div>
+  </section>
+
+  <!-- MEMÓRIAS -->
+  <section>
+    <div class="titulo-secao"><span class="num">II</span><h2>As memórias roubadas</h2></div>
+    <div class="prosa">
+      <p>Todos acordaram sem passado. O <b>caderno de pactos</b> é onde essas memórias estão presas — e devolvê-las é o coração emocional da aventura. A regra é simples: ao longo do jogo, entregue as lembranças <span class="destaque">em fragmentos</span>, sempre incompletos e perturbadores. A memória inteira só volta quando o <span class="destaque">caderno é destruído</span> no clímax.</p>
+    </div>
+
+    <div class="caixa">
+      <span class="rot">Como distribuir os fragmentos</span>
+      <p><b>Gatilho principal — a gaveta:</b> na casa há um objeto pessoal de cada herói. Ao tocar o seu, o jogador ganha <b>um flash</b>: um cheiro, um rosto meio apagado, uma palavra solta. Nunca a cena inteira.<br>
+      <b>Gatilhos de ambiente:</b> um cômodo, um retrato ou um som que dá <i>déjà vu</i> ("você já esteve num lugar assim…").<br>
+      <b>O caderno:</b> quem lê vê o próprio nome na última página e sente, físico, o <b>buraco</b> daquilo que perderam — mas ainda não lembra o quê.</p>
+    </div>
+
+    <p class="sub-secao">Sementes de memória (opcionais — os jogadores podem adotar, ajustar ou trocar). Cada uma conversa com o personagem:</p>
+    <div class="loot">
+      <div class="lootcard memcard"><b>Duda</b> Guardiã de uma mata que foi queimada. Veio seguindo a fumaça até o sítio — e ela não perdoa quem queima.</div>
+      <div class="lootcard memcard"><b>Vlad</b> Mensageiro que falava com os corvos, procurando um irmão que sumiu nesta estrada. Talvez um nome no caderno seja dele.</div>
+      <div class="lootcard memcard"><b>Matheus</b> Lavrador que perdeu a roça. O facão era da família — "achá-lo" no espantalho tinha um quê de familiar demais.</div>
+      <div class="lootcard memcard"><b>Caio</b> Batedor de carteiras que roubava para sustentar alguém. A corda e o lampião eram ferramentas de fuga, não de aventura.</div>
+      <div class="lootcard memcard"><b>Thais</b> Neta de uma benzedeira. <b>Não é vítima ao acaso:</b> veio de propósito acabar com a lenda do homem da colina — o que amarra o final do grupo.</div>
+      <div class="lootcard memcard"><b>Edu</b> Lutador de rua que vivia protegendo os fracos. Por isso luta desarmado: nunca precisou de arma para fazer o certo.</div>
+    </div>
+
+    <div class="caixa">
+      <span class="rot">O fechamento do arco (ao destruir o caderno)</span>
+      <p>No instante em que o caderno queima, <b>todas as memórias voltam de uma vez</b>. Pare o combate por um segundo e <b>convide cada jogador a narrar, em uma frase, a lembrança que retornou</b> — quem eram, por que estavam naquela estrada. É o beat que fecha a história.<br>
+      <b>Bônus mecânico:</b> a clareza dá força — o primeiro ataque de cada herói logo após recuperar a memória é feito <b>com vantagem</b>. Assim o momento emocional também vira virada de combate.</p>
+    </div>
+  </section>
+
+  <!-- BESTIÁRIO -->
+  <section>
+    <div class="titulo-secao"><span class="num">III</span><h2>Bestiário</h2></div>
+    <p class="sub-secao">Stats simplificadas para 6 heróis de nível 1. Reforce os PV se o grupo estiver com folga.</p>
+    <div class="bestas">
+
+      <div class="besta">
+        <h4>Goblin Arqueiro (tat. 7)</h4><div class="stats">CA 13 · PV 10</div>
+        <p>Arco curto +4, 1d6+2 (à distância). Foge e atira.</p>
+        <p class="fraq">Tatuagem "I·7". Frágil no corpo a corpo.</p>
+      </div>
+      <div class="besta">
+        <h4>Goblin Lanceiro montado (tat. 2 / 4)</h4><div class="stats">CA 14 · PV 12 cada</div>
+        <p>Lança +4, 1d6+2 (alcance +1,5m). Investe e recua.</p>
+        <p class="fraq">Tatuagens "II·2" e "III·4". A pé, atrapalhado.</p>
+      </div>
+      <div class="besta">
+        <h4>Tamanduá de Guerra</h4><div class="stats">CA 12 · PV 14</div>
+        <p>Garras +4, 1d8+2. Pode derrubar quem estiver a pé perto (FOR CD 12).</p>
+        <p class="fraq">Assusta com fogo.</p>
+      </div>
+      <div class="besta">
+        <h4>Mula-sem-cabeça</h4><div class="stats">CA 13 · PV 25</div>
+        <p>Coice +4, 2d6; fogo do pescoço 1d6 perto. Opcional, no curral.</p>
+        <p class="fraq">Reza forte (Religião/CAR CD 13) a acalma.</p>
+      </div>
+      <div class="besta">
+        <h4>Saci-Pererê</h4><div class="stats">CA 15 · PV 12</div>
+        <p>Some no vento, rouba 1 item/turno. Opcional, no sótão.</p>
+        <p class="fraq">Gorro numa garrafa = aliado zombeteiro.</p>
+      </div>
+      <div class="besta">
+        <h4>Cão Preto (forma selada)</h4><div class="stats">CA 12 · PV 8</div>
+        <p>Não ataca — ganido, olhos tristes, corrente curta. <b>É o Anhanguera preso.</b></p>
+        <p class="fraq">Soltá-lo = transformação. Ele mesmo não é o perigo… ainda.</p>
+      </div>
+
+      <div class="besta chefe">
+        <h4>☠ Anhanguera — forma de brasa</h4>
+        <div class="stats">CA 15 · PV 55 · Inic. +2 · surge quando o cão é solto</div>
+        <p>2 garras (+6, 1d8+3 cada) · Sopro de Brasa em cone (DES CD 13, 2d6 de fogo, 1x a cada 2 turnos). Resistência a dano físico comum.</p>
+        <p class="fraq">Fraquezas: o Facão do Espantalho ignora a resistência · gritar "Sebastião Salustiano" = vulnerável 1 turno · caderno destruído = −½ PV.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LOOT + DICAS -->
+  <section>
+    <div class="titulo-secao"><span class="num">IV</span><h2>Tesouros & condução</h2></div>
+    <div class="loot">
+      <div class="lootcard"><b>Pistola + munição</b> No baú (senha 7-2-4). Arma Vlad ou Caio. Não fura a resistência do chefe.</div>
+      <div class="lootcard"><b>Facão do Espantalho</b> Comum até o Ato 4 — a única lâmina que fere o diabo velho.</div>
+      <div class="lootcard"><b>Caderno de Pactos</b> −½ PV do chefe e devolve todas as memórias ao ser destruído.</div>
+      <div class="lootcard"><b>As memórias</b> Na gaveta e no caderno. O coração emocional do final.</div>
+    </div>
+
+    <div class="caixa"><span class="rot">Ritmo de terror para iniciantes</span>
+      <p>• <b>A casa vazia + os sinais de presença falsa</b> criam pavor sem inimigo à vista — segure esse clima antes do porão.<br>
+      • <b>"Sim, e…"</b>: recompense ideias criativas. Peça rolagem só quando o fracasso muda algo.<br>
+      • <b>Dê o holofote a cada um:</b> os corvos do Vlad como fonte de dicas, as lendas da Thais, o lampião do Caio, a cura da Duda, a fúria do Matheus, os punhos do Edu.<br>
+      • <b>Guarde a transformação</b> para pegar todos de surpresa — é o pico da noite.</p>
+    </div>
+  </section>
+
+  <footer>O Sítio SS · Guia do Mestre · a casa está vazia — é isso que deveria assustar você</footer>
+</div>
+</body>
+</html>
