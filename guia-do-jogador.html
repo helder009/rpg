@@ -53,6 +53,7 @@
   .attr .n{font-weight:700;font-size:.95rem}.attr .m{font-size:.7rem;color:var(--tinta-suave)}
   .linha-item{font-size:.92rem}
   .linha-item .rot{font-family:"Special Elite",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--brasa-esc);display:block;margin-top:2px}
+  .linha-item .rot.forte{color:var(--brasa);font-weight:700}
   .semarma{border:2px dashed var(--brasa);background:rgba(158,43,22,.08);padding:6px 8px;font-size:.86rem}
   .assinatura{margin-top:auto;border-top:2px dashed var(--linha);padding-top:10px}
   .assinatura .tag{display:inline-block;background:var(--brasa);color:var(--papel);font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;padding:2px 8px;margin-bottom:4px}
@@ -188,8 +189,8 @@ function cardHTML(c){
         <div class="vital"><b>Prof.</b><span class="v">+2</span></div>
       </div>
       <div class="attrs">${attrs}</div>
-      <div class="linha-item"><span class="rot">Armas / Magia</span>${escLines(c.armas)||"—"}</div>
-      <div class="linha-item"><span class="rot">Objetos</span>${escLines(c.objetos)||"—"}</div>
+      <div class="linha-item"><span class="rot forte">Armas / Magia</span>${escLines(c.armas)||"—"}</div>
+      <div class="linha-item"><span class="rot forte">Objetos</span>${escLines(c.objetos)||"—"}</div>
       ${condHTML}
       <div class="assinatura"><span class="tag">★ Assinatura</span><br><b>${c.assin.nome}</b> — ${c.assin.txt}</div>
     </div></div>`;
