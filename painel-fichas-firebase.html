@@ -138,6 +138,11 @@
   .modman{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;color:var(--tinta);display:flex;align-items:center;gap:4px;margin-left:auto}
   .modman input{width:46px}
   .linha-roll{display:flex;gap:8px;margin:7px 0}.linha-roll select{flex:1}
+  .btn-acao{width:120px;flex:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:700}
+  .btn-teste{background:#cce193;border-color:#7a8f4e}
+  .btn-dano{background:#d97878;border-color:#8f4a4a}
+  .btn-ataque{background:#41e8ff;border-color:#2a9fb0}
+  .btn-acao:hover{filter:brightness(1.05)}
   .dano-opts{display:flex;gap:14px;align-items:center;margin:2px 0 2px;font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.04em;color:var(--tinta)}
   .dano-opts label{display:flex;gap:5px;align-items:center;cursor:pointer}
   .dano-opts input[type=checkbox]{width:16px;height:16px;box-shadow:none;padding:0;margin:0;accent-color:var(--brasa)}
@@ -179,6 +184,7 @@
   <div class="barra">
     <button class="menu-btn" onclick="window.open('guia-do-jogador.html','_blank')">📖 Guia do Jogador ↗</button>
     <button class="menu-btn" onclick="window.open('https://www.google.com/search?q=roll+a+d20','_blank')">🎲 D20 online ↗</button>
+    <button class="menu-btn" onclick="window.open('https://pocketdm.com.br/compendio','_blank')">📚 Compêndio ↗</button>
     <button id="btnPin" style="display:none" class="mini">Trocar PIN</button>
     <button id="btnReset" style="display:none" class="mini">Zerar fichas</button>
     <span id="sync" class="sync"><span class="dot"></span>iniciando…</span>
@@ -208,21 +214,21 @@
           <button class="die brasa" onclick="rolarPuro(4)">d4</button>
           <span class="modman">mod <input id="modMan" type="number" value="0"></span>
         </div>
-        <div class="linha-roll"><select id="selTeste"></select><button onclick="rolarTeste()">Teste</button></div>
+        <div class="linha-roll"><select id="selTeste"></select><button class="btn-acao btn-teste" onclick="rolarTeste()">Teste 🎯</button></div>
         <div class="linha-roll">
           <select id="selAtaque">
             <option value="FOR">Ataque corpo a corpo (FOR)</option>
             <option value="DES">Ataque à distância / fino (DES)</option>
             <option value="MAG">Ataque mágico</option>
           </select>
-          <button onclick="rolarAtaque()">Ataque</button>
+          <button class="btn-acao btn-ataque" onclick="rolarAtaque()">Ataque 🗡</button>
         </div>
         <div class="linha-roll">
           <select id="selDano">
             <option>1d4</option><option selected>1d6</option><option>1d8</option><option>1d10</option><option>1d12</option>
             <option>2d4</option><option>2d6</option><option>2d8</option><option>2d10</option><option>3d6</option>
           </select>
-          <button onclick="rolarDano()">Dano</button>
+          <button class="btn-acao btn-dano" onclick="rolarDano()">Dano 🩸</button>
         </div>
         <div class="dano-opts">
           <label><input type="checkbox" id="chkAttrDano" checked> + atributo</label>
@@ -590,11 +596,12 @@ function setAdv(a){ adv=a; $("pNorm").classList.toggle("on",a==="none"); $("pAdv
 function d(n){ return 1+Math.floor(Math.random()*n); }
 function d20adv(){ if(adv==="adv"){const a=d(20),b=d(20);return{v:Math.max(a,b),rolls:[a,b]};} if(adv==="dis"){const a=d(20),b=d(20);return{v:Math.min(a,b),rolls:[a,b]};} const a=d(20); return{v:a,rolls:[a]}; }
 function detTxt(r,m){ const s=m>=0?"+"+m:""+m; const base=r.rolls.length>1?"["+r.rolls.join(", ")+"]→"+r.v:"["+r.v+"]"; return base+(m!==0?" "+s:"")+" = "+(r.v+m); }
-function mostra(label,r,m,quem){ const total=r.v+m, det=detTxt(r,m), crit=(r.v===20); const big=$("resBig"); big.textContent=total; big.classList.toggle("crit",crit); $("resDet").innerHTML=(quem?esc(quem)+" · ":"")+esc(label)+" · "+esc(det)+(crit?' <span class="crit-flag">★ Crítico!</span>':''); pushRoll({t:total,l:label,d:det,q:quem||"",ts:Date.now(),crit:crit}); }
+function mostrarGrande(e){ if(!e)return; const big=$("resBig"); big.textContent=e.t; big.classList.toggle("crit",!!e.crit); $("resDet").innerHTML=(e.q?esc(e.q)+" · ":"")+esc(e.l)+" · "+esc(e.d)+(e.crit?' <span class="crit-flag">★ Crítico!</span>':''); }
+function mostra(label,r,m,quem){ const e={t:r.v+m,l:label,d:detTxt(r,m),q:quem||"",ts:Date.now(),crit:(r.v===20)}; mostrarGrande(e); pushRoll(e); }
 let localRolls=[];
 function entryHTML(e){ const hora=e.ts?new Date(e.ts).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):""; const quem=e.q?`<b>${esc(e.q)}</b> · `:""; const crit=e.crit?' <span class="critb">Crítico!</span>':''; return `<div><span class="t">${e.t}</span> — ${quem}${esc(e.l)}: ${esc(e.d)}${crit} <span style="color:var(--tinta-suave)">· ${hora}</span></div>`; }
 function renderLogArr(arr){ const L=$("log"); L.innerHTML=""; arr.slice(-50).reverse().forEach(e=>L.insertAdjacentHTML("beforeend", entryHTML(e))); }
-function renderLogSnap(val){ if(!val){ $("log").innerHTML=""; return; } const arr=Object.keys(val).map(k=>val[k]).filter(Boolean).sort((a,b)=>(a.ts||0)-(b.ts||0)); renderLogArr(arr); }
+function renderLogSnap(val){ if(!val){ $("log").innerHTML=""; return; } const arr=Object.keys(val).map(k=>val[k]).filter(Boolean).sort((a,b)=>(a.ts||0)-(b.ts||0)); renderLogArr(arr); if(arr.length) mostrarGrande(arr[arr.length-1]); }
 function pushRoll(e){ if(online&&rollsRef){ rollsRef.push(e); } else { localRolls.push(e); if(localRolls.length>80)localRolls=localRolls.slice(-80); renderLogArr(localRolls); } }
 function limparRolls(){ if(online&&rollsRef){ rollsRef.remove(); } else { localRolls=[]; renderLogArr([]); } }
 function entidadeAtiva(){ if(!gm) return charAtual(); const s=$("selRolador"), v=s?s.value:""; if(v==="__mestre__") return {mestre:true,nome:"Mestre"}; let e=state.chars.find(c=>c.id===v); if(!e)e=(state.inimigos||[]).find(x=>x.id===v); return e||charAtual(); }
@@ -604,7 +611,7 @@ function profDe(c,skill){ if(c.expert&&c.expert.indexOf(skill)>=0)return PROF*2;
 function popularTestes(){ const s=$("selTeste"), prev=s.value; let html=""; for(const k in ATRIBS) html+=`<option value="attr:${k}">Teste de ${ATRIBS[k]} (${k})</option>`; const c=entidadeAtiva(); Object.keys(SKILLS).forEach(sk=>{ const p=profDe(c,sk); const mk=p>=PROF*2?" ✦✦":p>=PROF?" ✦":""; html+=`<option value="skill:${sk}">${sk} (${SKILLS[sk]})${mk}</option>`; }); s.innerHTML=html; s.value=prev||"skill:Percepção"; if(!s.value)s.value="skill:Percepção"; }
 function rolarTeste(){ const c=entidadeAtiva(), val=$("selTeste").value, parts=val.split(":"), tipo=parts[0], chave=parts[1]; let attr,prof=0,label; if(tipo==="attr"){ attr=chave; label="Teste de "+ATRIBS[attr]+" ("+attr+")"; } else { attr=SKILLS[chave]; prof=profDe(c,chave); label=chave+" ("+attr+")"; } const mo=(c.attrs?modN(c.attrs[attr]):0)+prof; const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(label+advtxt, d20adv(), mo, c.nome); }
 function rolarAtaque(){ const c=entidadeAtiva(), tipo=$("selAtaque").value; let attr,nome; if(tipo==="FOR"){ attr="FOR"; nome="Ataque corpo a corpo"; } else if(tipo==="DES"){ attr="DES"; nome="Ataque à distância/fino"; } else { attr=c.conjura||["INT","SAB","CAR"].reduce((a,b)=>(c.attrs?modN(c.attrs[b]):0)>(c.attrs?modN(c.attrs[a]):0)?b:a,"INT"); nome="Ataque mágico ("+attr+")"; } const mo=(c.attrs?modN(c.attrs[attr])+PROF:0); const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(nome+advtxt, d20adv(), mo, c.nome); }
-function mostraSimples(total,label,det,quem){ const big=$("resBig"); big.textContent=total; big.classList.remove("crit"); $("resDet").innerHTML=(quem?esc(quem)+" · ":"")+esc(label)+" · "+esc(det); pushRoll({t:total,l:label,d:det,q:quem||"",ts:Date.now(),crit:false}); }
+function mostraSimples(total,label,det,quem){ const e={t:total,l:label,d:det,q:quem||"",ts:Date.now(),crit:false}; mostrarGrande(e); pushRoll(e); }
 function rolarDano(){
   const c=entidadeAtiva(), expr=$("selDano").value, mm=expr.match(/^(\d+)d(\d+)$/); if(!mm)return;
   let qtd=parseInt(mm[1]), faces=parseInt(mm[2]);
