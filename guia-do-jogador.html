@@ -167,21 +167,30 @@ const BASE=[
 ];
 
 let dados=JSON.parse(JSON.stringify(BASE));
+const BASE_BY_ID={}; BASE.forEach((c,i)=>{ BASE_BY_ID[c.id]=Object.assign({ord:i+1},JSON.parse(JSON.stringify(c))); });
 function mod(v){ const n=Math.floor((v-10)/2); return (n>=0?"+":"")+n; }
 function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
 function escLines(s){ return esc(s).replace(/\n/g,"<br>"); }
 function aplicar(r){
   if(!r||!r.chars)return;
-  dados.forEach(c=>{ const rc=r.chars[c.id]; if(!rc)return;
-    ["pvAtual","pvMax","ca","cond","armas","objetos"].forEach(k=>{ if(rc[k]!==undefined&&rc[k]!==null)c[k]=rc[k]; });
-    if(rc.attrs){ for(const k in c.attrs){ if(typeof rc.attrs[k]==="number")c.attrs[k]=rc.attrs[k]; } }
-  });
+  dados=Object.keys(r.chars).map(id=>{ const rc=r.chars[id]||{}; const b=BASE_BY_ID[id]?JSON.parse(JSON.stringify(BASE_BY_ID[id])):{}; return {
+    id, ord:(typeof rc.ord==="number"?rc.ord:(b.ord!=null?b.ord:99)),
+    nome:rc.nome||b.nome||"Herói", cl:rc.cl||b.cl||"", cor:rc.cor||b.cor||"#4a3d2c",
+    pvMax:(typeof rc.pvMax==="number"?rc.pvMax:(b.pvMax||10)),
+    pvAtual:(typeof rc.pvAtual==="number"?rc.pvAtual:(typeof b.pvAtual==="number"?b.pvAtual:10)),
+    ca:(typeof rc.ca==="number"?rc.ca:(b.ca||10)), cond:rc.cond||"",
+    attrs:Object.assign({FOR:10,DES:10,CON:10,INT:10,SAB:10,CAR:10},b.attrs||{},rc.attrs||{}),
+    armas:(typeof rc.armas==="string"?rc.armas:(b.armas||"")),
+    objetos:(typeof rc.objetos==="string"?rc.objetos:(b.objetos||"")),
+    assin:{nome:(rc.assin&&rc.assin.nome)||(b.assin&&b.assin.nome)||"", txt:(rc.assin&&rc.assin.txt)||(b.assin&&b.assin.txt)||""}
+  }; }).sort((a,b)=>(a.ord||0)-(b.ord||0));
 }
 function cardHTML(c){
   const attrs=["FOR","DES","CON","INT","SAB","CAR"].map(k=>`<div class="attr"><b>${k}</b><span class="n">${c.attrs[k]}</span><span class="m">${mod(c.attrs[k])}</span></div>`).join("");
   const condHTML=c.cond?`<div class="semarma">⚠ <b>Condições:</b> ${esc(c.cond)}</div>`:"";
+  const assinHTML=(c.assin&&c.assin.nome)?`<div class="assinatura"><span class="tag">★ Assinatura</span><br><b>${esc(c.assin.nome)}</b>${c.assin.txt?" — "+esc(c.assin.txt):""}</div>`:"";
   return `<div class="ficha" style="border-left:7px solid ${c.cor}">
-    <div class="topo">${EMB[c.id]||""}<div><p class="nome">${c.nome}</p><div class="classe">${c.cl}</div></div></div>
+    <div class="topo">${EMB[c.id]||""}<div><p class="nome">${esc(c.nome)}</p><div class="classe">${esc(c.cl)}</div></div></div>
     <div class="corpo">
       <div class="vitais">
         <div class="vital pv"><b>PV</b><span class="v">${c.pvAtual}<small style="font-size:.62em;color:var(--tinta-suave)"> /${c.pvMax}</small></span></div>
@@ -192,7 +201,7 @@ function cardHTML(c){
       <div class="linha-item"><span class="rot forte">Armas / Magia</span>${escLines(c.armas)||"—"}</div>
       <div class="linha-item"><span class="rot forte">Objetos</span>${escLines(c.objetos)||"—"}</div>
       ${condHTML}
-      <div class="assinatura"><span class="tag">★ Assinatura</span><br><b>${c.assin.nome}</b> — ${c.assin.txt}</div>
+      ${assinHTML}
     </div></div>`;
 }
 function render(){ document.getElementById("fichasLive").innerHTML=dados.map(cardHTML).join(""); }
