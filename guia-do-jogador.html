@@ -63,12 +63,24 @@
   .feito::marker{content:"✓  ";color:var(--mata);font-weight:700}
   .live-ind{font-family:"Special Elite",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border:2px solid var(--linha);color:var(--tinta-suave)}
   .live-ind.on{border-color:var(--mata);color:var(--mata)}
+  .topbar{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .topbar a{font-family:"Special Elite",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta);text-decoration:none;border:2px solid var(--tinta);background:var(--papel-esc);box-shadow:2px 2px 0 var(--tinta);padding:6px 12px}
+  .topbar a:hover{background:var(--papel)}
+  .ed-btn{font-family:"Special Elite",monospace;font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:2px solid var(--tinta);background:var(--papel-esc);color:var(--tinta-suave);padding:3px 9px;box-shadow:1px 1px 0 var(--tinta);margin-left:8px;vertical-align:middle}
+  .ed-btn:hover{background:var(--papel)}
+  #historiaBox textarea{width:100%;min-height:120px;font-family:inherit;font-size:1rem;line-height:1.6;border:2px solid var(--tinta);background:var(--papel-esc);color:var(--tinta);padding:10px 12px;resize:vertical}
+  #historiaBox .hist-texto{white-space:normal}
   footer{border-top:2px solid var(--tinta);margin-top:44px;padding:18px 0;text-align:center;font-family:"Special Elite",monospace;font-size:.72rem;letter-spacing:.1em;color:var(--tinta-suave)}
   @media (max-width:520px){.titulo-secao .num{display:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
+
+  <div class="topbar">
+    <a href="https://www.google.com/search?q=roll+a+d20" target="_blank" rel="noopener">🎲 D20 online ↗</a>
+    <a href="https://pocketdm.com.br/compendio" target="_blank" rel="noopener">📚 Compêndio ↗</a>
+  </div>
 
   <header class="capa">
     <svg class="selo" viewBox="0 0 100 100" fill="none" stroke="#211a12" stroke-width="3">
@@ -101,6 +113,12 @@
         <li><b>Agora:</b> a casa espera do outro lado do muro. Falta atravessar — e entrar.</li>
       </ul>
     </div>
+  </section>
+
+  <section>
+    <div class="titulo-secao"><span class="num">✒</span><h2>A história até agora</h2></div>
+    <p class="sub-secao">O resumo que o Mestre vai atualizando conforme a aventura avança. <button id="btnMestreGuia" class="ed-btn" onclick="toggleEdit()">✏️ Mestre</button></p>
+    <div id="historiaBox" class="prosa"></div>
   </section>
 
   <section>
@@ -167,6 +185,7 @@ const BASE=[
 ];
 
 let dados=JSON.parse(JSON.stringify(BASE));
+let db=null, salaPin="DEBERG", historia="", gmGuia=false;
 const BASE_BY_ID={}; BASE.forEach((c,i)=>{ BASE_BY_ID[c.id]=Object.assign({ord:i+1},JSON.parse(JSON.stringify(c))); });
 function mod(v){ const n=Math.floor((v-10)/2); return (n>=0?"+":"")+n; }
 function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
@@ -206,14 +225,35 @@ function cardHTML(c){
 }
 function render(){ document.getElementById("fichasLive").innerHTML=dados.map(cardHTML).join(""); }
 function setLive(on){ const el=document.getElementById("liveInd"); el.textContent=on?"● ao vivo":"local"; el.classList.toggle("on",!!on); }
+function isEditingHist(){ const a=document.activeElement; return a&&a.id==="histEdit"; }
+function toggleEdit(){
+  if(gmGuia){ gmGuia=false; renderHistoria(); return; }
+  const p=prompt("PIN do Mestre para editar:"); if(p===null)return;
+  if(p===salaPin){ gmGuia=true; renderHistoria(); } else alert("PIN incorreto.");
+}
+function renderHistoria(){
+  const box=document.getElementById("historiaBox"); if(!box)return;
+  const btn=document.getElementById("btnMestreGuia");
+  if(gmGuia){
+    box.innerHTML=`<textarea id="histEdit" placeholder="Escreva o que já aconteceu na aventura até agora…">${esc(historia)}</textarea>`;
+    const t=document.getElementById("histEdit"); let tm=null;
+    const commit=()=>{ historia=t.value; if(db){ db.ref("salas/"+ROOM+"/historia").set(historia); } };
+    t.addEventListener("input",()=>{ historia=t.value; clearTimeout(tm); tm=setTimeout(commit,600); });
+    t.addEventListener("blur",commit);
+    if(btn)btn.textContent="✔ pronto";
+  } else {
+    box.innerHTML = historia.trim() ? `<div class="hist-texto">${escLines(historia)}</div>` : `<div style="color:var(--tinta-suave);font-style:italic">O Mestre ainda não escreveu o resumo.</div>`;
+    if(btn)btn.textContent="✏️ Mestre";
+  }
+}
 
 (function init(){
   const m=location.hash.match(/sala=([^&]+)/); if(m)ROOM=decodeURIComponent(m[1]);
-  render();
+  render(); renderHistoria();
   try{
     firebase.initializeApp(FIREBASE_CONFIG);
-    const db=firebase.database();
-    db.ref("salas/"+ROOM).on("value",snap=>{ const v=snap.val(); if(v){ aplicar(v); render(); setLive(true); } }, ()=>setLive(false));
+    db=firebase.database();
+    db.ref("salas/"+ROOM).on("value",snap=>{ const v=snap.val(); if(v){ if(typeof v.pin==="string")salaPin=v.pin; if(!isEditingHist()){ historia=(typeof v.historia==="string")?v.historia:""; renderHistoria(); } aplicar(v); render(); setLive(true); } }, ()=>setLive(false));
   }catch(e){ console.error(e); setLive(false); }
 })();
 </script>
