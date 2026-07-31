@@ -62,6 +62,15 @@
   .vcond .lbl-forte{display:block;font-family:"Special Elite",monospace;text-transform:uppercase;letter-spacing:.1em;font-size:.66rem;font-weight:700;color:var(--brasa);margin-bottom:2px}
   .vcond input,.vcond .txt{font-size:.85rem}
   .painel.notas-box{background:#a2c0d2}
+  .img-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .img-slot{display:flex;flex-direction:column;gap:6px}
+  .img-box{height:240px;border:2px solid var(--tinta);background:#f3ead0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+  .img-box img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block}
+  .img-box .img-ph{font-family:"Special Elite",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta-suave)}
+  .img-box.erro::after{content:"imagem não carregou";font-family:"Special Elite",monospace;font-size:.66rem;color:var(--brasa-esc);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(158,43,22,.08)}
+  .img-ctrl{display:flex;gap:6px}
+  .img-ctrl input{flex:1;font-size:.82rem}
+  .img-ctrl button{padding:4px 9px;box-shadow:1px 1px 0 var(--tinta)}
   .inim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
   .card.inim{margin-top:0;border-left-color:#9e2b16}
   .card.inim .cab{gap:8px}
@@ -246,6 +255,11 @@
     <div id="canvasNota">Somente o Mestre desenha; vocês veem em tempo real.</div>
   </div>
 
+  <div class="painel" id="imagensSec" style="margin-top:14px">
+    <h3>Imagens <span class="tagm">ao vivo</span></h3>
+    <div id="imagens" class="img-grid"></div>
+  </div>
+
 </div>
 <div id="flash" class="flash"></div>
 
@@ -323,6 +337,7 @@ const ENEMIES_SEED=[
 
 let state=JSON.parse(JSON.stringify(PADRAO));
 state.inimigos=JSON.parse(JSON.stringify(ENEMIES_SEED));
+state.imagens=["","",""];
 let gm=false, atual=state.chars[0].id, adv="none";
 let db=null, salaRef=null, desenhoRef=null, rollsRef=null, online=false;
 const $=id=>document.getElementById(id);
@@ -353,7 +368,7 @@ function mostraSetup(){ online=false; atualizaSync(); $("avisoBox").innerHTML='<
 async function saveRemote(){
   state.updated=Date.now(); state.updatedBy=gm?"Mestre":"";
   if(!online){ atualizaSync(); return; }
-  const p={pin:state.pin,updated:state.updated,updatedBy:state.updatedBy,notasMestre:state.notasMestre||"",chars:{},inimigos:{}};
+  const p={pin:state.pin,updated:state.updated,updatedBy:state.updatedBy,notasMestre:state.notasMestre||"",chars:{},inimigos:{},imagens:(state.imagens||["","",""]).slice(0,3)};
   state.chars.forEach(c=>{ p.chars[c.id]={pvAtual:c.pvAtual,pvMax:c.pvMax,ca:c.ca,cond:c.cond||"",notas:c.notas||"",attrs:Object.assign({},c.attrs),armas:c.armas||"",objetos:c.objetos||""}; });
   state.inimigos.forEach(e=>{ p.inimigos[e.id]={id:e.id,ord:e.ord||0,nome:e.nome||"",ca:e.ca||10,pvMax:e.pvMax||1,pvAtual:e.pvAtual||0,cond:e.cond||"",attrs:Object.assign({},e.attrs),ataques:e.ataques||"",tracos:e.tracos||""}; });
   try{ await salaRef.update(p); }catch(e){ console.error(e); flash("Erro ao salvar"); }
@@ -378,6 +393,7 @@ function aplicaRemoto(r){
       pvMax:(typeof e.pvMax==="number"?e.pvMax:1), pvAtual:(typeof e.pvAtual==="number"?e.pvAtual:(e.pvMax||1)),
       cond:e.cond||"", attrs:Object.assign({FOR:10,DES:10,CON:10,INT:10,SAB:10,CAR:10},e.attrs||{}),
       ataques:e.ataques||"", tracos:e.tracos||"" })).sort((a,b)=>(a.ord||0)-(b.ord||0)); }
+  if(r.imagens){ state.imagens=[0,1,2].map(i=>{ const u=r.imagens[i]; return (typeof u==="string")?u:""; }); }
   syncNotasUI();
 }
 function atualizaSync(){
@@ -440,7 +456,36 @@ function renderFicha(){
     });
   }
 }
-function render(){ popularSelect(); popularRolador(); renderFicha(); renderInimigos(); syncNotasUI(); atualizaSync(); }
+function render(){ popularSelect(); popularRolador(); renderFicha(); renderInimigos(); renderImagens(); syncNotasUI(); atualizaSync(); }
+
+function renderImagens(){
+  const cont=$("imagens"), sec=$("imagensSec"); if(!cont||!sec)return;
+  const imgs=state.imagens||["","",""];
+  const temAlguma=imgs.some(u=>u&&u.trim());
+  if(!gm && !temAlguma){ sec.style.display="none"; cont.innerHTML=""; return; }
+  sec.style.display="block";
+  let html="";
+  for(let i=0;i<3;i++){
+    const u=(imgs[i]||"").trim();
+    if(!gm && !u) continue;
+    const box = u
+      ? `<div class="img-box"><img src="${esc(u)}" alt="" onerror="this.style.display='none';this.parentNode.classList.add('erro')"></div>`
+      : `<div class="img-box"><span class="img-ph">colar URL abaixo</span></div>`;
+    const ctrl = gm
+      ? `<div class="img-ctrl"><input class="ilive img-url" data-i="${i}" value="${esc(u)}" placeholder="colar URL da imagem"><button onclick="limparImg(${i})" title="limpar">✕</button></div>`
+      : ``;
+    html+=`<div class="img-slot">${box}${ctrl}</div>`;
+  }
+  cont.innerHTML=html;
+  if(gm){
+    cont.querySelectorAll("input.img-url").forEach(el=>{
+      const commit=()=>{ const i=parseInt(el.dataset.i); state.imagens[i]=el.value.trim(); saveRemote(); renderImagens(); };
+      el.addEventListener("change",commit);
+      el.addEventListener("blur",commit);
+    });
+  }
+}
+function limparImg(i){ state.imagens[i]=""; renderImagens(); saveRemote(); }
 
 function enemyCardHTML(e){
   const ratio=e.pvMax>0?e.pvAtual/e.pvMax:0, cor=ratio>0.5?"#42542f":ratio>0.25?"#b5842f":"#9e2b16";
@@ -558,7 +603,7 @@ function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"f
 
 $("btnMestre").addEventListener("click",()=>{ if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; } const p=prompt("Digite o PIN do Mestre:"); if(p===null)return; if(p===state.pin){ gm=true; setModo(); render(); if(online)saveRemote(); flash("Modo Mestre ativado"); } else alert("PIN incorreto."); });
 $("btnPin").addEventListener("click",async()=>{ const n=prompt("Novo PIN do Mestre:",state.pin); if(n&&n.trim()){ state.pin=n.trim(); await saveRemote(); flash("PIN atualizado"); } });
-$("btnReset").addEventListener("click",async()=>{ if(!confirm("Zerar as fichas dos jogadores para o padrão? (inimigos, quadro e anotações do Mestre não mudam)"))return; const pin=state.pin,nm=state.notasMestre,inim=state.inimigos; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin; state.notasMestre=nm; state.inimigos=inim; await saveRemote(); render(); flash("Fichas zeradas"); });
+$("btnReset").addEventListener("click",async()=>{ if(!confirm("Zerar as fichas dos jogadores para o padrão? (inimigos, quadro e anotações do Mestre não mudam)"))return; const pin=state.pin,nm=state.notasMestre,inim=state.inimigos,imgs=state.imagens; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin; state.notasMestre=nm; state.inimigos=inim; state.imagens=imgs; await saveRemote(); render(); flash("Fichas zeradas"); });
 $("selFicha").addEventListener("change",e=>{ atual=e.target.value; renderFicha(); popularTestes(); });
 $("selRolador").addEventListener("change",()=>popularTestes());
 (function(){ const t=$("notasMestre"); t.addEventListener("input",()=>{ if(!gm)return; state.notasMestre=t.value; clearTimeout(notaTimer); notaTimer=setTimeout(saveRemote,500); }); t.addEventListener("blur",()=>{ if(!gm)return; state.notasMestre=t.value; saveRemote(); }); })();
