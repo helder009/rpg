@@ -21,6 +21,7 @@
   .capa::before{content:"";position:absolute;inset:8px;border:1px solid var(--linha);pointer-events:none}
   .capa .selo{margin:0 auto 6px;width:112px;height:112px;display:block}
   .capa h1{font-family:"Rye",serif;font-weight:400;font-size:clamp(2rem,7vw,3.6rem);line-height:.98;margin:.1em 0;color:var(--tinta)}
+  .capa .subtitulo{font-family:"Special Elite",monospace;text-transform:uppercase;letter-spacing:.2em;font-size:1.1rem;font-weight:700;color:var(--brasa-esc);margin-top:5px}
   .capa .fio{width:55%;height:1px;background:var(--tinta);margin:14px auto;position:relative}
   .capa .fio::before,.capa .fio::after{content:"◆";position:absolute;top:-.7em;color:var(--brasa)}
   .capa .fio::before{left:-14px}.capa .fio::after{right:-14px}
@@ -31,6 +32,7 @@
   .titulo-secao .num{font-family:"Special Elite",monospace;font-size:1.3rem;color:var(--brasa);border:2px solid var(--brasa);border-radius:50%;width:2.4em;height:2.4em;display:grid;place-items:center;flex:none;transform:rotate(-4deg)}
   .sub-secao{color:var(--tinta-suave);margin:.2em 0 1.2em;max-width:780px}
   .prosa{max-width:780px}.prosa p{margin:.6em 0}
+  .prosa.intro{max-width:none}
   .regras{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
   .regra{border:2px solid var(--tinta);padding:12px 14px;background:rgba(255,255,255,.14);box-shadow:4px 4px 0 rgba(33,26,18,.5)}
   .regra b{display:block;font-family:"Special Elite",monospace;font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--brasa-esc);margin-bottom:3px}
@@ -86,23 +88,15 @@
 <div class="wrap">
 
   <header class="capa">
-    <svg class="selo" viewBox="0 0 100 100" fill="none" stroke="#211a12" stroke-width="3">
-      <rect x="18" y="30" width="64" height="52" fill="#d8c69c" stroke="#211a12"/>
-      <path d="M18 30 L50 12 L82 30" fill="#9e2b16" stroke="#211a12"/>
-      <rect x="42" y="54" width="16" height="28" fill="#211a12"/>
-      <rect x="26" y="42" width="12" height="12" fill="#211a12"/><rect x="62" y="42" width="12" height="12" fill="#211a12"/>
-      <text x="50" y="26" font-family="monospace" font-size="12" fill="#211a12" text-anchor="middle" font-weight="bold">SS</text>
-    </svg>
-    <h1>O Sítio SS</h1>
-    <div class="fio"></div>
-    <p class="lume">Vocês acordaram sem memória. Só sabem o que os olhos mostram: uma estrada de terra, um portão de ferro com duas letras, e um sítio velho que não parece querer visita.</p>
+    <h1>Guia do Jogador</h1>
+    <div class="subtitulo">RPG: Sítio SS</div>
   </header>
 
   <section>
     <div class="titulo-secao"><span class="num">?</span><h2>Onde vocês estão</h2></div>
-    <div class="prosa">
+    <div class="prosa intro">
       <p>Seis desconhecidos despertaram numa carroça parada na beira da estrada. Ninguém lembra o próprio passado — nem como chegou ali. À frente, um portão marcado <b>SS</b> e, atrás dele, um sítio: espantalho no pátio, colmeias zunindo, um muro de madeira cercando a casa principal.</p>
-      <p>Alguma coisa nesse lugar guarda as respostas — e talvez as memórias de vocês. O jeito é entrar e descobrir.</p>
+      <p>Alguma coisa nesse lugar guarda as respostas — e talvez as memórias de vocês.<br>O jeito é entrar e descobrir.</p>
     </div>
   </section>
 
