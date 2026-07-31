@@ -78,6 +78,10 @@
   .card.inim .cab input.nome-in:focus{outline:1px solid var(--brasa)}
   .card.inim .cab button{padding:2px 8px;box-shadow:none}
   .card.inim .attr input{width:100%}
+  .card .cab input.nome-in{flex:1;min-width:90px;font-family:"Rye",serif;font-size:1.2rem;border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);padding:2px 6px;box-shadow:none}
+  .card .cab input.cl-in{flex:1;min-width:80px;font-family:"Special Elite",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--brasa);border:2px solid var(--tinta);background:var(--papel);padding:3px 6px;box-shadow:none}
+  .card .cab{gap:6px;flex-wrap:wrap}
+  .card .cab button{box-shadow:none;padding:3px 9px}
   .critb{display:inline-block;background:#2f7d3a;color:#fff;font-family:"Special Elite",monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;margin-left:4px}
   .resultado .big.crit{color:#2f7d3a}
   .crit-flag{font-family:"Special Elite",monospace;font-size:.72rem;color:#2f7d3a;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
@@ -183,6 +187,7 @@
   <div class="layout">
     <div class="col">
       <div class="sel-wrap"><label>Ficha visível</label><select id="selFicha"></select></div>
+      <button class="mini brasa" id="btnNovoHeroi" style="display:none" onclick="addHeroi()">+ Novo herói</button>
       <div id="ficha"></div>
     </div>
     <div class="col">
@@ -341,6 +346,8 @@ const ENEMIES_SEED=[
 ];
 
 let state=JSON.parse(JSON.stringify(PADRAO));
+state.chars.forEach((c,i)=>{ c.ord=i+1; if(!c.assin)c.assin={nome:"",txt:""}; });
+const SEED_BY_ID={}; PADRAO.chars.forEach((c,i)=>{ SEED_BY_ID[c.id]=JSON.parse(JSON.stringify(c)); SEED_BY_ID[c.id].ord=i+1; });
 state.inimigos=JSON.parse(JSON.stringify(ENEMIES_SEED));
 state.imagens=["","",""];
 let gm=false, atual=state.chars[0].id, adv="none";
@@ -374,7 +381,7 @@ async function saveRemote(){
   state.updated=Date.now(); state.updatedBy=gm?"Mestre":"";
   if(!online){ atualizaSync(); return; }
   const p={pin:state.pin,updated:state.updated,updatedBy:state.updatedBy,notasMestre:state.notasMestre||"",chars:{},inimigos:{},imagens:(state.imagens||["","",""]).slice(0,3)};
-  state.chars.forEach(c=>{ p.chars[c.id]={pvAtual:c.pvAtual,pvMax:c.pvMax,ca:c.ca,cond:c.cond||"",notas:c.notas||"",attrs:Object.assign({},c.attrs),armas:c.armas||"",objetos:c.objetos||""}; });
+  state.chars.forEach(c=>{ p.chars[c.id]={id:c.id,ord:c.ord||0,nome:c.nome||"",cl:c.cl||"",cor:c.cor||"#4a3d2c",conjura:c.conjura||null,pericias:c.pericias||[],expert:c.expert||[],assin:{nome:(c.assin&&c.assin.nome)||"",txt:(c.assin&&c.assin.txt)||""},pvAtual:c.pvAtual,pvMax:c.pvMax,ca:c.ca,cond:c.cond||"",notas:c.notas||"",attrs:Object.assign({},c.attrs),armas:c.armas||"",objetos:c.objetos||""}; });
   state.inimigos.forEach(e=>{ p.inimigos[e.id]={id:e.id,ord:e.ord||0,nome:e.nome||"",ca:e.ca||10,pvMax:e.pvMax||1,pvAtual:e.pvAtual||0,cond:e.cond||"",attrs:Object.assign({},e.attrs),ataques:e.ataques||"",tracos:e.tracos||""}; });
   try{ await salaRef.update(p); }catch(e){ console.error(e); flash("Erro ao salvar"); }
   atualizaSync();
@@ -384,15 +391,21 @@ function aplicaRemoto(r){
   if(typeof r.pin==="string")state.pin=r.pin;
   state.updated=r.updated||0; state.updatedBy=r.updatedBy||"";
   if(typeof r.notasMestre==="string")state.notasMestre=r.notasMestre;
-  if(r.chars) state.chars.forEach(c=>{ const rc=r.chars[c.id]; if(!rc)return;
-    if(typeof rc.pvAtual==="number")c.pvAtual=rc.pvAtual;
-    if(typeof rc.pvMax==="number")c.pvMax=rc.pvMax;
-    if(typeof rc.ca==="number")c.ca=rc.ca;
-    if(typeof rc.cond==="string")c.cond=rc.cond;
-    if(typeof rc.notas==="string")c.notas=rc.notas;
-    if(rc.attrs){ for(const k in ATRIBS){ if(typeof rc.attrs[k]==="number")c.attrs[k]=rc.attrs[k]; } }
-    if(typeof rc.armas==="string")c.armas=rc.armas;
-    if(typeof rc.objetos==="string")c.objetos=rc.objetos; });
+  if(r.chars){ state.chars=Object.keys(r.chars).map(id=>{ const rc=r.chars[id]||{}; const seed=SEED_BY_ID[id]; const b=seed?JSON.parse(JSON.stringify(seed)):{}; return {
+      id:id, ord:(typeof rc.ord==="number"?rc.ord:(b.ord!=null?b.ord:99)),
+      nome:rc.nome||b.nome||"Herói", cl:rc.cl||b.cl||"", cor:rc.cor||b.cor||"#4a3d2c",
+      conjura:(rc.conjura!==undefined?rc.conjura:(b.conjura||null)),
+      pericias:rc.pericias||b.pericias||[], expert:rc.expert||b.expert||[],
+      assin:{nome:(rc.assin&&rc.assin.nome)||(b.assin&&b.assin.nome)||"", txt:(rc.assin&&rc.assin.txt)||(b.assin&&b.assin.txt)||""},
+      pvMax:(typeof rc.pvMax==="number"?rc.pvMax:(b.pvMax||10)),
+      pvAtual:(typeof rc.pvAtual==="number"?rc.pvAtual:(typeof b.pvAtual==="number"?b.pvAtual:10)),
+      ca:(typeof rc.ca==="number"?rc.ca:(b.ca||10)), cond:rc.cond||"",
+      notas:(typeof rc.notas==="string"?rc.notas:(b.notas||"")),
+      attrs:Object.assign({FOR:10,DES:10,CON:10,INT:10,SAB:10,CAR:10},b.attrs||{},rc.attrs||{}),
+      armas:(typeof rc.armas==="string"?rc.armas:(b.armas||"")),
+      objetos:(typeof rc.objetos==="string"?rc.objetos:(b.objetos||""))
+    }; }).sort((a,b)=>(a.ord||0)-(b.ord||0));
+    if(!state.chars.find(c=>c.id===atual)) atual=state.chars[0]?state.chars[0].id:atual; }
   if(r.inimigos){ state.inimigos=Object.keys(r.inimigos).map(k=>r.inimigos[k]).filter(Boolean).map(e=>({
       id:e.id||("e"+Math.random()), ord:e.ord||0, nome:e.nome||"", ca:(typeof e.ca==="number"?e.ca:10),
       pvMax:(typeof e.pvMax==="number"?e.pvMax:1), pvAtual:(typeof e.pvAtual==="number"?e.pvAtual:(e.pvMax||1)),
@@ -415,6 +428,20 @@ function setModo(){
   $("btnPin").style.display=gm?"":"none"; $("btnReset").style.display=gm?"":"none"; atualizaExtra();
 }
 function ajustaHP(id,delta){ const c=state.chars.find(x=>x.id===id); c.pvAtual=Math.max(0,Math.min(c.pvMax,c.pvAtual+delta)); render(); saveRemote(); }
+function addHeroi(){
+  const ord=(state.chars.reduce((m,c)=>Math.max(m,c.ord||0),0))+1;
+  const id="h"+Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36);
+  state.chars.push({id,ord,nome:"Novo herói",cl:"Herói · —",cor:"#4a3d2c",conjura:null,pericias:[],expert:[],assin:{nome:"",txt:""},pvMax:10,pvAtual:10,ca:12,cond:"",notas:"",attrs:{FOR:10,DES:10,CON:10,INT:10,SAB:10,CAR:10},armas:"",objetos:""});
+  atual=id; render(); saveRemote(); flash("Herói criado");
+}
+function removeHeroi(id){
+  if(state.chars.length<=1){ alert("Precisa haver ao menos um herói."); return; }
+  const c=state.chars.find(x=>x.id===id);
+  if(!confirm("Remover o herói "+(c?c.nome:"")+"? Isso apaga a ficha dele pra todos."))return;
+  state.chars=state.chars.filter(x=>x.id!==id);
+  if(atual===id) atual=state.chars[0].id;
+  render(); saveRemote(); flash("Herói removido");
+}
 
 function popularSelect(){ const s=$("selFicha"); s.innerHTML=state.chars.map(c=>`<option value="${c.id}">${c.nome} · ${c.pvAtual}/${c.pvMax} PV</option>`).join(""); s.value=atual; }
 function renderFicha(){
@@ -423,7 +450,7 @@ function renderFicha(){
   const attrsHTML=["FOR","DES","CON","INT","SAB","CAR"].map(k=>`<div class="attr"><b>${k}</b>${gm?`<input class="live" type="number" value="${c.attrs[k]}" data-id="${c.id}" data-attr="${k}">`:`<span class="n">${c.attrs[k]}</span>`}<span class="m">${mod(c.attrs[k])}</span></div>`).join("");
   $("ficha").innerHTML=`
     <div class="card" style="border-left-color:${c.cor}">
-      <div class="cab"><span class="nome">${c.nome}</span><span class="cl">${c.cl}</span></div>
+      <div class="cab">${gm?`<input class="live nome-in" data-id="${c.id}" data-f="nome" value="${esc(c.nome)}"><input class="live cl-in" data-id="${c.id}" data-f="cl" value="${esc(c.cl)}"><button class="mini" onclick="removeHeroi('${c.id}')" title="remover herói">✕</button>`:`<span class="nome">${esc(c.nome)}</span><span class="cl">${esc(c.cl)}</span>`}</div>
       <div class="corpo">
         <div class="vitais-topo">
           <div class="vbox"><b>PV</b><span class="vv">${c.pvAtual} / ${c.pvMax}</span></div>
@@ -445,18 +472,20 @@ function renderFicha(){
         <div class="campo"><label class="lbl-forte">Armas / Magia</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="armas" style="min-height:78px">${esc(c.armas)}</textarea>`:`<div class="txt">${escLines(c.armas)||"—"}</div>`}</div>
         <div class="campo"><label class="lbl-forte">Objetos</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="objetos" style="min-height:46px">${esc(c.objetos)}</textarea>`:`<div class="txt">${escLines(c.objetos)||"—"}</div>`}</div>
         <div class="campo"><label class="lbl-forte">Anotações</label><textarea class="live" data-id="${c.id}" data-f="notas" ${dis} placeholder="${gm?'lembretes rápidos…':''}">${esc(c.notas)}</textarea></div>
-        <div class="assin"><span class="tag">Assinatura</span><br><b>${c.assin.nome}</b> — ${c.assin.txt}</div>
+        <div class="assin"><span class="tag">Assinatura</span><br>${gm?`<input class="live" data-id="${c.id}" data-f="assinNome" value="${esc(c.assin.nome)}" placeholder="nome da assinatura" style="font-family:'Rye',serif;margin-bottom:4px"><textarea class="live" data-id="${c.id}" data-f="assinTxt" placeholder="o que ela faz" style="min-height:38px">${esc(c.assin.txt)}</textarea>`:`<b>${esc(c.assin.nome)}</b>${c.assin.txt?" — "+esc(c.assin.txt):""}`}</div>
       </div>
     </div>`;
   if(gm){
     $("ficha").querySelectorAll("input.live, textarea.live").forEach(el=>{
-      const commit=()=>{ const c2=state.chars.find(x=>x.id===el.dataset.id);
+      const commit=()=>{ const c2=state.chars.find(x=>x.id===el.dataset.id); if(!c2)return;
         if(el.dataset.attr){ let v=parseInt(el.value)||0; v=Math.max(1,Math.min(30,v)); c2.attrs[el.dataset.attr]=v; saveRemote(); return; }
         const f=el.dataset.f;
+        if(f==="assinNome"){ if(!c2.assin)c2.assin={nome:"",txt:""}; c2.assin.nome=el.value; saveRemote(); return; }
+        if(f==="assinTxt"){ if(!c2.assin)c2.assin={nome:"",txt:""}; c2.assin.txt=el.value; saveRemote(); return; }
         if(f==="pvMax"||f==="ca"){ let v=parseInt(el.value)||0; v=Math.max(0,v); c2[f]=v; if(f==="pvMax")c2.pvAtual=Math.min(c2.pvAtual,v); }
         else c2[f]=el.value;
         saveRemote(); };
-      el.addEventListener("change",()=>{ commit(); if(el.dataset.attr||el.dataset.f==="pvMax"||el.dataset.f==="ca") render(); });
+      el.addEventListener("change",()=>{ commit(); if(el.dataset.attr||el.dataset.f==="pvMax"||el.dataset.f==="ca"||el.dataset.f==="nome"||el.dataset.f==="cl") render(); });
       el.addEventListener("blur",commit);
     });
   }
@@ -607,11 +636,11 @@ function attachCanvas(){
   tela.addEventListener("pointerup",fimTraco); tela.addEventListener("pointercancel",fimTraco);
   $("brush").addEventListener("input",e=>{ brush=parseInt(e.target.value)||3; });
 }
-function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; const rt=$("rollTools"); if(rt)rt.style.display=gm?"block":"none"; const isec=$("inimigosSec"); if(isec)isec.style.display=gm?"block":"none"; const rw=$("roladorWrap"); if(rw)rw.style.display=gm?"flex":"none"; syncNotasUI(); }
+function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; const rt=$("rollTools"); if(rt)rt.style.display=gm?"block":"none"; const isec=$("inimigosSec"); if(isec)isec.style.display=gm?"block":"none"; const rw=$("roladorWrap"); if(rw)rw.style.display=gm?"flex":"none"; const bn=$("btnNovoHeroi"); if(bn)bn.style.display=gm?"inline-block":"none"; syncNotasUI(); }
 
 $("btnMestre").addEventListener("click",()=>{ if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; } const p=prompt("Digite o PIN do Mestre:"); if(p===null)return; if(p===state.pin){ gm=true; setModo(); render(); if(online)saveRemote(); flash("Modo Mestre ativado"); } else alert("PIN incorreto."); });
 $("btnPin").addEventListener("click",async()=>{ const n=prompt("Novo PIN do Mestre:",state.pin); if(n&&n.trim()){ state.pin=n.trim(); await saveRemote(); flash("PIN atualizado"); } });
-$("btnReset").addEventListener("click",async()=>{ if(!confirm("Zerar as fichas dos jogadores para o padrão? (inimigos, quadro e anotações do Mestre não mudam)"))return; const pin=state.pin,nm=state.notasMestre,inim=state.inimigos,imgs=state.imagens; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin; state.notasMestre=nm; state.inimigos=inim; state.imagens=imgs; await saveRemote(); render(); flash("Fichas zeradas"); });
+$("btnReset").addEventListener("click",async()=>{ if(!confirm("Zerar as fichas dos jogadores para o padrão? (inimigos, quadro e anotações do Mestre não mudam)"))return; const pin=state.pin,nm=state.notasMestre,inim=state.inimigos,imgs=state.imagens; state=JSON.parse(JSON.stringify(PADRAO)); state.chars.forEach((c,i)=>{ c.ord=i+1; if(!c.assin)c.assin={nome:"",txt:""}; }); state.pin=pin; state.notasMestre=nm; state.inimigos=inim; state.imagens=imgs; atual=state.chars[0].id; await saveRemote(); render(); flash("Fichas zeradas"); });
 $("selFicha").addEventListener("change",e=>{ atual=e.target.value; renderFicha(); popularTestes(); });
 $("selRolador").addEventListener("change",()=>popularTestes());
 (function(){ const t=$("notasMestre"); t.addEventListener("input",()=>{ if(!gm)return; state.notasMestre=t.value; clearTimeout(notaTimer); notaTimer=setTimeout(saveRemote,500); }); t.addEventListener("blur",()=>{ if(!gm)return; state.notasMestre=t.value; saveRemote(); }); })();
