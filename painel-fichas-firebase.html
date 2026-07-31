@@ -128,14 +128,16 @@
   .assin .tag{display:inline-block;background:var(--brasa);color:var(--papel);font-family:"Special Elite",monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;padding:2px 7px;margin-bottom:3px}
   .assin b{font-family:"Rye",serif;font-weight:400;font-size:1rem}
   .painel{border:2.5px solid var(--tinta);background:var(--papel-esc);box-shadow:5px 5px 0 var(--tinta);padding:12px 14px}
-  .painel.dados-box{background:#918b7c}
+  .painel.dados-box{background:#918b7c;position:relative}
   .tagm{font-family:"Special Elite",monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.1em;background:var(--brasa);color:var(--papel);padding:2px 7px}
   .adv-row{display:flex;gap:6px;margin-bottom:8px}
   .pill{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;padding:5px 9px;border:2px solid var(--tinta);cursor:pointer;background:var(--papel)}
   .pill.on{background:var(--brasa);color:var(--papel);border-color:var(--brasa-esc)}
   .dados-puros{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
   .die{font-family:"Rye",serif;font-size:1rem;padding:8px 14px}
-  .modman{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;color:var(--tinta);display:flex;align-items:center;gap:4px;margin-left:auto}
+  .modman{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;color:var(--tinta);display:flex;align-items:center;gap:4px}
+  .d20-ill{position:absolute;top:10px;right:12px;width:48px;height:48px;pointer-events:none}
+  #roladorWrap{padding-right:56px}
   .modman input{width:46px}
   .linha-roll{display:flex;gap:8px;margin:7px 0}.linha-roll select{flex:1}
   .btn-acao{width:120px;flex:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:700}
@@ -197,7 +199,8 @@
     </div>
     <div class="col">
       <div class="painel dados-box">
-        <h3>Dados</h3>
+        <h3>Rolador de Dados</h3>
+        <svg class="d20-ill" viewBox="0 0 100 100" fill="none" stroke="#211a12" stroke-width="2.5" stroke-linejoin="round" aria-hidden="true"><polygon points="50,7 87,28.5 87,71.5 50,93 13,71.5 13,28.5" fill="#e6d9b8"/><polygon points="31,39 69,39 50,71" fill="#d8c69c"/><line x1="50" y1="7" x2="31" y2="39"/><line x1="50" y1="7" x2="69" y2="39"/><line x1="13" y1="28.5" x2="31" y2="39"/><line x1="87" y1="28.5" x2="69" y2="39"/><line x1="13" y1="71.5" x2="50" y2="71"/><line x1="87" y1="71.5" x2="50" y2="71"/><line x1="50" y1="93" x2="50" y2="71"/><text x="50" y="60" text-anchor="middle" font-family="Rye, serif" font-size="20" fill="#211a12" stroke="none">20</text></svg>
         <div class="linha-roll" id="roladorWrap" style="display:none">
           <label style="font-family:'Special Elite',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta);align-self:center;white-space:nowrap">Rolar como</label>
           <select id="selRolador"></select>
