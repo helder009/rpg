@@ -59,6 +59,28 @@
   .besta .fraq{color:var(--mata);font-size:.85rem;font-style:italic}
   .chefe{grid-column:1/-1;border:3px solid var(--brasa);background:rgba(212,86,47,.12);box-shadow:6px 6px 0 #000}
   .chefe h4{color:var(--brasa-cl);font-size:1.35rem}
+  .npcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:14px}
+  .npc{border:2.5px solid var(--brasa);background:var(--papel-esc);box-shadow:5px 5px 0 #000;display:flex;flex-direction:column}
+  .npc .cab{background:var(--brasa);color:#221c1a;padding:8px 12px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .npc .cab .nm{font-family:"Rye",serif;font-size:1.12rem;line-height:1}
+  .npc .cab .tag{font-family:"Special Elite",monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+  .npc .body{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+  .npc .lin{display:flex;gap:6px;flex-wrap:wrap}
+  .npc .stat{border:1px solid var(--linha);padding:3px 8px;font-family:"Special Elite",monospace;font-size:.64rem}
+  .npc .stat b{color:var(--brasa-cl)}
+  .npc .attrs{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
+  .npc .attr{text-align:center;border:1px solid var(--linha);padding:3px 0}
+  .npc .attr b{display:block;font-family:"Special Elite",monospace;font-size:.5rem;color:var(--brasa-cl)}
+  .npc .attr .n{font-size:.82rem;font-weight:700;line-height:1}
+  .npc .attr .m{display:block;font-size:.58rem;color:var(--tinta-suave)}
+  .npc .rot{font-family:"Special Elite",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--brasa-cl);display:block;margin-bottom:2px}
+  .npc .atk{font-size:.86rem;line-height:1.35}
+  .npc .fraq{color:var(--mata);font-size:.84rem;font-style:italic}
+  .npc.chefe{grid-column:1/-1;box-shadow:6px 6px 0 #000}
+  .npc.branca{border-style:dashed}
+  .npc .vazio{border:1px dashed var(--linha);min-height:1.5em;padding:3px 6px;font-size:.82rem;color:var(--tinta-suave)}
+  .npc .duas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.npc .duas{grid-template-columns:1fr}}
   .item{border:2px solid var(--brasa-cl);background:rgba(240,163,95,.08);padding:12px 14px;margin:12px 0}
   .item h4{font-family:"Rye",serif;font-weight:400;margin:0 0 4px;color:var(--brasa-cl)}
   .item .stats{font-family:"Special Elite",monospace;font-size:.72rem;color:var(--tinta-suave)}
@@ -86,6 +108,153 @@
     <span class="faixa">Guia do Mestre</span>
     <p class="lume">Não há velho na varanda. A casa está vazia — e é justamente isso que assusta. O homem da colina dorme no porão, de quatro patas, esperando um coração mole soltar a corrente.</p>
   </header>
+
+  <!-- FICHAS DOS NPCS -->
+  <section>
+    <div class="titulo-secao"><span class="num">⚔</span><h2>Fichas dos NPCs</h2></div>
+    <p class="sub-secao">Blocos de combate prontos pra puxar na hora da luta. Ajuste os PV pra cima se o grupo estiver com folga (são 6 heróis).</p>
+    <div class="npcs">
+
+      <!-- GOBLIN ARQUEIRO -->
+      <div class="npc">
+        <div class="cab"><span class="nm">Goblin Arqueiro</span><span class="tag">Tat. I · 7</span></div>
+        <div class="body">
+          <div class="lin"><span class="stat"><b>CA</b> 13</span><span class="stat"><b>PV</b> 10</span><span class="stat"><b>Inic.</b> +2</span><span class="stat"><b>Desl.</b> 9m</span></div>
+          <div class="attrs">
+            <div class="attr"><b>FOR</b><span class="n">8</span><span class="m">-1</span></div>
+            <div class="attr"><b>DES</b><span class="n">14</span><span class="m">+2</span></div>
+            <div class="attr"><b>CON</b><span class="n">10</span><span class="m">+0</span></div>
+            <div class="attr"><b>INT</b><span class="n">10</span><span class="m">+0</span></div>
+            <div class="attr"><b>SAB</b><span class="n">8</span><span class="m">-1</span></div>
+            <div class="attr"><b>CAR</b><span class="n">8</span><span class="m">-1</span></div>
+          </div>
+          <div><span class="rot">Ataques</span>
+            <div class="atk">Arco curto <b>+4</b> — 1d6+2 (à distância 24/96m)</div>
+            <div class="atk">Adaga <b>+4</b> — 1d4+2 (corpo a corpo)</div>
+          </div>
+          <div><span class="rot">Traços</span><div class="atk">Fuga ardilosa: Desengajar ou Esconder como ação bônus. Visão no escuro.</div></div>
+          <div><span class="rot">Tática</span><div class="atk">Atira de longe e recua; foge se cercado.</div></div>
+        </div>
+      </div>
+
+      <!-- GOBLIN LANCEIRO (CICATRIZ) -->
+      <div class="npc">
+        <div class="cab"><span class="nm">Goblin Lanceiro</span><span class="tag">Cicatriz · Tat. II · 2</span></div>
+        <div class="body">
+          <div class="lin"><span class="stat"><b>CA</b> 14</span><span class="stat"><b>PV</b> 12</span><span class="stat"><b>Inic.</b> +2</span><span class="stat"><b>Desl.</b> 12m (montado)</span></div>
+          <div class="attrs">
+            <div class="attr"><b>FOR</b><span class="n">12</span><span class="m">+1</span></div>
+            <div class="attr"><b>DES</b><span class="n">14</span><span class="m">+2</span></div>
+            <div class="attr"><b>CON</b><span class="n">12</span><span class="m">+1</span></div>
+            <div class="attr"><b>INT</b><span class="n">8</span><span class="m">-1</span></div>
+            <div class="attr"><b>SAB</b><span class="n">8</span><span class="m">-1</span></div>
+            <div class="attr"><b>CAR</b><span class="n">8</span><span class="m">-1</span></div>
+          </div>
+          <div><span class="rot">Ataques</span>
+            <div class="atk">Lança <b>+4</b> — 1d6+2 (alcance +1,5m); <b>+2 no dano</b> ao investir montado.</div>
+          </div>
+          <div><span class="rot">Montaria — Tamanduá de Guerra</span><div class="atk">CA 12 · PV 14 · Garras +4 (1d8+2); pode Derrubar quem estiver a pé perto (FOR CD 12). Foge do fogo.</div></div>
+          <div><span class="rot">Tática</span><div class="atk">Investe, fere e recua com a montaria. A pé, fica atrapalhado.</div></div>
+        </div>
+      </div>
+
+      <!-- GOBLIN LANCEIRO (CAOLHO) -->
+      <div class="npc">
+        <div class="cab"><span class="nm">Goblin Lanceiro</span><span class="tag">Caolho · Tat. III · 4</span></div>
+        <div class="body">
+          <div class="lin"><span class="stat"><b>CA</b> 14</span><span class="stat"><b>PV</b> 12</span><span class="stat"><b>Inic.</b> +2</span><span class="stat"><b>Desl.</b> 12m (montado)</span></div>
+          <div class="attrs">
+            <div class="attr"><b>FOR</b><span class="n">12</span><span class="m">+1</span></div>
+            <div class="attr"><b>DES</b><span class="n">14</span><span class="m">+2</span></div>
+            <div class="attr"><b>CON</b><span class="n">12</span><span class="m">+1</span></div>
+            <div class="attr"><b>INT</b><span class="n">8</span><span class="m">-1</span></div>
+            <div class="attr"><b>SAB</b><span class="n">8</span><span class="m">-1</span></div>
+            <div class="attr"><b>CAR</b><span class="n">8</span><span class="m">-1</span></div>
+          </div>
+          <div><span class="rot">Ataques</span>
+            <div class="atk">Lança <b>+4</b> — 1d6+2 (alcance +1,5m); <b>+2 no dano</b> ao investir montado.</div>
+          </div>
+          <div><span class="rot">Montaria — Tamanduá de Guerra</span><div class="atk">CA 12 · PV 14 · Garras +4 (1d8+2); pode Derrubar (FOR CD 12). Foge do fogo.</div></div>
+          <div><span class="rot">Traço</span><div class="atk">Caolho: desvantagem em ataques à distância além de 9m.</div></div>
+        </div>
+      </div>
+
+      <!-- MULA-SEM-CABEÇA -->
+      <div class="npc">
+        <div class="cab"><span class="nm">Mula-sem-cabeça</span><span class="tag">Assombração</span></div>
+        <div class="body">
+          <div class="lin"><span class="stat"><b>CA</b> 13</span><span class="stat"><b>PV</b> 25</span><span class="stat"><b>Inic.</b> +1</span><span class="stat"><b>Desl.</b> 18m</span></div>
+          <div class="attrs">
+            <div class="attr"><b>FOR</b><span class="n">16</span><span class="m">+3</span></div>
+            <div class="attr"><b>DES</b><span class="n">12</span><span class="m">+1</span></div>
+            <div class="attr"><b>CON</b><span class="n">15</span><span class="m">+2</span></div>
+            <div class="attr"><b>INT</b><span class="n">4</span><span class="m">-3</span></div>
+            <div class="attr"><b>SAB</b><span class="n">10</span><span class="m">+0</span></div>
+            <div class="attr"><b>CAR</b><span class="n">8</span><span class="m">-1</span></div>
+          </div>
+          <div><span class="rot">Ataques</span>
+            <div class="atk">Coice <b>+5</b> — 2d6+3 (corpo a corpo).</div>
+            <div class="atk">Jorro de fogo (do pescoço): quem estiver a 1,5m faz DES CD 13 ou toma 1d6 de fogo. Recarrega a cada 2 turnos.</div>
+          </div>
+          <div><span class="rot">Traços</span><div class="atk">Galope flamejante: corre em disparada, ilumina a área. Resistência a fogo.</div></div>
+          <div class="fraq">Fraqueza: uma reza forte / benzê-la (Religião ou CAR CD 13) a acalma; dizer o nome de batismo dela em voz alta a liberta.</div>
+        </div>
+      </div>
+
+      <!-- ANHANGUERA (CHEFE) -->
+      <div class="npc chefe">
+        <div class="cab"><span class="nm">☠ Velho Anhanguera</span><span class="tag">Chefe · o homem da colina</span></div>
+        <div class="body">
+          <div class="duas">
+            <div>
+              <span class="rot">Forma selada — Cão Preto</span>
+              <div class="lin"><span class="stat"><b>CA</b> 12</span><span class="stat"><b>PV</b> 8</span></div>
+              <div class="atk" style="margin-top:5px">Não ataca — ganido, corrente curta. <b>É o selo.</b> Soltá-lo (corrente/coleira ou apagar o círculo) o transforma na forma de brasa. Até lá, o Anhanguera não pode agir.</div>
+            </div>
+            <div>
+              <span class="rot">Forma de brasa — revelada</span>
+              <div class="lin"><span class="stat"><b>CA</b> 15</span><span class="stat"><b>PV</b> 55</span><span class="stat"><b>Inic.</b> +2</span><span class="stat"><b>Desl.</b> 9m</span></div>
+              <div class="attrs" style="margin-top:5px">
+                <div class="attr"><b>FOR</b><span class="n">18</span><span class="m">+4</span></div>
+                <div class="attr"><b>DES</b><span class="n">14</span><span class="m">+2</span></div>
+                <div class="attr"><b>CON</b><span class="n">16</span><span class="m">+3</span></div>
+                <div class="attr"><b>INT</b><span class="n">12</span><span class="m">+1</span></div>
+                <div class="attr"><b>SAB</b><span class="n">14</span><span class="m">+2</span></div>
+                <div class="attr"><b>CAR</b><span class="n">16</span><span class="m">+3</span></div>
+              </div>
+            </div>
+          </div>
+          <div><span class="rot">Ataques (forma de brasa)</span>
+            <div class="atk">2× Garras de brasa <b>+6</b> — 1d8+3 cortante + 1d6 de fogo cada.</div>
+            <div class="atk">Sopro de Brasa (cone de 4,5m): DES CD 13, 2d6 de fogo. Recarrega a cada 2 turnos.</div>
+          </div>
+          <div><span class="rot">Traços</span><div class="atk">Resistência a dano físico comum (não-mágico). Forma enganosa: mente e engana enquanto selado.</div></div>
+          <div class="fraq">Fraquezas: o <b>Facão do Espantalho</b> ignora a resistência · gritar <b>"Sebastião Salustiano!"</b> o deixa Vulnerável por 1 turno · destruir o <b>caderno de pactos</b> tira metade dos PV na hora.</div>
+        </div>
+      </div>
+
+      <!-- FICHA EM BRANCO -->
+      <div class="npc branca">
+        <div class="cab"><span class="nm">Ficha em branco</span><span class="tag">preencha à vontade</span></div>
+        <div class="body">
+          <div class="vazio">Nome / tipo: __________________________</div>
+          <div class="lin"><span class="stat"><b>CA</b> __</span><span class="stat"><b>PV</b> __</span><span class="stat"><b>Inic.</b> __</span><span class="stat"><b>Desl.</b> __</span></div>
+          <div class="attrs">
+            <div class="attr"><b>FOR</b><span class="n">—</span><span class="m">·</span></div>
+            <div class="attr"><b>DES</b><span class="n">—</span><span class="m">·</span></div>
+            <div class="attr"><b>CON</b><span class="n">—</span><span class="m">·</span></div>
+            <div class="attr"><b>INT</b><span class="n">—</span><span class="m">·</span></div>
+            <div class="attr"><b>SAB</b><span class="n">—</span><span class="m">·</span></div>
+            <div class="attr"><b>CAR</b><span class="n">—</span><span class="m">·</span></div>
+          </div>
+          <div><span class="rot">Ataques</span><div class="vazio">&nbsp;</div><div class="vazio">&nbsp;</div></div>
+          <div><span class="rot">Traços / especiais</span><div class="vazio">&nbsp;</div></div>
+          <div><span class="rot">Fraqueza / tática</span><div class="vazio">&nbsp;</div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
 
   <!-- SEGREDO CENTRAL -->
   <section>
