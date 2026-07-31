@@ -53,6 +53,44 @@
   .duo{display:flex;gap:8px}.campo{flex:1}
   .campo label{display:block;font-family:"Special Elite",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tinta-suave);margin-bottom:2px}
   .campo label.lbl-forte{color:var(--brasa);font-weight:700;font-size:.66rem}
+  .vitais-topo{display:flex;gap:8px;align-items:stretch;margin-bottom:2px}
+  .vbox{border:2px solid var(--tinta);background:var(--papel);text-align:center;padding:5px 12px;display:flex;flex-direction:column;justify-content:center;min-width:74px}
+  .vbox b{font-family:"Special Elite",monospace;font-size:.56rem;letter-spacing:.1em;color:var(--tinta-suave);text-transform:uppercase}
+  .vbox .vv{font-family:"Rye",serif;font-size:1.35rem;line-height:1.05;color:var(--brasa)}
+  .vbox.ca .vv{color:var(--tinta)}
+  .vcond{flex:1;display:flex;flex-direction:column;gap:2px}
+  .vcond .lbl-forte{display:block;font-family:"Special Elite",monospace;text-transform:uppercase;letter-spacing:.1em;font-size:.66rem;font-weight:700;color:var(--brasa);margin-bottom:2px}
+  .vcond input,.vcond .txt{font-size:.85rem}
+  .painel.notas-box{background:#a2c0d2}
+  .inim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .card.inim{margin-top:0;border-left-color:#9e2b16}
+  .card.inim .cab{gap:8px}
+  .card.inim .cab input.nome-in{flex:1;font-family:"Rye",serif;font-size:1.08rem;border:none;background:transparent;padding:2px 0;color:var(--tinta);box-shadow:none}
+  .card.inim .cab input.nome-in:focus{outline:1px solid var(--brasa)}
+  .card.inim .cab button{padding:2px 8px;box-shadow:none}
+  .card.inim .attr input{width:100%}
+  .critb{display:inline-block;background:#2f7d3a;color:#fff;font-family:"Special Elite",monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;margin-left:4px}
+  .resultado .big.crit{color:#2f7d3a}
+  .crit-flag{font-family:"Special Elite",monospace;font-size:.72rem;color:#2f7d3a;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .npc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .ie-card{border:2px solid var(--tinta);background:rgba(158,43,22,.06);padding:10px;display:flex;flex-direction:column;gap:6px}
+  .ie-cab{display:flex;gap:6px;align-items:center}
+  .ie-nome{flex:1;font-weight:700;font-family:"Rye",serif;font-size:1.05rem;border:2px solid var(--tinta);background:var(--papel);padding:3px 6px}
+  .ie-hp{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+  .ie-pv{font-family:"Rye",serif;font-size:1.35rem;color:var(--brasa);margin-right:4px}
+  .ie-pv small{font-size:.68rem;color:var(--tinta-suave)}
+  .ie-bar{height:8px;border:2px solid var(--tinta);background:var(--papel);overflow:hidden}
+  .ie-bar i{display:block;height:100%}
+  .ie-row{display:flex;align-items:center;gap:6px}
+  .ie-row label{font-family:"Special Elite",monospace;font-size:.58rem;text-transform:uppercase;color:var(--tinta-suave)}
+  .ie-row input{width:52px}
+  .ie-attrs{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
+  .ie-attr{text-align:center;border:1px solid var(--linha);padding:2px 0}
+  .ie-attr b{display:block;font-family:"Special Elite",monospace;font-size:.5rem;color:var(--brasa-esc)}
+  .ie-attr input{width:100%;text-align:center;padding:1px 0;font-size:.8rem;border:1px solid var(--tinta);background:var(--papel);box-shadow:none}
+  .ie-attr .m{display:block;font-size:.56rem;color:var(--tinta-suave)}
+  .ie-lbl{display:block;font-family:"Special Elite",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--brasa);font-weight:700;margin-top:2px}
+  .ie-card textarea{min-height:46px;font-size:.85rem}
   .vitais-top{display:flex;gap:8px;align-items:stretch;margin-bottom:2px}
   .vt{border:2px solid var(--tinta);background:rgba(255,255,255,.16);padding:5px 6px;text-align:center;min-width:66px;display:flex;flex-direction:column;justify-content:center}
   .vt b{font-family:"Special Elite",monospace;font-size:.58rem;letter-spacing:.1em;color:var(--tinta-suave)}
@@ -87,6 +125,9 @@
   .modman{font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;color:var(--tinta);display:flex;align-items:center;gap:4px;margin-left:auto}
   .modman input{width:46px}
   .linha-roll{display:flex;gap:8px;margin:7px 0}.linha-roll select{flex:1}
+  .dano-opts{display:flex;gap:14px;align-items:center;margin:2px 0 2px;font-family:"Special Elite",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.04em;color:var(--tinta)}
+  .dano-opts label{display:flex;gap:5px;align-items:center;cursor:pointer}
+  .dano-opts input[type=checkbox]{width:16px;height:16px;box-shadow:none;padding:0;margin:0;accent-color:var(--brasa)}
   .resultado{border:2px solid var(--tinta);background:#fff;text-align:center;padding:10px;margin:8px 0}
   .resultado .big{font-family:"Rye",serif;font-size:2.6rem;line-height:1;color:var(--brasa)}
   .resultado .det{font-family:"Special Elite",monospace;font-size:.72rem;color:var(--tinta-suave);margin-top:4px}
@@ -134,6 +175,10 @@
     <div class="col">
       <div class="painel dados-box">
         <h3>Dados</h3>
+        <div class="linha-roll" id="roladorWrap" style="display:none">
+          <label style="font-family:'Special Elite',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta);align-self:center;white-space:nowrap">Rolar como</label>
+          <select id="selRolador"></select>
+        </div>
         <div class="adv-row">
           <span class="pill on" id="pNorm" onclick="setAdv('none')">Normal</span>
           <span class="pill" id="pAdv" onclick="setAdv('adv')">Vantagem</span>
@@ -154,15 +199,32 @@
           </select>
           <button onclick="rolarAtaque()">Ataque</button>
         </div>
+        <div class="linha-roll">
+          <select id="selDano">
+            <option>1d4</option><option selected>1d6</option><option>1d8</option><option>1d10</option><option>1d12</option>
+            <option>2d4</option><option>2d6</option><option>2d8</option><option>2d10</option><option>3d6</option>
+          </select>
+          <button onclick="rolarDano()">Dano</button>
+        </div>
+        <div class="dano-opts">
+          <label><input type="checkbox" id="chkAttrDano" checked> + atributo</label>
+          <label><input type="checkbox" id="chkCritDano"> crítico (×2 dados)</label>
+        </div>
         <div class="resultado"><div class="big" id="resBig">—</div><div class="det" id="resDet">escolha um dado ou uma rolagem</div></div>
         <div id="rollTools" style="display:none;text-align:right;margin-bottom:4px"><button class="mini" onclick="limparRolls()">🗑 Limpar histórico</button></div>
         <div class="log" id="log"></div>
       </div>
-      <div class="painel">
+      <div class="painel notas-box">
         <h3>Anotações do Mestre <span class="tagm">ao vivo</span></h3>
         <textarea id="notasMestre" placeholder="—" disabled></textarea>
       </div>
     </div>
+  </div>
+
+  <div class="painel" id="inimigosSec" style="display:none;margin-top:14px">
+    <h3>Inimigos <span class="tagm">só o Mestre vê</span></h3>
+    <div id="inimigos" class="inim-grid"></div>
+    <button class="mini brasa" style="margin-top:10px" onclick="addInimigo()">+ Novo inimigo</button>
   </div>
 
   <div class="painel" style="margin-top:14px">
@@ -241,7 +303,26 @@ const PADRAO = {
 const ATRIBS={FOR:"Força",DES:"Destreza",CON:"Constituição",INT:"Inteligência",SAB:"Sabedoria",CAR:"Carisma"};
 const SKILLS={"Acrobacia":"DES","Arcanismo":"INT","Atletismo":"FOR","Atuação":"CAR","Enganação":"CAR","Furtividade":"DES","História":"INT","Intimidação":"CAR","Intuição":"SAB","Investigação":"INT","Ladinagem":"DES","Lidar com Animais":"SAB","Medicina":"SAB","Natureza":"INT","Percepção":"SAB","Persuasão":"CAR","Religião":"INT","Sobrevivência":"SAB"};
 
+const ENEMIES_SEED=[
+  {id:"gob-arq",ord:1,nome:"Goblin Arqueiro",ca:13,pvMax:10,pvAtual:10,cond:"",attrs:{FOR:8,DES:14,CON:10,INT:10,SAB:8,CAR:8},
+   ataques:"Arco curto +4 — 1d6+2 (à distância 24/96m)\nAdaga +4 — 1d4+2 (corpo a corpo)",
+   tracos:"Fuga ardilosa: Desengajar/Esconder como ação bônus. Visão no escuro. Tatuagem I·7."},
+  {id:"gob-cic",ord:2,nome:"Goblin Lanceiro (Cicatriz)",ca:14,pvMax:12,pvAtual:12,cond:"",attrs:{FOR:12,DES:14,CON:12,INT:8,SAB:8,CAR:8},
+   ataques:"Lança +4 — 1d6+2 (alcance +1,5m; +2 no dano ao investir montado)",
+   tracos:"Montaria Tamanduá: CA12 · PV14 · Garras +4 (1d8+2), Derruba (FOR CD12). Tatuagem II·2."},
+  {id:"gob-cao",ord:3,nome:"Goblin Lanceiro (Caolho)",ca:14,pvMax:12,pvAtual:12,cond:"",attrs:{FOR:12,DES:14,CON:12,INT:8,SAB:8,CAR:8},
+   ataques:"Lança +4 — 1d6+2 (alcance +1,5m; +2 no dano ao investir montado)",
+   tracos:"Caolho: desvantagem à distância além de 9m. Montaria Tamanduá: CA12 · PV14 · Garras +4. Tatuagem III·4."},
+  {id:"mula",ord:4,nome:"Mula-sem-cabeça",ca:13,pvMax:25,pvAtual:25,cond:"",attrs:{FOR:16,DES:12,CON:15,INT:4,SAB:10,CAR:8},
+   ataques:"Coice +5 — 2d6+3\nJorro de fogo: DES CD 13 ou 1d6 fogo (recarrega a cada 2 turnos)",
+   tracos:"Galope flamejante; resistência a fogo. Fraqueza: reza forte (Religião/CAR CD13) acalma; nome de batismo a liberta."},
+  {id:"anhanguera",ord:5,nome:"Velho Anhanguera (brasa)",ca:15,pvMax:55,pvAtual:55,cond:"",attrs:{FOR:18,DES:14,CON:16,INT:12,SAB:14,CAR:16},
+   ataques:"2× Garras de brasa +6 — 1d8+3 + 1d6 fogo cada\nSopro de Brasa (cone 4,5m): DES CD 13, 2d6 fogo (recarrega a cada 2 turnos)",
+   tracos:'Forma selada = Cão Preto (PV 8): soltá-lo o desperta. Resistência a dano físico comum. Fraquezas: o Facão do Espantalho ignora a resistência; gritar "Sebastião Salustiano" = vulnerável 1 turno; destruir o caderno de pactos = −½ PV.'}
+];
+
 let state=JSON.parse(JSON.stringify(PADRAO));
+state.inimigos=JSON.parse(JSON.stringify(ENEMIES_SEED));
 let gm=false, atual=state.chars[0].id, adv="none";
 let db=null, salaRef=null, desenhoRef=null, rollsRef=null, online=false;
 const $=id=>document.getElementById(id);
@@ -251,7 +332,7 @@ function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").repla
 function escLines(s){ return esc(s).replace(/\n/g,"<br>"); }
 function flash(m){ const f=$("flash"); f.textContent=m; f.classList.add("on"); clearTimeout(f._t); f._t=setTimeout(()=>f.classList.remove("on"),1600); }
 function temConfig(){ const c=FIREBASE_CONFIG; return c&&c.databaseURL&&c.databaseURL.indexOf("COLE_AQUI")<0&&c.apiKey&&c.apiKey.indexOf("COLE_AQUI")<0; }
-function editando(){ const a=document.activeElement; return a&&a.classList&&a.classList.contains("live"); }
+function editando(){ const a=document.activeElement; return a&&a.classList&&(a.classList.contains("live")||a.classList.contains("ilive")); }
 function charAtual(){ return state.chars.find(c=>c.id===atual)||state.chars[0]; }
 
 function initFirebase(){
@@ -272,8 +353,9 @@ function mostraSetup(){ online=false; atualizaSync(); $("avisoBox").innerHTML='<
 async function saveRemote(){
   state.updated=Date.now(); state.updatedBy=gm?"Mestre":"";
   if(!online){ atualizaSync(); return; }
-  const p={pin:state.pin,updated:state.updated,updatedBy:state.updatedBy,notasMestre:state.notasMestre||"",chars:{}};
+  const p={pin:state.pin,updated:state.updated,updatedBy:state.updatedBy,notasMestre:state.notasMestre||"",chars:{},inimigos:{}};
   state.chars.forEach(c=>{ p.chars[c.id]={pvAtual:c.pvAtual,pvMax:c.pvMax,ca:c.ca,cond:c.cond||"",notas:c.notas||"",attrs:Object.assign({},c.attrs),armas:c.armas||"",objetos:c.objetos||""}; });
+  state.inimigos.forEach(e=>{ p.inimigos[e.id]={id:e.id,ord:e.ord||0,nome:e.nome||"",ca:e.ca||10,pvMax:e.pvMax||1,pvAtual:e.pvAtual||0,cond:e.cond||"",attrs:Object.assign({},e.attrs),ataques:e.ataques||"",tracos:e.tracos||""}; });
   try{ await salaRef.update(p); }catch(e){ console.error(e); flash("Erro ao salvar"); }
   atualizaSync();
 }
@@ -291,6 +373,11 @@ function aplicaRemoto(r){
     if(rc.attrs){ for(const k in ATRIBS){ if(typeof rc.attrs[k]==="number")c.attrs[k]=rc.attrs[k]; } }
     if(typeof rc.armas==="string")c.armas=rc.armas;
     if(typeof rc.objetos==="string")c.objetos=rc.objetos; });
+  if(r.inimigos){ state.inimigos=Object.keys(r.inimigos).map(k=>r.inimigos[k]).filter(Boolean).map(e=>({
+      id:e.id||("e"+Math.random()), ord:e.ord||0, nome:e.nome||"", ca:(typeof e.ca==="number"?e.ca:10),
+      pvMax:(typeof e.pvMax==="number"?e.pvMax:1), pvAtual:(typeof e.pvAtual==="number"?e.pvAtual:(e.pvMax||1)),
+      cond:e.cond||"", attrs:Object.assign({FOR:10,DES:10,CON:10,INT:10,SAB:10,CAR:10},e.attrs||{}),
+      ataques:e.ataques||"", tracos:e.tracos||"" })).sort((a,b)=>(a.ord||0)-(b.ord||0)); }
   syncNotasUI();
 }
 function atualizaSync(){
@@ -317,7 +404,11 @@ function renderFicha(){
     <div class="card" style="border-left-color:${c.cor}">
       <div class="cab"><span class="nome">${c.nome}</span><span class="cl">${c.cl}</span></div>
       <div class="corpo">
-        <div class="hp"><span class="valor">${c.pvAtual}<small> / ${c.pvMax}</small></span></div>
+        <div class="vitais-topo">
+          <div class="vbox"><b>PV</b><span class="vv">${c.pvAtual} / ${c.pvMax}</span></div>
+          <div class="vbox ca"><b>CA</b><span class="vv">${c.ca}</span></div>
+          <div class="vcond"><label class="lbl-forte">Condições</label>${gm?`<input class="live" type="text" value="${esc(c.cond)}" placeholder="ex: envenenado, caído…" data-id="${c.id}" data-f="cond">`:`<div class="txt">${escLines(c.cond)||"—"}</div>`}</div>
+        </div>
         <div class="barra-hp"><i style="width:${Math.round(ratio*100)}%;background:${cor}"></i></div>
         ${gm?`<div class="hpbtns">
           <button class="mini" onclick="ajustaHP('${c.id}',-5)">-5</button>
@@ -325,11 +416,10 @@ function renderFicha(){
           <button class="mini" onclick="ajustaHP('${c.id}',1)">+1</button>
           <button class="mini" onclick="ajustaHP('${c.id}',5)">+5</button>
           <button class="mini brasa" onclick="ajustaHP('${c.id}',999)">cheio</button></div>`:``}
-        <div class="duo">
-          <div class="campo"><label>PV máx</label>${gm?`<input class="live num-inline" type="number" value="${c.pvMax}" data-id="${c.id}" data-f="pvMax">`:`<div class="ro">${c.pvMax}</div>`}</div>
-          <div class="campo"><label>CA</label>${gm?`<input class="live num-inline" type="number" value="${c.ca}" data-id="${c.id}" data-f="ca">`:`<div class="ro">${c.ca}</div>`}</div>
-        </div>
-        <div class="campo"><label>Condições</label><input class="live" type="text" value="${esc(c.cond)}" placeholder="${gm?'ex: envenenado, caído…':'—'}" data-id="${c.id}" data-f="cond" ${dis}></div>
+        ${gm?`<div class="duo">
+          <div class="campo"><label>PV máx</label><input class="live num-inline" type="number" value="${c.pvMax}" data-id="${c.id}" data-f="pvMax"></div>
+          <div class="campo"><label>CA</label><input class="live num-inline" type="number" value="${c.ca}" data-id="${c.id}" data-f="ca"></div>
+        </div>`:``}
         <div class="attrs">${attrsHTML}</div>
         <div class="campo"><label class="lbl-forte">Armas / Magia</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="armas" style="min-height:78px">${esc(c.armas)}</textarea>`:`<div class="txt">${escLines(c.armas)||"—"}</div>`}</div>
         <div class="campo"><label class="lbl-forte">Objetos</label>${gm?`<textarea class="live" data-id="${c.id}" data-f="objetos" style="min-height:46px">${esc(c.objetos)}</textarea>`:`<div class="txt">${escLines(c.objetos)||"—"}</div>`}</div>
@@ -350,24 +440,100 @@ function renderFicha(){
     });
   }
 }
-function render(){ popularSelect(); renderFicha(); syncNotasUI(); atualizaSync(); }
+function render(){ popularSelect(); popularRolador(); renderFicha(); renderInimigos(); syncNotasUI(); atualizaSync(); }
+
+function enemyCardHTML(e){
+  const ratio=e.pvMax>0?e.pvAtual/e.pvMax:0, cor=ratio>0.5?"#42542f":ratio>0.25?"#b5842f":"#9e2b16";
+  const attrsHTML=["FOR","DES","CON","INT","SAB","CAR"].map(k=>`<div class="attr"><b>${k}</b><input class="ilive" type="number" value="${e.attrs[k]}" data-id="${e.id}" data-attr="${k}"><span class="m">${mod(e.attrs[k])}</span></div>`).join("");
+  return `<div class="card inim">
+    <div class="cab"><input class="ilive nome-in" data-id="${e.id}" data-f="nome" value="${esc(e.nome)}"><button class="mini" onclick="removeInimigo('${e.id}')" title="remover">✕</button></div>
+    <div class="corpo">
+      <div class="vitais-topo">
+        <div class="vbox"><b>PV</b><span class="vv">${e.pvAtual} / ${e.pvMax}</span></div>
+        <div class="vbox ca"><b>CA</b><span class="vv">${e.ca}</span></div>
+        <div class="vcond"><label class="lbl-forte">Condições</label><input class="ilive" type="text" value="${esc(e.cond)}" placeholder="—" data-id="${e.id}" data-f="cond"></div>
+      </div>
+      <div class="barra-hp"><i style="width:${Math.round(ratio*100)}%;background:${cor}"></i></div>
+      <div class="hpbtns">
+        <button class="mini" onclick="ajustaInimHP('${e.id}',-5)">-5</button>
+        <button class="mini" onclick="ajustaInimHP('${e.id}',-1)">-1</button>
+        <button class="mini" onclick="ajustaInimHP('${e.id}',1)">+1</button>
+        <button class="mini" onclick="ajustaInimHP('${e.id}',5)">+5</button>
+        <button class="mini brasa" onclick="ajustaInimHP('${e.id}',999)">cheio</button>
+      </div>
+      <div class="duo">
+        <div class="campo"><label>PV máx</label><input class="ilive num-inline" type="number" value="${e.pvMax}" data-id="${e.id}" data-f="pvMax"></div>
+        <div class="campo"><label>CA</label><input class="ilive num-inline" type="number" value="${e.ca}" data-id="${e.id}" data-f="ca"></div>
+      </div>
+      <div class="attrs">${attrsHTML}</div>
+      <div class="campo"><label class="lbl-forte">Ataques</label><textarea class="ilive" data-id="${e.id}" data-f="ataques" style="min-height:58px">${esc(e.ataques)}</textarea></div>
+      <div class="campo"><label class="lbl-forte">Traços</label><textarea class="ilive" data-id="${e.id}" data-f="tracos" style="min-height:58px">${esc(e.tracos)}</textarea></div>
+    </div>
+  </div>`;
+}
+function renderInimigos(){
+  const cont=$("inimigos"); if(!cont)return;
+  if(!gm){ cont.innerHTML=""; return; }
+  cont.innerHTML=(state.inimigos||[]).map(enemyCardHTML).join("");
+  cont.querySelectorAll(".ilive").forEach(el=>{
+    const commit=()=>commitInim(el);
+    el.addEventListener("change",()=>{ commit(); if(el.dataset.attr||el.dataset.f==="pvMax"||el.dataset.f==="ca") renderInimigos(); });
+    el.addEventListener("blur",commit);
+  });
+}
+function commitInim(el){
+  const e=(state.inimigos||[]).find(x=>x.id===el.dataset.id); if(!e)return;
+  if(el.dataset.attr){ let v=parseInt(el.value)||0; v=Math.max(1,Math.min(30,v)); e.attrs[el.dataset.attr]=v; saveRemote(); return; }
+  const f=el.dataset.f;
+  if(f==="pvMax"||f==="ca"){ let v=parseInt(el.value)||0; v=Math.max(0,v); e[f]=v; if(f==="pvMax")e.pvAtual=Math.min(e.pvAtual,v); }
+  else e[f]=el.value;
+  if(el.dataset.f==="nome") popularRolador();
+  saveRemote();
+}
+function ajustaInimHP(id,delta){ const e=(state.inimigos||[]).find(x=>x.id===id); if(!e)return; e.pvAtual=Math.max(0,Math.min(e.pvMax,e.pvAtual+delta)); renderInimigos(); saveRemote(); }
+function addInimigo(){
+  const ord=(state.inimigos||[]).reduce((m,e)=>Math.max(m,e.ord||0),0)+1;
+  const id="e"+Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36);
+  state.inimigos.push({id,ord,nome:"Novo inimigo",ca:12,pvMax:10,pvAtual:10,cond:"",attrs:{FOR:10,DES:10,CON:10,INT:10,SAB:10,CAR:10},ataques:"",tracos:""});
+  renderInimigos(); popularRolador(); saveRemote();
+}
+function removeInimigo(id){
+  const e=(state.inimigos||[]).find(x=>x.id===id);
+  if(!confirm("Remover "+(e?e.nome:"este inimigo")+"?"))return;
+  state.inimigos=(state.inimigos||[]).filter(x=>x.id!==id);
+  renderInimigos(); popularRolador(); saveRemote();
+}
 
 function setAdv(a){ adv=a; $("pNorm").classList.toggle("on",a==="none"); $("pAdv").classList.toggle("on",a==="adv"); $("pDis").classList.toggle("on",a==="dis"); }
 function d(n){ return 1+Math.floor(Math.random()*n); }
 function d20adv(){ if(adv==="adv"){const a=d(20),b=d(20);return{v:Math.max(a,b),rolls:[a,b]};} if(adv==="dis"){const a=d(20),b=d(20);return{v:Math.min(a,b),rolls:[a,b]};} const a=d(20); return{v:a,rolls:[a]}; }
 function detTxt(r,m){ const s=m>=0?"+"+m:""+m; const base=r.rolls.length>1?"["+r.rolls.join(", ")+"]→"+r.v:"["+r.v+"]"; return base+(m!==0?" "+s:"")+" = "+(r.v+m); }
-function mostra(label,r,m,quem){ const total=r.v+m, det=detTxt(r,m); $("resBig").textContent=total; $("resDet").textContent=(quem?quem+" · ":"")+label+" · "+det; pushRoll({t:total,l:label,d:det,q:quem||"",ts:Date.now()}); }
+function mostra(label,r,m,quem){ const total=r.v+m, det=detTxt(r,m), crit=(r.v===20); const big=$("resBig"); big.textContent=total; big.classList.toggle("crit",crit); $("resDet").innerHTML=(quem?esc(quem)+" · ":"")+esc(label)+" · "+esc(det)+(crit?' <span class="crit-flag">★ Crítico!</span>':''); pushRoll({t:total,l:label,d:det,q:quem||"",ts:Date.now(),crit:crit}); }
 let localRolls=[];
-function entryHTML(e){ const hora=e.ts?new Date(e.ts).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):""; const quem=e.q?`<b>${esc(e.q)}</b> · `:""; return `<div><span class="t">${e.t}</span> — ${quem}${esc(e.l)}: ${esc(e.d)} <span style="color:var(--tinta-suave)">· ${hora}</span></div>`; }
+function entryHTML(e){ const hora=e.ts?new Date(e.ts).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):""; const quem=e.q?`<b>${esc(e.q)}</b> · `:""; const crit=e.crit?' <span class="critb">Crítico!</span>':''; return `<div><span class="t">${e.t}</span> — ${quem}${esc(e.l)}: ${esc(e.d)}${crit} <span style="color:var(--tinta-suave)">· ${hora}</span></div>`; }
 function renderLogArr(arr){ const L=$("log"); L.innerHTML=""; arr.slice(-50).reverse().forEach(e=>L.insertAdjacentHTML("beforeend", entryHTML(e))); }
 function renderLogSnap(val){ if(!val){ $("log").innerHTML=""; return; } const arr=Object.keys(val).map(k=>val[k]).filter(Boolean).sort((a,b)=>(a.ts||0)-(b.ts||0)); renderLogArr(arr); }
 function pushRoll(e){ if(online&&rollsRef){ rollsRef.push(e); } else { localRolls.push(e); if(localRolls.length>80)localRolls=localRolls.slice(-80); renderLogArr(localRolls); } }
 function limparRolls(){ if(online&&rollsRef){ rollsRef.remove(); } else { localRolls=[]; renderLogArr([]); } }
-function rolarPuro(sides){ const m=parseInt($("modMan").value)||0; let r; if(sides===20){ r=d20adv(); } else { const a=d(sides); r={v:a,rolls:[a]}; } const advtxt=(sides===20&&adv!=="none")?(" ("+(adv==="adv"?"vantagem":"desvantagem")+")"):""; mostra("d"+sides+advtxt,r,m,charAtual().nome); }
+function entidadeAtiva(){ if(!gm) return charAtual(); const s=$("selRolador"), v=s?s.value:""; if(v==="__mestre__") return {mestre:true,nome:"Mestre"}; let e=state.chars.find(c=>c.id===v); if(!e)e=(state.inimigos||[]).find(x=>x.id===v); return e||charAtual(); }
+function popularRolador(){ const s=$("selRolador"); if(!s)return; const prev=s.value; let html=state.chars.map(c=>`<option value="${c.id}">${esc(c.nome)}</option>`).join(""); if(gm){ html+=`<option value="__mestre__">— Mestre (rolagem simples) —</option>`; if((state.inimigos||[]).length) html+=`<optgroup label="Inimigos">`+state.inimigos.map(e=>`<option value="${e.id}">${esc(e.nome)}</option>`).join("")+`</optgroup>`; } s.innerHTML=html; if(prev && Array.from(s.options).some(o=>o.value===prev)) s.value=prev; else s.value=atual; }
+function rolarPuro(sides){ const m=parseInt($("modMan").value)||0; let r; if(sides===20){ r=d20adv(); } else { const a=d(sides); r={v:a,rolls:[a]}; } const advtxt=(sides===20&&adv!=="none")?(" ("+(adv==="adv"?"vantagem":"desvantagem")+")"):""; mostra("d"+sides+advtxt,r,m,entidadeAtiva().nome); }
 function profDe(c,skill){ if(c.expert&&c.expert.indexOf(skill)>=0)return PROF*2; if(c.pericias&&c.pericias.indexOf(skill)>=0)return PROF; return 0; }
-function popularTestes(){ const s=$("selTeste"), prev=s.value; let html=""; for(const k in ATRIBS) html+=`<option value="attr:${k}">Teste de ${ATRIBS[k]} (${k})</option>`; const c=charAtual(); Object.keys(SKILLS).forEach(sk=>{ const p=profDe(c,sk); const mk=p>=PROF*2?" ✦✦":p>=PROF?" ✦":""; html+=`<option value="skill:${sk}">${sk} (${SKILLS[sk]})${mk}</option>`; }); s.innerHTML=html; s.value=prev||"skill:Percepção"; if(!s.value)s.value="skill:Percepção"; }
-function rolarTeste(){ const c=charAtual(), val=$("selTeste").value, parts=val.split(":"), tipo=parts[0], chave=parts[1]; let attr,prof=0,label; if(tipo==="attr"){ attr=chave; label="Teste de "+ATRIBS[attr]+" ("+attr+")"; } else { attr=SKILLS[chave]; prof=profDe(c,chave); label=chave+" ("+attr+")"; } const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(label+advtxt, d20adv(), modN(c.attrs[attr])+prof, c.nome); }
-function rolarAtaque(){ const c=charAtual(), tipo=$("selAtaque").value; let attr,nome; if(tipo==="FOR"){ attr="FOR"; nome="Ataque corpo a corpo"; } else if(tipo==="DES"){ attr="DES"; nome="Ataque à distância/fino"; } else { attr=c.conjura||["INT","SAB","CAR"].reduce((a,b)=>modN(c.attrs[b])>modN(c.attrs[a])?b:a,"INT"); nome="Ataque mágico ("+attr+")"; } const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(nome+advtxt, d20adv(), modN(c.attrs[attr])+PROF, c.nome); }
+function popularTestes(){ const s=$("selTeste"), prev=s.value; let html=""; for(const k in ATRIBS) html+=`<option value="attr:${k}">Teste de ${ATRIBS[k]} (${k})</option>`; const c=entidadeAtiva(); Object.keys(SKILLS).forEach(sk=>{ const p=profDe(c,sk); const mk=p>=PROF*2?" ✦✦":p>=PROF?" ✦":""; html+=`<option value="skill:${sk}">${sk} (${SKILLS[sk]})${mk}</option>`; }); s.innerHTML=html; s.value=prev||"skill:Percepção"; if(!s.value)s.value="skill:Percepção"; }
+function rolarTeste(){ const c=entidadeAtiva(), val=$("selTeste").value, parts=val.split(":"), tipo=parts[0], chave=parts[1]; let attr,prof=0,label; if(tipo==="attr"){ attr=chave; label="Teste de "+ATRIBS[attr]+" ("+attr+")"; } else { attr=SKILLS[chave]; prof=profDe(c,chave); label=chave+" ("+attr+")"; } const mo=(c.attrs?modN(c.attrs[attr]):0)+prof; const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(label+advtxt, d20adv(), mo, c.nome); }
+function rolarAtaque(){ const c=entidadeAtiva(), tipo=$("selAtaque").value; let attr,nome; if(tipo==="FOR"){ attr="FOR"; nome="Ataque corpo a corpo"; } else if(tipo==="DES"){ attr="DES"; nome="Ataque à distância/fino"; } else { attr=c.conjura||["INT","SAB","CAR"].reduce((a,b)=>(c.attrs?modN(c.attrs[b]):0)>(c.attrs?modN(c.attrs[a]):0)?b:a,"INT"); nome="Ataque mágico ("+attr+")"; } const mo=(c.attrs?modN(c.attrs[attr])+PROF:0); const advtxt=adv!=="none"?(" ["+(adv==="adv"?"vant":"desv")+"]"):""; mostra(nome+advtxt, d20adv(), mo, c.nome); }
+function mostraSimples(total,label,det,quem){ const big=$("resBig"); big.textContent=total; big.classList.remove("crit"); $("resDet").innerHTML=(quem?esc(quem)+" · ":"")+esc(label)+" · "+esc(det); pushRoll({t:total,l:label,d:det,q:quem||"",ts:Date.now(),crit:false}); }
+function rolarDano(){
+  const c=entidadeAtiva(), expr=$("selDano").value, mm=expr.match(/^(\d+)d(\d+)$/); if(!mm)return;
+  let qtd=parseInt(mm[1]), faces=parseInt(mm[2]);
+  const critX2=$("chkCritDano").checked; if(critX2)qtd*=2;
+  const rolls=[]; let soma=0; for(let i=0;i<qtd;i++){ const x=d(faces); rolls.push(x); soma+=x; }
+  const tipo=$("selAtaque").value, attr=tipo==="FOR"?"FOR":tipo==="DES"?"DES":(c.conjura||"CAR");
+  const m=($("chkAttrDano").checked && c.attrs)?modN(c.attrs[attr]):0;
+  const total=soma+m, sinal=m>0?" +"+m:(m<0?" "+m:"");
+  const det="["+rolls.join(", ")+"]"+sinal+" = "+total;
+  mostraSimples(total, "Dano "+qtd+"d"+faces+(critX2?" (crít ×2)":""), det, c.nome);
+}
 
 let notaTimer=null;
 function syncNotasUI(){ const t=$("notasMestre"); if(!t)return; t.disabled=!gm; if(document.activeElement!==t)t.value=state.notasMestre||""; t.placeholder=gm?"O que os jogadores devem ver — o que está à vista, pistas, avisos…":"— sem anotações —"; }
@@ -388,12 +554,13 @@ function attachCanvas(){
   tela.addEventListener("pointerup",fimTraco); tela.addEventListener("pointercancel",fimTraco);
   $("brush").addEventListener("input",e=>{ brush=parseInt(e.target.value)||3; });
 }
-function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; const rt=$("rollTools"); if(rt)rt.style.display=gm?"block":"none"; syncNotasUI(); }
+function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; const rt=$("rollTools"); if(rt)rt.style.display=gm?"block":"none"; const isec=$("inimigosSec"); if(isec)isec.style.display=gm?"block":"none"; const rw=$("roladorWrap"); if(rw)rw.style.display=gm?"flex":"none"; syncNotasUI(); }
 
-$("btnMestre").addEventListener("click",()=>{ if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; } const p=prompt("Digite o PIN do Mestre:"); if(p===null)return; if(p===state.pin){ gm=true; setModo(); render(); flash("Modo Mestre ativado"); } else alert("PIN incorreto."); });
+$("btnMestre").addEventListener("click",()=>{ if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; } const p=prompt("Digite o PIN do Mestre:"); if(p===null)return; if(p===state.pin){ gm=true; setModo(); render(); if(online)saveRemote(); flash("Modo Mestre ativado"); } else alert("PIN incorreto."); });
 $("btnPin").addEventListener("click",async()=>{ const n=prompt("Novo PIN do Mestre:",state.pin); if(n&&n.trim()){ state.pin=n.trim(); await saveRemote(); flash("PIN atualizado"); } });
-$("btnReset").addEventListener("click",async()=>{ if(!confirm("Zerar as fichas para o padrão? (o quadro e as anotações do Mestre não mudam)"))return; const pin=state.pin,nm=state.notasMestre; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin; state.notasMestre=nm; await saveRemote(); render(); flash("Fichas zeradas"); });
+$("btnReset").addEventListener("click",async()=>{ if(!confirm("Zerar as fichas dos jogadores para o padrão? (inimigos, quadro e anotações do Mestre não mudam)"))return; const pin=state.pin,nm=state.notasMestre,inim=state.inimigos; state=JSON.parse(JSON.stringify(PADRAO)); state.pin=pin; state.notasMestre=nm; state.inimigos=inim; await saveRemote(); render(); flash("Fichas zeradas"); });
 $("selFicha").addEventListener("change",e=>{ atual=e.target.value; renderFicha(); popularTestes(); });
+$("selRolador").addEventListener("change",()=>popularTestes());
 (function(){ const t=$("notasMestre"); t.addEventListener("input",()=>{ if(!gm)return; state.notasMestre=t.value; clearTimeout(notaTimer); notaTimer=setTimeout(saveRemote,500); }); t.addEventListener("blur",()=>{ if(!gm)return; state.notasMestre=t.value; saveRemote(); }); })();
 
 (function init(){ const m=location.hash.match(/sala=([^&]+)/); if(m)ROOM=decodeURIComponent(m[1]); attachCanvas(); setModo(); render(); popularTestes(); atualizaExtra(); initFirebase(); })();
