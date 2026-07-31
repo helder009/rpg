@@ -65,7 +65,7 @@
   .img-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
   .img-slot{display:flex;flex-direction:column;gap:6px}
   .img-box{height:240px;border:2px solid var(--tinta);background:#f3ead0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-  .img-box img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block}
+  .img-box img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block;cursor:zoom-in}
   .img-box .img-ph{font-family:"Special Elite",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta-suave)}
   .img-box.erro::after{content:"imagem não carregou";font-family:"Special Elite",monospace;font-size:.66rem;color:var(--brasa-esc);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(158,43,22,.08)}
   .img-ctrl{display:flex;gap:6px}
@@ -153,6 +153,10 @@
   #canvasNota{font-size:.8rem;color:var(--tinta-suave);margin-top:5px}
   .flash{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--tinta);color:var(--papel);font-family:"Special Elite",monospace;font-size:.74rem;padding:8px 16px;box-shadow:3px 3px 0 var(--brasa);opacity:0;transition:opacity .25s;pointer-events:none;z-index:20}
   .flash.on{opacity:1}
+  .lightbox{position:fixed;inset:0;background:rgba(20,15,10,.93);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out;padding:20px}
+  .lightbox.on{display:flex}
+  .lightbox img{max-width:96vw;max-height:96vh;width:auto;height:auto;object-fit:contain;box-shadow:0 0 0 3px var(--tinta),6px 6px 0 rgba(0,0,0,.5)}
+  .lightbox .fechar{position:absolute;top:14px;right:16px;background:var(--brasa);color:var(--papel);border:2px solid var(--papel);box-shadow:none;font-size:.9rem;padding:4px 11px;cursor:pointer;z-index:2}
 </style>
 </head>
 <body>
@@ -261,6 +265,7 @@
   </div>
 
 </div>
+<div id="lightbox" class="lightbox" onclick="fecharImg()"><button class="fechar" onclick="fecharImg()">✕</button><img id="lightboxImg" src="" alt=""></div>
 <div id="flash" class="flash"></div>
 
 <script>
@@ -469,7 +474,7 @@ function renderImagens(){
     const u=(imgs[i]||"").trim();
     if(!gm && !u) continue;
     const box = u
-      ? `<div class="img-box"><img src="${esc(u)}" alt="" onerror="this.style.display='none';this.parentNode.classList.add('erro')"></div>`
+      ? `<div class="img-box"><img src="${esc(u)}" alt="" onclick="abrirImg(this.src)" onerror="this.style.display='none';this.parentNode.classList.add('erro')"></div>`
       : `<div class="img-box"><span class="img-ph">colar URL abaixo</span></div>`;
     const ctrl = gm
       ? `<div class="img-ctrl"><input class="ilive img-url" data-i="${i}" value="${esc(u)}" placeholder="colar URL da imagem"><button onclick="limparImg(${i})" title="limpar">✕</button></div>`
@@ -486,6 +491,9 @@ function renderImagens(){
   }
 }
 function limparImg(i){ state.imagens[i]=""; renderImagens(); saveRemote(); }
+function abrirImg(url){ if(!url)return; $("lightboxImg").src=url; $("lightbox").classList.add("on"); }
+function fecharImg(){ $("lightbox").classList.remove("on"); $("lightboxImg").src=""; }
+document.addEventListener("keydown",e=>{ if(e.key==="Escape")fecharImg(); });
 
 function enemyCardHTML(e){
   const ratio=e.pvMax>0?e.pvAtual/e.pvMax:0, cor=ratio>0.5?"#42542f":ratio>0.25?"#b5842f":"#9e2b16";
