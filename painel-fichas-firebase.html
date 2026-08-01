@@ -177,7 +177,6 @@
     <div><div class="eyebrow">Painel · Firebase · tempo real</div><h1>RPG: Sítio SS</h1></div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <button id="btnMestre" class="brasa">🔑 Entrar como Mestre</button>
-      <span id="modoBadge" class="modo jogador">Modo Jogador</span>
     </div>
   </header>
 
@@ -431,7 +430,6 @@ function atualizaSync(){
 }
 
 function setModo(){
-  const b=$("modoBadge"); b.className="modo "+(gm?"mestre":"jogador"); b.textContent=gm?"Modo Mestre":"Modo Jogador";
   $("btnMestre").textContent=gm?"🚪 Sair do Modo Mestre":"🔑 Entrar como Mestre";
   $("btnPin").style.display=gm?"":"none"; $("btnReset").style.display=gm?"":"none"; atualizaExtra();
 }
