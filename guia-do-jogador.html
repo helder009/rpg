@@ -146,7 +146,8 @@ const EMB={
   matheus:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.4" fill="none"><path d="M14 40 L40 14" stroke="#211a12" stroke-width="4"/><path d="M40 14 q6 -4 4 4 q-1 6 -8 6 z" fill="#9e2b16" stroke="#211a12"/><rect x="10" y="38" width="10" height="6" rx="1" transform="rotate(-45 15 41)" fill="#211a12"/></svg>',
   caio:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.2" fill="none"><rect x="17" y="16" width="16" height="22" rx="2" fill="#211a12"/><rect x="21" y="20" width="8" height="14" fill="#b5842f"/><path d="M20 16 q5 -8 10 0" stroke="#211a12" fill="none"/><line x1="25" y1="8" x2="25" y2="12"/></svg>',
   thais:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2.2" fill="none"><path d="M25 8 q8 10 6 18 q-2 6 -6 8 q-4 -2 -6 -8 q-2 -8 6 -18z" fill="#9e2b16" stroke="#211a12"/><path d="M25 20 q3 6 0 14" stroke="#e6d9b8" stroke-width="1.6"/><path d="M18 40 q7 6 14 0" stroke="#211a12"/></svg>',
-  edu:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="3" fill="none"><line x1="11" y1="39" x2="35" y2="15"/><line x1="39" y1="39" x2="15" y2="15"/><path d="M35 15 l3 -4 1 5 z" fill="#211a12"/><path d="M15 15 l-3 -4 -1 5 z" fill="#211a12"/><rect x="7" y="37" width="8" height="4" rx="1" transform="rotate(-45 11 39)" fill="#211a12"/><rect x="35" y="37" width="8" height="4" rx="1" transform="rotate(45 39 39)" fill="#211a12"/><path d="M25 21 v9 M20 25 h10" stroke="#9e2b16" stroke-width="2.5"/></svg>'
+  edu:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="3" fill="none"><line x1="11" y1="39" x2="35" y2="15"/><line x1="39" y1="39" x2="15" y2="15"/><path d="M35 15 l3 -4 1 5 z" fill="#211a12"/><path d="M15 15 l-3 -4 -1 5 z" fill="#211a12"/><rect x="7" y="37" width="8" height="4" rx="1" transform="rotate(-45 11 39)" fill="#211a12"/><rect x="35" y="37" width="8" height="4" rx="1" transform="rotate(45 39 39)" fill="#211a12"/><path d="M25 21 v9 M20 25 h10" stroke="#9e2b16" stroke-width="2.5"/></svg>',
+  nati:'<svg class="selo-classe" viewBox="0 0 50 50" stroke="#211a12" stroke-width="2" fill="none"><path d="M41 9 a10 10 0 1 0 2 19 a8 8 0 1 1 -2 -19z" fill="#211a12" stroke="none"/><path d="M13 43 q-1 -13 6 -15 q2 5 6 5 q4 0 6 -5 q7 2 6 15z" fill="#5a4a6e" stroke="#211a12"/><path d="M13 30 l1 -8 6 5z" fill="#5a4a6e" stroke="#211a12"/><path d="M37 30 l-1 -8 -6 5z" fill="#5a4a6e" stroke="#211a12"/><circle cx="20" cy="36" r="1.3" fill="#e6d9b8"/><circle cx="28" cy="36" r="1.3" fill="#e6d9b8"/></svg>'
 };
 const BASE=[
   {id:"duda",nome:"Duda",cl:"Druida · Elfa",cor:"#42542f",pvMax:12,pvAtual:12,ca:14,cond:"",attrs:{FOR:8,DES:15,CON:13,INT:12,SAB:16,CAR:10},
@@ -166,7 +167,10 @@ const BASE=[
    objetos:"Foco arcano (colar de sementes), vestes, bolsa de componentes.",assin:{nome:"Mísseis Mágicos",txt:"3 dardos de 1d4+1 que sempre acertam."}},
   {id:"edu",nome:"Edu",cl:"Guerreiro · Humano",cor:"#7a5a2e",pvMax:14,pvAtual:14,ca:14,cond:"",attrs:{FOR:16,DES:13,CON:15,INT:10,SAB:12,CAR:10},
    armas:"Sem facas no momento (improvisa). Faca +5, 1d4+3 (arremessa 6/18m). Estilo Duas Armas: 2 ataques de faca por ação.\nHomem de fé: Reza Forte 1x/dia (acalma criatura do folclore, CD 13, ou vantagem contra medo). Fôlego 1x/descanso (1d10+1 PV).",
-   objetos:"Armadura de couro, terço e crucifixo, cinto de facas vazio, mochila.",assin:{nome:"Corte em Cruz",txt:"dois talhos cruzados; contra o amaldiçoado, +1d6 por acerto."}}
+   objetos:"Armadura de couro, terço e crucifixo, cinto de facas vazio, mochila.",assin:{nome:"Corte em Cruz",txt:"dois talhos cruzados; contra o amaldiçoado, +1d6 por acerto."}},
+  {id:"nati",nome:"Nati",cl:"Patrulheira/Monja · Meio-Elfa",cor:"#5a4a6e",pvMax:12,pvAtual:12,ca:14,cond:"",attrs:{FOR:16,DES:14,CON:13,INT:10,SAB:15,CAR:14},
+   armas:"Golpe marcial desarmado +5 — 1d6+3 (Monja: 2 golpes de mãos livres). Arco curto +4 — 1d6+2.\nPatrulheira: vantagem pra rastrear e achar caminho/abrigo; sentido pra criaturas do folclore.",
+   objetos:"Traje Sob Medida do Viajante (armadura leve e elegante). Elixires de Restauração Radiante (3 usos, curam 1d8+2). Guia de Rotas Ancestrais (mapas — vantagem em Sobrevivência).",assin:{nome:"Equilíbrio Felino",txt:"1x/cena invoca 🌑 Sombra (vantagem em furtividade/percepção ou distrai um inimigo) ou 🌕 Luar (+2 CA num aliado ou desperta quem caiu/enfeitiçado)."}}
 ];
 
 let dados=JSON.parse(JSON.stringify(BASE));
@@ -188,6 +192,8 @@ function aplicar(r){
     objetos:(typeof rc.objetos==="string"?rc.objetos:(b.objetos||"")),
     assin:{nome:(rc.assin&&rc.assin.nome)||(b.assin&&b.assin.nome)||"", txt:(rc.assin&&rc.assin.txt)||(b.assin&&b.assin.txt)||""}
   }; }).sort((a,b)=>(a.ord||0)-(b.ord||0));
+  BASE.forEach((seed,i)=>{ if(!dados.find(c=>c.id===seed.id)){ const c=Object.assign({ord:i+1},JSON.parse(JSON.stringify(seed))); dados.push(c); } });
+  dados.sort((a,b)=>(a.ord||0)-(b.ord||0));
 }
 function cardHTML(c){
   const attrs=["FOR","DES","CON","INT","SAB","CAR"].map(k=>`<div class="attr"><b>${k}</b><span class="n">${c.attrs[k]}</span><span class="m">${mod(c.attrs[k])}</span></div>`).join("");
