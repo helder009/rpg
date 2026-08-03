@@ -327,7 +327,13 @@ const PADRAO = {
       pericias:["Atletismo","Intimidação","Percepção","Religião"], expert:[],
       armas:"Sem facas no momento (improvisa). Faca +5, 1d4+3 (arremessa 6/18m). Estilo Duas Armas: 2 ataques de faca por ação.\nHomem de fé: Reza Forte 1x/dia (acalma criatura do folclore, CD 13, ou vantagem contra medo). Fôlego 1x/descanso (1d10+1 PV).",
       objetos:"Armadura de couro, terço e crucifixo, cinto de facas vazio, mochila.",
-      assin:{nome:"Corte em Cruz",txt:"dois talhos cruzados; contra o amaldiçoado, +1d6 por acerto."} }
+      assin:{nome:"Corte em Cruz",txt:"dois talhos cruzados; contra o amaldiçoado, +1d6 por acerto."} },
+    { id:"nati", nome:"Nati", cl:"Patrulheira/Monja · Meio-Elfa", cor:"#5a4a6e", pvMax:12, pvAtual:12, ca:14, cond:"", notas:"Chegou depois — achada desacordada na entrada do sítio.",
+      attrs:{FOR:16,DES:14,CON:13,INT:10,SAB:15,CAR:14}, conjura:null,
+      pericias:["Percepção","Sobrevivência","Acrobacia","Intuição"], expert:[],
+      armas:"Golpe marcial desarmado +5 — 1d6+3 (Monja: 2 golpes de mãos livres). Arco curto +4 — 1d6+2.\nPatrulheira: vantagem pra rastrear e achar caminho/abrigo; sentido pra criaturas do folclore.",
+      objetos:"Traje Sob Medida do Viajante (armadura leve e elegante). Elixires de Restauração Radiante (3 usos, curam 1d8+2). Guia de Rotas Ancestrais (mapas — vantagem em Sobrevivência).",
+      assin:{nome:"Equilíbrio Felino",txt:"1x/cena invoca 🌑 Sombra (vantagem em furtividade/percepção, ou distrai um inimigo: ataca com desvantagem 1 turno) ou 🌕 Luar (+2 CA num aliado por 1 turno, ou desperta quem caiu/enfeitiçado)."} }
   ]
 };
 
@@ -412,6 +418,8 @@ function aplicaRemoto(r){
       armas:(typeof rc.armas==="string"?rc.armas:(b.armas||"")),
       objetos:(typeof rc.objetos==="string"?rc.objetos:(b.objetos||""))
     }; }).sort((a,b)=>(a.ord||0)-(b.ord||0));
+    Object.keys(SEED_BY_ID).forEach(id=>{ if(!state.chars.find(c=>c.id===id)) state.chars.push(JSON.parse(JSON.stringify(SEED_BY_ID[id]))); });
+    state.chars.sort((a,b)=>(a.ord||0)-(b.ord||0));
     if(!state.chars.find(c=>c.id===atual)) atual=state.chars[0]?state.chars[0].id:atual; }
   if(r.inimigos){ state.inimigos=Object.keys(r.inimigos).map(k=>r.inimigos[k]).filter(Boolean).map(e=>({
       id:e.id||("e"+Math.random()), ord:e.ord||0, nome:e.nome||"", ca:(typeof e.ca==="number"?e.ca:10),
