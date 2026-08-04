@@ -70,6 +70,9 @@
   .img-box.erro::after{content:"imagem não carregou";font-family:"Special Elite",monospace;font-size:.66rem;color:var(--brasa-esc);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(158,43,22,.08)}
   .img-ctrl{display:flex;gap:6px}
   .img-ctrl input{flex:1;font-size:.82rem}
+  .img-drag{display:inline-flex;align-items:center;justify-content:center;cursor:grab;border:2px solid var(--tinta);background:var(--papel-esc);padding:0 8px;font-size:1rem;line-height:1;user-select:none;box-shadow:1px 1px 0 var(--tinta)}
+  .img-drag:active{cursor:grabbing}
+  .img-slot.dragover{outline:3px dashed var(--brasa);outline-offset:2px}
   .img-ctrl button{padding:4px 9px;box-shadow:1px 1px 0 var(--tinta)}
   .inim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
   .card.inim{margin-top:0;border-left-color:#9e2b16}
@@ -168,6 +171,8 @@
   .lightbox.on{display:flex}
   .lightbox img{max-width:96vw;max-height:96vh;width:auto;height:auto;object-fit:contain;box-shadow:0 0 0 3px var(--tinta),6px 6px 0 rgba(0,0,0,.5)}
   .lightbox .fechar{position:absolute;top:14px;right:16px;background:var(--brasa);color:var(--papel);border:2px solid var(--papel);box-shadow:none;font-size:.9rem;padding:4px 11px;cursor:pointer;z-index:2}
+  .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;background:var(--brasa);color:var(--papel);border:2px solid var(--papel);font-family:"Rye",serif;font-size:1.7rem;line-height:1;cursor:pointer;box-shadow:none;z-index:2;padding:0;align-items:center;justify-content:center;display:none}
+  .lb-prev{left:14px}.lb-next{right:14px}
 </style>
 </head>
 <body>
@@ -252,6 +257,11 @@
     <button class="mini brasa" style="margin-top:10px" onclick="addInimigo()">+ Novo inimigo</button>
   </div>
 
+  <div class="painel" id="imagensSec" style="margin-top:14px">
+    <h3>Imagens <span class="tagm">ao vivo</span></h3>
+    <div id="imagens" class="img-grid"></div>
+  </div>
+
   <div class="painel" style="margin-top:14px">
     <h3>Quadro do Mestre <span class="tagm">ao vivo</span></h3>
     <div id="canvasCtrl" class="canvas-ctrl" style="display:none">
@@ -271,13 +281,8 @@
     <div id="canvasNota">Somente o Mestre desenha; vocês veem em tempo real.</div>
   </div>
 
-  <div class="painel" id="imagensSec" style="margin-top:14px">
-    <h3>Imagens <span class="tagm">ao vivo</span></h3>
-    <div id="imagens" class="img-grid"></div>
-  </div>
-
 </div>
-<div id="lightbox" class="lightbox" onclick="fecharImg()"><button class="fechar" onclick="fecharImg()">✕</button><img id="lightboxImg" src="" alt=""></div>
+<div id="lightbox" class="lightbox" onclick="fecharImg()"><button class="fechar" onclick="event.stopPropagation();fecharImg()">✕</button><button class="lb-nav lb-prev" id="lbPrev" onclick="event.stopPropagation();navLight(-1)">‹</button><img id="lightboxImg" src="" alt="" onclick="event.stopPropagation()"><button class="lb-nav lb-next" id="lbNext" onclick="event.stopPropagation();navLight(1)">›</button></div>
 <div id="flash" class="flash"></div>
 
 <script>
@@ -352,17 +357,21 @@ const ENEMIES_SEED=[
    tracos:"Caolho: desvantagem à distância além de 9m. Montaria Tamanduá: CA12 · PV14 · Garras +4. Tatuagem III·4."},
   {id:"mula",ord:4,nome:"Mula-sem-cabeça",ca:13,pvMax:25,pvAtual:25,cond:"",attrs:{FOR:16,DES:12,CON:15,INT:4,SAB:10,CAR:8},
    ataques:"Coice +5 — 2d6+3\nJorro de fogo: DES CD 13 ou 1d6 fogo (recarrega a cada 2 turnos)",
-   tracos:"Galope flamejante; resistência a fogo. Fraqueza: reza forte (Religião/CAR CD13) acalma; nome de batismo a liberta."},
+   tracos:"Galope flamejante; resistência a fogo. ANGATURAMA: reza forte (Religião/CAR CD13) acalma; tirar o cabestro a liberta → volta a ser mulher: 'Aguyjé!' (enfim livre)."},
   {id:"anhanguera",ord:5,nome:"Velho Anhanguera (brasa)",ca:15,pvMax:55,pvAtual:55,cond:"",attrs:{FOR:18,DES:14,CON:16,INT:12,SAB:14,CAR:16},
    ataques:"2× Garras de brasa +6 — 1d8+3 + 1d6 fogo cada\nSopro de Brasa (cone 4,5m): DES CD 13, 2d6 fogo (recarrega a cada 2 turnos)",
-   tracos:'Forma selada = Cão Preto (PV 8): soltá-lo o desperta. Resistência a dano físico comum. Fraquezas: o Facão do Espantalho ignora a resistência; gritar "Bartolomeu Bueno" = vulnerável 1 turno; destruir o caderno de pactos = −½ PV.'}
+   tracos:'Forma selada = Cão Preto (PV 8), preso pelo typýra (selo indígena de urucum/jenipapo). Romper o selo o desperta. Resistência a dano físico comum. Fraquezas: o Facão do Espantalho ignora a resistência; gritar "Bartolomeu Bueno" = vulnerável 1 turno; destruir o caderno de pactos = −½ PV.'},
+  {id:"tratador",ord:6,nome:"O Tratador (troll)",ca:13,pvMax:45,pvAtual:45,cond:"",attrs:{FOR:18,DES:12,CON:17,INT:6,SAB:10,CAR:7},
+   ataques:"2× Manoplas de raiz +6 — 1d8+4 cada\nBordoada +6 — 2d6+4 (FOR CD 14 ou Derrubado)\nAgarrão +6: prende (Atletismo/Acrobacia CD 14 escapa)",
+   tracos:"Regeneração +5 PV/turno (não regenera se levou fogo nesse turno). Faro cego (furtividade não adianta perto). Vínculo com a mula: resistência a dano físico comum enquanto ela estiver amaldiçoada. Fraquezas: fogo; tirar o cabestro da mula = vulnerável 1 turno. ANGATURAMA: poupado, vira o antigo caseiro: 'Xe pytuú' (eu descanso)."}
 ];
 
 let state=JSON.parse(JSON.stringify(PADRAO));
 state.chars.forEach((c,i)=>{ c.ord=i+1; if(!c.assin)c.assin={nome:"",txt:""}; });
 const SEED_BY_ID={}; PADRAO.chars.forEach((c,i)=>{ SEED_BY_ID[c.id]=JSON.parse(JSON.stringify(c)); SEED_BY_ID[c.id].ord=i+1; });
 state.inimigos=JSON.parse(JSON.stringify(ENEMIES_SEED));
-state.imagens=["","",""];
+state.seedInim=[];
+state.imagens=["","","",""];
 let gm=false, atual=state.chars[0].id, adv="none";
 let db=null, salaRef=null, desenhoRef=null, rollsRef=null, online=false;
 const $=id=>document.getElementById(id);
@@ -393,7 +402,7 @@ function mostraSetup(){ online=false; atualizaSync(); $("avisoBox").innerHTML='<
 async function saveRemote(){
   state.updated=Date.now(); state.updatedBy=gm?"Mestre":"";
   if(!online){ atualizaSync(); return; }
-  const p={pin:state.pin,updated:state.updated,updatedBy:state.updatedBy,notasMestre:state.notasMestre||"",chars:{},inimigos:{},imagens:(state.imagens||["","",""]).slice(0,3)};
+  const p={pin:state.pin,updated:state.updated,updatedBy:state.updatedBy,notasMestre:state.notasMestre||"",chars:{},inimigos:{},imagens:(state.imagens||["","","",""]).slice(0,4),seedInim:(state.seedInim||[])};
   state.chars.forEach(c=>{ p.chars[c.id]={id:c.id,ord:c.ord||0,nome:c.nome||"",cl:c.cl||"",cor:c.cor||"#4a3d2c",conjura:c.conjura||null,pericias:c.pericias||[],expert:c.expert||[],assin:{nome:(c.assin&&c.assin.nome)||"",txt:(c.assin&&c.assin.txt)||""},pvAtual:c.pvAtual,pvMax:c.pvMax,ca:c.ca,cond:c.cond||"",notas:c.notas||"",attrs:Object.assign({},c.attrs),armas:c.armas||"",objetos:c.objetos||""}; });
   state.inimigos.forEach(e=>{ p.inimigos[e.id]={id:e.id,ord:e.ord||0,nome:e.nome||"",ca:e.ca||10,pvMax:e.pvMax||1,pvAtual:e.pvAtual||0,cond:e.cond||"",attrs:Object.assign({},e.attrs),ataques:e.ataques||"",tracos:e.tracos||""}; });
   try{ await salaRef.update(p); }catch(e){ console.error(e); flash("Erro ao salvar"); }
@@ -426,7 +435,8 @@ function aplicaRemoto(r){
       pvMax:(typeof e.pvMax==="number"?e.pvMax:1), pvAtual:(typeof e.pvAtual==="number"?e.pvAtual:(e.pvMax||1)),
       cond:e.cond||"", attrs:Object.assign({FOR:10,DES:10,CON:10,INT:10,SAB:10,CAR:10},e.attrs||{}),
       ataques:e.ataques||"", tracos:e.tracos||"" })).sort((a,b)=>(a.ord||0)-(b.ord||0)); }
-  if(r.imagens){ state.imagens=[0,1,2].map(i=>{ const u=r.imagens[i]; return (typeof u==="string")?u:""; }); }
+  if(r.imagens){ state.imagens=[0,1,2,3].map(i=>{ const u=r.imagens[i]; return (typeof u==="string")?u:""; }); }
+  if(r.seedInim){ state.seedInim=Array.isArray(r.seedInim)?r.seedInim.slice():Object.values(r.seedInim); }
   syncNotasUI();
 }
 function atualizaSync(){
@@ -513,16 +523,16 @@ function renderImagens(){
   if(!gm && !temAlguma){ sec.style.display="none"; cont.innerHTML=""; return; }
   sec.style.display="block";
   let html="";
-  for(let i=0;i<3;i++){
+  for(let i=0;i<4;i++){
     const u=(imgs[i]||"").trim();
     if(!gm && !u) continue;
     const box = u
       ? `<div class="img-box"><img src="${esc(u)}" alt="" onclick="abrirImg(this.src)" onerror="this.style.display='none';this.parentNode.classList.add('erro')"></div>`
       : `<div class="img-box"><span class="img-ph">colar URL abaixo</span></div>`;
     const ctrl = gm
-      ? `<div class="img-ctrl"><input class="ilive img-url" data-i="${i}" value="${esc(u)}" placeholder="colar URL da imagem"><button onclick="limparImg(${i})" title="limpar">✕</button></div>`
+      ? `<div class="img-ctrl"><span class="img-drag" draggable="true" ondragstart="dragImgStart(${i})" title="arrastar para reordenar">⠿</span><input class="ilive img-url" data-i="${i}" value="${esc(u)}" placeholder="colar URL da imagem"><button onclick="limparImg(${i})" title="limpar">✕</button></div>`
       : ``;
-    html+=`<div class="img-slot">${box}${ctrl}</div>`;
+    html+=`<div class="img-slot"${gm?` ondragover="event.preventDefault()" ondragenter="this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="this.classList.remove('dragover');dropImg(event,${i})"`:``}>${box}${ctrl}</div>`;
   }
   cont.innerHTML=html;
   if(gm){
@@ -534,9 +544,15 @@ function renderImagens(){
   }
 }
 function limparImg(i){ state.imagens[i]=""; renderImagens(); saveRemote(); }
-function abrirImg(url){ if(!url)return; $("lightboxImg").src=url; $("lightbox").classList.add("on"); }
+let dragImgIdx=null;
+function dragImgStart(i){ dragImgIdx=i; }
+function dropImg(ev,target){ ev.preventDefault(); if(dragImgIdx===null||dragImgIdx===target){ dragImgIdx=null; return; } const arr=(state.imagens||["","","",""]).slice(); const moved=arr.splice(dragImgIdx,1)[0]; arr.splice(target,0,moved); while(arr.length<4)arr.push(""); state.imagens=arr.slice(0,4); dragImgIdx=null; renderImagens(); saveRemote(); }
+let lightUrls=[], lightIdx=0;
+function abrirImg(url){ if(!url)return; lightUrls=(state.imagens||[]).filter(u=>u&&u.trim()); lightIdx=lightUrls.indexOf(url); if(lightIdx<0)lightIdx=0; mostraLight(); $("lightbox").classList.add("on"); }
+function mostraLight(){ if(!lightUrls.length){ fecharImg(); return; } $("lightboxImg").src=lightUrls[lightIdx]; const multi=lightUrls.length>1; const pv=$("lbPrev"),nx=$("lbNext"); if(pv)pv.style.display=multi?"flex":"none"; if(nx)nx.style.display=multi?"flex":"none"; }
+function navLight(d){ if(!lightUrls.length)return; lightIdx=(lightIdx+d+lightUrls.length)%lightUrls.length; $("lightboxImg").src=lightUrls[lightIdx]; }
 function fecharImg(){ $("lightbox").classList.remove("on"); $("lightboxImg").src=""; }
-document.addEventListener("keydown",e=>{ if(e.key==="Escape")fecharImg(); });
+document.addEventListener("keydown",e=>{ if(!$("lightbox").classList.contains("on"))return; if(e.key==="Escape")fecharImg(); else if(e.key==="ArrowLeft")navLight(-1); else if(e.key==="ArrowRight")navLight(1); });
 
 function enemyCardHTML(e){
   const ratio=e.pvMax>0?e.pvAtual/e.pvMax:0, cor=ratio>0.5?"#42542f":ratio>0.25?"#b5842f":"#9e2b16";
@@ -599,6 +615,16 @@ function removeInimigo(id){
   state.inimigos=(state.inimigos||[]).filter(x=>x.id!==id);
   renderInimigos(); popularRolador(); saveRemote();
 }
+function semearInimigos(){
+  if(!online)return; if(!state.seedInim)state.seedInim=[]; let mudou=false;
+  ENEMIES_SEED.forEach(seed=>{
+    if(state.seedInim.indexOf(seed.id)<0){
+      state.seedInim.push(seed.id); mudou=true;
+      if(!(state.inimigos||[]).find(x=>x.id===seed.id)) state.inimigos.push(JSON.parse(JSON.stringify(seed)));
+    }
+  });
+  if(mudou){ state.inimigos.sort((a,b)=>(a.ord||0)-(b.ord||0)); renderInimigos(); popularRolador(); saveRemote(); }
+}
 
 function setAdv(a){ adv=a; $("pNorm").classList.toggle("on",a==="none"); $("pAdv").classList.toggle("on",a==="adv"); $("pDis").classList.toggle("on",a==="dis"); }
 function d(n){ return 1+Math.floor(Math.random()*n); }
@@ -653,9 +679,9 @@ function attachCanvas(){
 }
 function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; const rt=$("rollTools"); if(rt)rt.style.display=gm?"block":"none"; const isec=$("inimigosSec"); if(isec)isec.style.display=gm?"block":"none"; const rw=$("roladorWrap"); if(rw)rw.style.display=gm?"flex":"none"; const bn=$("btnNovoHeroi"); if(bn)bn.style.display=gm?"inline-block":"none"; syncNotasUI(); }
 
-$("btnMestre").addEventListener("click",()=>{ if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; } const p=prompt("Digite o PIN do Mestre:"); if(p===null)return; if(p===state.pin){ gm=true; setModo(); render(); if(online)saveRemote(); flash("Modo Mestre ativado"); } else alert("PIN incorreto."); });
+$("btnMestre").addEventListener("click",()=>{ if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; } const p=prompt("Digite o PIN do Mestre:"); if(p===null)return; if(p===state.pin){ gm=true; setModo(); render(); if(online){ saveRemote(); semearInimigos(); } flash("Modo Mestre ativado"); } else alert("PIN incorreto."); });
 $("btnPin").addEventListener("click",async()=>{ const n=prompt("Novo PIN do Mestre:",state.pin); if(n&&n.trim()){ state.pin=n.trim(); await saveRemote(); flash("PIN atualizado"); } });
-$("btnReset").addEventListener("click",async()=>{ if(!confirm("Zerar as fichas dos jogadores para o padrão? (inimigos, quadro e anotações do Mestre não mudam)"))return; const pin=state.pin,nm=state.notasMestre,inim=state.inimigos,imgs=state.imagens; state=JSON.parse(JSON.stringify(PADRAO)); state.chars.forEach((c,i)=>{ c.ord=i+1; if(!c.assin)c.assin={nome:"",txt:""}; }); state.pin=pin; state.notasMestre=nm; state.inimigos=inim; state.imagens=imgs; atual=state.chars[0].id; await saveRemote(); render(); flash("Fichas zeradas"); });
+$("btnReset").addEventListener("click",async()=>{ if(!confirm("Zerar as fichas dos jogadores para o padrão? (inimigos, quadro e anotações do Mestre não mudam)"))return; const pin=state.pin,nm=state.notasMestre,inim=state.inimigos,imgs=state.imagens,sd=state.seedInim; state=JSON.parse(JSON.stringify(PADRAO)); state.chars.forEach((c,i)=>{ c.ord=i+1; if(!c.assin)c.assin={nome:"",txt:""}; }); state.pin=pin; state.notasMestre=nm; state.inimigos=inim; state.imagens=imgs; state.seedInim=sd; atual=state.chars[0].id; await saveRemote(); render(); flash("Fichas zeradas"); });
 $("selFicha").addEventListener("change",e=>{ atual=e.target.value; renderFicha(); popularTestes(); });
 $("selRolador").addEventListener("change",()=>popularTestes());
 (function(){ const t=$("notasMestre"); t.addEventListener("input",()=>{ if(!gm)return; state.notasMestre=t.value; clearTimeout(notaTimer); notaTimer=setTimeout(saveRemote,500); }); t.addEventListener("blur",()=>{ if(!gm)return; state.notasMestre=t.value; saveRemote(); }); })();
