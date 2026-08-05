@@ -363,7 +363,25 @@ const ENEMIES_SEED=[
    tracos:'Forma selada = Cão Preto (PV 8), preso pelo typýra (selo indígena de urucum/jenipapo). Romper o selo o desperta. Resistência a dano físico comum. Fraquezas: o Facão do Espantalho ignora a resistência; gritar "Bartolomeu Bueno" = vulnerável 1 turno; destruir o caderno de pactos = −½ PV.'},
   {id:"tratador",ord:6,nome:"O Tratador (troll)",ca:13,pvMax:45,pvAtual:45,cond:"",attrs:{FOR:18,DES:12,CON:17,INT:6,SAB:10,CAR:7},
    ataques:"2× Manoplas de raiz +6 — 1d8+4 cada\nBordoada +6 — 2d6+4 (FOR CD 14 ou Derrubado)\nAgarrão +6: prende (Atletismo/Acrobacia CD 14 escapa)",
-   tracos:"Regeneração +5 PV/turno (não regenera se levou fogo nesse turno). Faro cego (furtividade não adianta perto). Vínculo com a mula: resistência a dano físico comum enquanto ela estiver amaldiçoada. Fraquezas: fogo; tirar o cabestro da mula = vulnerável 1 turno. ANGATURAMA: poupado, vira o antigo caseiro: 'Xe pytuú' (eu descanso)."}
+   tracos:"Regeneração +5 PV/turno (não regenera se levou fogo nesse turno). Faro cego (furtividade não adianta perto). Vínculo com a mula: resistência a dano físico comum enquanto ela estiver amaldiçoada. Fraquezas: fogo; tirar o cabestro da mula = vulnerável 1 turno. ANGATURAMA: poupado, vira o antigo caseiro: 'Xe pytuú' (eu descanso)."},
+  {id:"saci",ord:7,nome:"Saci-Pererê (fácil)",ca:14,pvMax:10,pvAtual:10,cond:"",attrs:{FOR:8,DES:16,CON:10,INT:12,SAB:12,CAR:14},
+   ataques:"Travessura +5: sopro de terra nos olhos (DES CD 12 ou cego 1 turno)\nFurtar item +5 (DES)",
+   tracos:"Redemoinho: some e reaparece a 6m (desvantagem pra acertá-lo em terreno aberto). ANGATURAMA: capturar o gorro vermelho o domina (vira moleque, dá uma pista)."},
+  {id:"curupira",ord:8,nome:"Curupira (fácil)",ca:13,pvMax:14,pvAtual:14,cond:"",attrs:{FOR:12,DES:15,CON:12,INT:8,SAB:14,CAR:10},
+   ataques:"Garras +4 — 1d6+2\nAssobio que desnorteia: SAB CD 12 ou confuso 1 turno",
+   tracos:"Pés ao contrário: rastros enganam (Sobrevivência CD 13). Corredor da mata: dobra o movimento entre árvores. ANGATURAMA: respeito à mata o torna guia/aliado; detesta fogo tolo."},
+  {id:"bandeirante",ord:9,nome:"Bandeirante Fantasma (médio)",ca:14,pvMax:22,pvAtual:22,cond:"",attrs:{FOR:14,DES:13,CON:13,INT:10,SAB:11,CAR:12},
+   ataques:"Espada de ferro velho +4 — 1d8+2\nBacamarte +3 — 1d10 (recarrega 1 rodada)",
+   tracos:"Parte-morto: resistência a dano físico não-mágico. Marcha fria: imune a medo. Fraquezas: fogo, fé (Reza Forte), e a verdade — 'Bueno está morto' = vulnerável 1 turno. Reza/sepultura o faz descansar."},
+  {id:"boitata",ord:10,nome:"Boitatá (médio)",ca:14,pvMax:26,pvAtual:26,cond:"",attrs:{FOR:15,DES:15,CON:14,INT:4,SAB:13,CAR:12},
+   ataques:"Bote flamejante +4 — 1d8+2 + 1d6 fogo\nOlhar de brasa (cone): SAB CD 13 ou cego/ofuscado 1 turno",
+   tracos:"Corpo de fogo (toque sem proteção = 1d6). Resistência a fogo, visão no escuro. Fraquezas: água e escuridão total (−2 em tudo). Pune quem queima a mata; pode poupar quem não usou fogo à toa."},
+  {id:"maedoouro",ord:11,nome:"Mãe-do-Ouro (difícil)",ca:15,pvMax:40,pvAtual:40,cond:"",attrs:{FOR:12,DES:15,CON:15,INT:13,SAB:14,CAR:18},
+   ataques:"Bola de fogo +6 (à distância) — 2d6 fogo\nToque escaldante +3 — 1d8+1 + 1d6 fogo\nFascínio: SAB CD 14 ou enfeitiçado (vai atrás do 'ouro')",
+   tracos:"Forma dupla (bola de fogo / mulher de ouro). Voa. Resistência a fogo. Fraqueza: recusar o ouro a enfraquece; fé/luz benta rompe o fascínio; sem ganância por 3 turnos, definha."},
+  {id:"capelobo",ord:12,nome:"Capelobo (difícil)",ca:15,pvMax:48,pvAtual:48,cond:"",attrs:{FOR:18,DES:12,CON:17,INT:5,SAB:12,CAR:6},
+   ataques:"Focinho perfurante +6 — 2d6+4 (suga o vigor: alvo −1 nos ataques até descansar)\nPatada +6 — 1d10+4",
+   tracos:"Couro de pedra: resistência a dano físico comum (flechas/lâminas quicam). Faro no escuro. Uivo que gela: SAB CD 13 ou amedrontado. Fraqueza: só o umbigo é mole (acerto ali ignora a resistência); fogo o assusta."}
 ];
 
 let state=JSON.parse(JSON.stringify(PADRAO));
