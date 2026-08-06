@@ -251,10 +251,10 @@
     </div>
   </div>
 
-  <div class="painel" id="inimigosSec" style="display:none;margin-top:14px">
-    <h3>Inimigos <span class="tagm">só o Mestre vê</span></h3>
-    <div id="inimigos" class="inim-grid"></div>
-    <button class="mini brasa" style="margin-top:10px" onclick="addInimigo()">+ Novo inimigo</button>
+  <div class="painel" id="batalhaSec" style="display:none;margin-top:14px">
+    <h3>Em batalha <span class="tagm">só o Mestre vê</span></h3>
+    <div id="batalha" class="inim-grid"></div>
+    <div id="batalhaVazio" style="font-size:.85rem;color:var(--tinta-suave);font-style:italic">Nenhum inimigo em batalha. Mande alguém do <b>Banco de inimigos</b> (abaixo do quadro). ↓</div>
   </div>
 
   <div class="painel" id="imagensSec" style="margin-top:14px">
@@ -279,6 +279,12 @@
     </div>
     <div class="canvas-wrap"><canvas id="tela" width="900" height="480"></canvas></div>
     <div id="canvasNota">Somente o Mestre desenha; vocês veem em tempo real.</div>
+  </div>
+
+  <div class="painel" id="inimigosSec" style="display:none;margin-top:14px">
+    <h3>Banco de inimigos <span class="tagm">só o Mestre vê</span></h3>
+    <div id="inimigos" class="inim-grid"></div>
+    <button class="mini brasa" style="margin-top:10px" onclick="addInimigo()">+ Novo inimigo</button>
   </div>
 
 </div>
@@ -422,7 +428,7 @@ async function saveRemote(){
   if(!online){ atualizaSync(); return; }
   const p={pin:state.pin,updated:state.updated,updatedBy:state.updatedBy,notasMestre:state.notasMestre||"",chars:{},inimigos:{},imagens:(state.imagens||["","","",""]).slice(0,4),seedInim:(state.seedInim||[])};
   state.chars.forEach(c=>{ p.chars[c.id]={id:c.id,ord:c.ord||0,nome:c.nome||"",cl:c.cl||"",cor:c.cor||"#4a3d2c",conjura:c.conjura||null,pericias:c.pericias||[],expert:c.expert||[],assin:{nome:(c.assin&&c.assin.nome)||"",txt:(c.assin&&c.assin.txt)||""},pvAtual:c.pvAtual,pvMax:c.pvMax,ca:c.ca,cond:c.cond||"",notas:c.notas||"",attrs:Object.assign({},c.attrs),armas:c.armas||"",objetos:c.objetos||""}; });
-  state.inimigos.forEach(e=>{ p.inimigos[e.id]={id:e.id,ord:e.ord||0,nome:e.nome||"",ca:e.ca||10,pvMax:e.pvMax||1,pvAtual:e.pvAtual||0,cond:e.cond||"",attrs:Object.assign({},e.attrs),ataques:e.ataques||"",tracos:e.tracos||""}; });
+  state.inimigos.forEach(e=>{ p.inimigos[e.id]={id:e.id,ord:e.ord||0,nome:e.nome||"",ca:e.ca||10,pvMax:e.pvMax||1,pvAtual:e.pvAtual||0,cond:e.cond||"",attrs:Object.assign({},e.attrs),ataques:e.ataques||"",tracos:e.tracos||"",emBatalha:!!e.emBatalha}; });
   try{ await salaRef.update(p); }catch(e){ console.error(e); flash("Erro ao salvar"); }
   atualizaSync();
 }
@@ -452,7 +458,7 @@ function aplicaRemoto(r){
       id:e.id||("e"+Math.random()), ord:e.ord||0, nome:e.nome||"", ca:(typeof e.ca==="number"?e.ca:10),
       pvMax:(typeof e.pvMax==="number"?e.pvMax:1), pvAtual:(typeof e.pvAtual==="number"?e.pvAtual:(e.pvMax||1)),
       cond:e.cond||"", attrs:Object.assign({FOR:10,DES:10,CON:10,INT:10,SAB:10,CAR:10},e.attrs||{}),
-      ataques:e.ataques||"", tracos:e.tracos||"" })).sort((a,b)=>(a.ord||0)-(b.ord||0)); }
+      ataques:e.ataques||"", tracos:e.tracos||"", emBatalha:!!e.emBatalha })).sort((a,b)=>(a.ord||0)-(b.ord||0)); }
   if(r.imagens){ state.imagens=[0,1,2,3].map(i=>{ const u=r.imagens[i]; return (typeof u==="string")?u:""; }); }
   if(r.seedInim){ state.seedInim=Array.isArray(r.seedInim)?r.seedInim.slice():Object.values(r.seedInim); }
   syncNotasUI();
@@ -598,19 +604,27 @@ function enemyCardHTML(e){
       <div class="attrs">${attrsHTML}</div>
       <div class="campo"><label class="lbl-forte">Ataques</label><textarea class="ilive" data-id="${e.id}" data-f="ataques" style="min-height:58px">${esc(e.ataques)}</textarea></div>
       <div class="campo"><label class="lbl-forte">Traços</label><textarea class="ilive" data-id="${e.id}" data-f="tracos" style="min-height:58px">${esc(e.tracos)}</textarea></div>
+      <button class="mini ${e.emBatalha?'':'brasa'}" style="width:100%;margin-top:2px" onclick="toggleBatalha('${e.id}')">${e.emBatalha?'↩ Tirar da batalha':'⚔ Mandar para batalha'}</button>
     </div>
   </div>`;
 }
-function renderInimigos(){
-  const cont=$("inimigos"); if(!cont)return;
-  if(!gm){ cont.innerHTML=""; return; }
-  cont.innerHTML=(state.inimigos||[]).map(enemyCardHTML).join("");
+function renderEnemyCards(cont,list){
+  cont.innerHTML=list.map(enemyCardHTML).join("");
   cont.querySelectorAll(".ilive").forEach(el=>{
-    const commit=()=>commitInim(el);
-    el.addEventListener("change",()=>{ commit(); if(el.dataset.attr||el.dataset.f==="pvMax"||el.dataset.f==="ca") renderInimigos(); });
-    el.addEventListener("blur",commit);
+    el.addEventListener("change",()=>{ commitInim(el); if(el.dataset.attr||el.dataset.f==="pvMax"||el.dataset.f==="ca") renderInimigos(); });
+    el.addEventListener("blur",()=>commitInim(el));
   });
 }
+function renderInimigos(){
+  const bench=$("inimigos"), batalha=$("batalha"), vazio=$("batalhaVazio");
+  if(!gm){ if(bench)bench.innerHTML=""; if(batalha)batalha.innerHTML=""; return; }
+  const arr=state.inimigos||[];
+  const emB=arr.filter(e=>e.emBatalha), fora=arr.filter(e=>!e.emBatalha);
+  if(bench) renderEnemyCards(bench,fora);
+  if(batalha) renderEnemyCards(batalha,emB);
+  if(vazio) vazio.style.display=emB.length?"none":"block";
+}
+function toggleBatalha(id){ const e=(state.inimigos||[]).find(x=>x.id===id); if(!e)return; e.emBatalha=!e.emBatalha; renderInimigos(); popularRolador(); saveRemote(); }
 function commitInim(el){
   const e=(state.inimigos||[]).find(x=>x.id===el.dataset.id); if(!e)return;
   if(el.dataset.attr){ let v=parseInt(el.value)||0; v=Math.max(1,Math.min(30,v)); e.attrs[el.dataset.attr]=v; saveRemote(); return; }
@@ -657,7 +671,7 @@ function renderLogSnap(val){ if(!val){ $("log").innerHTML=""; return; } const ar
 function pushRoll(e){ if(online&&rollsRef){ rollsRef.push(e); } else { localRolls.push(e); if(localRolls.length>80)localRolls=localRolls.slice(-80); renderLogArr(localRolls); } }
 function limparRolls(){ if(online&&rollsRef){ rollsRef.remove(); } else { localRolls=[]; renderLogArr([]); } }
 function entidadeAtiva(){ if(!gm) return charAtual(); const s=$("selRolador"), v=s?s.value:""; if(v==="__mestre__") return {mestre:true,nome:"Mestre"}; let e=state.chars.find(c=>c.id===v); if(!e)e=(state.inimigos||[]).find(x=>x.id===v); return e||charAtual(); }
-function popularRolador(){ const s=$("selRolador"); if(!s)return; const prev=s.value; let html=state.chars.map(c=>`<option value="${c.id}">${esc(c.nome)}</option>`).join(""); if(gm){ html+=`<option value="__mestre__">— Mestre (rolagem simples) —</option>`; if((state.inimigos||[]).length) html+=`<optgroup label="Inimigos">`+state.inimigos.map(e=>`<option value="${e.id}">${esc(e.nome)}</option>`).join("")+`</optgroup>`; } s.innerHTML=html; if(prev && Array.from(s.options).some(o=>o.value===prev)) s.value=prev; else s.value=atual; }
+function popularRolador(){ const s=$("selRolador"); if(!s)return; const prev=s.value; let html=state.chars.map(c=>`<option value="${c.id}">${esc(c.nome)}</option>`).join(""); if(gm){ html+=`<option value="__mestre__">— Mestre (rolagem simples) —</option>`; const emB=(state.inimigos||[]).filter(e=>e.emBatalha); if(emB.length) html+=`<optgroup label="Em batalha">`+emB.map(e=>`<option value="${e.id}">${esc(e.nome)}</option>`).join("")+`</optgroup>`; } s.innerHTML=html; if(prev && Array.from(s.options).some(o=>o.value===prev)) s.value=prev; else s.value=atual; }
 function rolarPuro(sides){ const m=parseInt($("modMan").value)||0; let r; if(sides===20){ r=d20adv(); } else { const a=d(sides); r={v:a,rolls:[a]}; } const advtxt=(sides===20&&adv!=="none")?(" ("+(adv==="adv"?"vantagem":"desvantagem")+")"):""; mostra("d"+sides+advtxt,r,m,entidadeAtiva().nome); }
 function profDe(c,skill){ if(c.expert&&c.expert.indexOf(skill)>=0)return PROF*2; if(c.pericias&&c.pericias.indexOf(skill)>=0)return PROF; return 0; }
 function popularTestes(){ const s=$("selTeste"), prev=s.value; let html=""; for(const k in ATRIBS) html+=`<option value="attr:${k}">Teste de ${ATRIBS[k]} (${k})</option>`; const c=entidadeAtiva(); Object.keys(SKILLS).forEach(sk=>{ const p=profDe(c,sk); const mk=p>=PROF*2?" ✦✦":p>=PROF?" ✦":""; html+=`<option value="skill:${sk}">${sk} (${SKILLS[sk]})${mk}</option>`; }); s.innerHTML=html; s.value=prev||"skill:Percepção"; if(!s.value)s.value="skill:Percepção"; }
@@ -695,7 +709,7 @@ function attachCanvas(){
   tela.addEventListener("pointerup",fimTraco); tela.addEventListener("pointercancel",fimTraco);
   $("brush").addEventListener("input",e=>{ brush=parseInt(e.target.value)||3; });
 }
-function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; const rt=$("rollTools"); if(rt)rt.style.display=gm?"block":"none"; const isec=$("inimigosSec"); if(isec)isec.style.display=gm?"block":"none"; const rw=$("roladorWrap"); if(rw)rw.style.display=gm?"flex":"none"; const bn=$("btnNovoHeroi"); if(bn)bn.style.display=gm?"inline-block":"none"; syncNotasUI(); }
+function atualizaExtra(){ const cc=$("canvasCtrl"); if(cc)cc.style.display=gm?"flex":"none"; const cn=$("canvasNota"); if(cn)cn.textContent=gm?"Você desenha; os jogadores veem em tempo real.":"Somente o Mestre desenha; vocês veem em tempo real."; if(tela)tela.style.cursor=gm?"crosshair":"default"; const rt=$("rollTools"); if(rt)rt.style.display=gm?"block":"none"; const isec=$("inimigosSec"); if(isec)isec.style.display=gm?"block":"none"; const bsec=$("batalhaSec"); if(bsec)bsec.style.display=gm?"block":"none"; const rw=$("roladorWrap"); if(rw)rw.style.display=gm?"flex":"none"; const bn=$("btnNovoHeroi"); if(bn)bn.style.display=gm?"inline-block":"none"; syncNotasUI(); }
 
 $("btnMestre").addEventListener("click",()=>{ if(gm){ gm=false; setModo(); render(); flash("Modo jogador"); return; } const p=prompt("Digite o PIN do Mestre:"); if(p===null)return; if(p===state.pin){ gm=true; setModo(); render(); if(online){ saveRemote(); semearInimigos(); } flash("Modo Mestre ativado"); } else alert("PIN incorreto."); });
 $("btnPin").addEventListener("click",async()=>{ const n=prompt("Novo PIN do Mestre:",state.pin); if(n&&n.trim()){ state.pin=n.trim(); await saveRemote(); flash("PIN atualizado"); } });
